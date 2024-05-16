@@ -1,10 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { TokenType } from 'constants/auth';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SignUpRequestDto } from './dto';
+import { LoginRequestDto, SignUpRequestDto } from './dto';
 import { ITokenPayload } from './interfaces';
 
 @Injectable()
@@ -37,7 +41,6 @@ export class AuthService {
         },
       });
 
-      // Generate tokens
       const tokens = await this.signTokens({
         sub: newUser.id,
         email: newUser.email,
@@ -56,6 +59,40 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException('Error creating user');
     }
+  }
+
+  async login(dto: LoginRequestDto) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email: dto.email,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Wrong email or password');
+    }
+
+    const passwordMatch = await argon.verify(user.password, dto.password);
+
+    if (!passwordMatch) {
+      throw new UnauthorizedException('Wrong email or password');
+    }
+
+    const tokens = await this.signTokens({
+      sub: user.id,
+      email: user.email,
+    });
+
+    return {
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+    };
   }
 
   async generateJwtToken(
