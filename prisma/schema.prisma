@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(user)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Order     Order[]
+
+  @@map("users")
+}
+
+model Book {
+  id                 Int            @id @default(autoincrement())
+  slug               String         @unique
+  name               String
+  description        String
+  image              String
+  price              Float
+  discountPrice      Float
+  discountPercentage Float
+  authorId           Int            @map("author_id")
+  promotionListId    Int?           @map("promotion_list_id")
+  totalStars         Float
+  totalReviews       Int
+  availableQuantity  Int
+  soldQuantity       Int
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  author             Author         @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author")
+  promotionList      PromotionList? @relation(fields: [promotionListId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_book_promotion_list")
+  bookAuthor         BookAuthor[]
+  BookCategory       BookCategory[]
+  RatingReview       RatingReview[]
+  OrderItem          OrderItem[]
+
+  @@map("books")
+}
+
+model Author {
+  id         Int          @id @default(autoincrement())
+  name       String
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  books      Book[]
+  bookAuthor BookAuthor[]
+
+  @@map("authors")
+}
+
+model BookAuthor {
+  bookId   Int    @map("book_id")
+  authorId Int    @map("author_id")
+  book     Book   @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author_book")
+  author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author_author")
+
+  @@id([bookId, authorId])
+  @@map("book_author")
+}
+
+model Category {
+  id           Int            @id @default(autoincrement())
+  name         String
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+  BookCategory BookCategory[]
+
+  @@map("categories")
+}
+
+model BookCategory {
+  bookId     Int      @map("book_id")
+  categoryId Int      @map("category_id")
+  book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_category_book")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_category_category")
+
+  @@id([bookId, categoryId])
+  @@map("book_category")
+}
+
+model RatingReview {
+  id        Int      @id @default(autoincrement())
+  bookId    Int      @map("book_id")
+  star      Int
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_rating_review_book")
+
+  @@map("rating_reviews")
+}
+
+model PromotionList {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  Book      Book[]
+
+  @@map("promotion_lists")
+}
+
+model Order {
+  id         String      @id @default(uuid())
+  userId     String      @map("user_id")
+  status     OrderStatus
+  totalPrice Float
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_user")
+  OrderItem  OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String   @map("order_id")
+  bookId    Int      @map("book_id")
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_item_order")
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_item_book")
+
+  @@map("order_items")
+}
+
+enum UserRole {
+  admin
+  user
+}
+
+enum OrderStatus {
+  pending
+  processing
+  completed
+  cancelled
+}
