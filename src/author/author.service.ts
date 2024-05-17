@@ -1,10 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthorPageOptionsDto } from './dto';
+import { AuthorPageOptionsDto, CreateAuthorDto } from './dto';
 
 @Injectable()
 export class AuthorService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async createAuthor(dto: CreateAuthorDto) {
+    try {
+      const author = await this.prismaService.author.create({
+        data: {
+          name: dto.name,
+        },
+      });
+
+      return author;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException({
+        message: 'Failed to create author',
+      });
+    }
+  }
 
   async getAuthors(dto: AuthorPageOptionsDto) {
     const conditions = {
