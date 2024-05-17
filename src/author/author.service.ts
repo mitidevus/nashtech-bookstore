@@ -1,6 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthorPageOptionsDto, CreateAuthorDto } from './dto';
+import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
 
 @Injectable()
 export class AuthorService {
@@ -55,5 +59,37 @@ export class AuthorService {
       totalPages: Math.ceil(totalCount / dto.take),
       totalCount,
     };
+  }
+
+  async updateAuthor(id: number, dto: UpdateAuthorDto) {
+    const author = await this.prismaService.author.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!author) {
+      throw new NotFoundException({
+        message: 'Author not found',
+      });
+    }
+
+    try {
+      const updatedAuthor = await this.prismaService.author.update({
+        where: {
+          id,
+        },
+        data: {
+          name: dto.name,
+        },
+      });
+
+      return updatedAuthor;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException({
+        message: 'Failed to update author',
+      });
+    }
   }
 }
