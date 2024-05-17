@@ -40,7 +40,7 @@ export class BookService {
 
       return result;
     } catch (error) {
-      console.log(error);
+      console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to create book',
       });
