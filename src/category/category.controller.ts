@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -40,5 +41,12 @@ export class CategoryController {
     @Body() dto: UpdateCategoryDto,
   ) {
     return await this.categoryService.updateCategory(id, dto);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':id')
+  async deleteCategory(@Param('id', ParseIntPipe) id: number) {
+    return await this.categoryService.deleteCategory(id);
   }
 }

@@ -71,7 +71,7 @@ export class CategoryService {
 
     if (!category) {
       throw new NotFoundException({
-        message: 'category not found',
+        message: 'Category not found',
       });
     }
 
@@ -90,6 +90,37 @@ export class CategoryService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to update category',
+      });
+    }
+  }
+
+  async deleteCategory(id: number) {
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException({
+        message: 'Category not found',
+      });
+    }
+
+    try {
+      await this.prismaService.category.delete({
+        where: {
+          id,
+        },
+      });
+
+      return {
+        message: 'Deleted category successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to delete category',
       });
     }
   }
