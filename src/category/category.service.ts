@@ -4,30 +4,31 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
+import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
-export class AuthorService {
+export class CategoryService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createAuthor(dto: CreateAuthorDto) {
+  async createCategory(dto: CreateCategoryDto) {
     try {
-      const author = await this.prismaService.author.create({
+      const category = await this.prismaService.category.create({
         data: {
           ...dto,
         },
       });
 
-      return author;
+      return category;
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
-        message: 'Failed to create author',
+        message: 'Failed to create category',
       });
     }
   }
 
-  async getAuthors(dto: AuthorPageOptionsDto) {
+  async getCategories(dto: CategoryPageOptionsDto) {
     const conditions = {
       orderBy: [
         {
@@ -44,38 +45,38 @@ export class AuthorService {
           }
         : undefined;
 
-    const [authors, totalCount] = await Promise.all([
-      this.prismaService.author.findMany({
+    const [categories, totalCount] = await Promise.all([
+      this.prismaService.category.findMany({
         ...conditions,
         ...pageOption,
       }),
-      this.prismaService.author.count({
+      this.prismaService.category.count({
         ...conditions,
       }),
     ]);
 
     return {
-      data: authors,
+      data: categories,
       totalPages: Math.ceil(totalCount / dto.take),
       totalCount,
     };
   }
 
-  async updateAuthor(id: number, dto: UpdateAuthorDto) {
-    const author = await this.prismaService.author.findUnique({
+  async updateCategory(id: number, dto: UpdateCategoryDto) {
+    const category = await this.prismaService.category.findUnique({
       where: {
         id,
       },
     });
 
-    if (!author) {
+    if (!category) {
       throw new NotFoundException({
-        message: 'Author not found',
+        message: 'Category not found',
       });
     }
 
     try {
-      const updatedAuthor = await this.prismaService.author.update({
+      const updatedCategory = await this.prismaService.category.update({
         where: {
           id,
         },
@@ -84,42 +85,42 @@ export class AuthorService {
         },
       });
 
-      return updatedAuthor;
+      return updatedCategory;
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
-        message: 'Failed to update author',
+        message: 'Failed to update category',
       });
     }
   }
 
-  async deleteAuthor(id: number) {
-    const author = await this.prismaService.author.findUnique({
+  async deleteCategory(id: number) {
+    const category = await this.prismaService.category.findUnique({
       where: {
         id,
       },
     });
 
-    if (!author) {
+    if (!category) {
       throw new NotFoundException({
-        message: 'Author not found',
+        message: 'Category not found',
       });
     }
 
     try {
-      await this.prismaService.author.delete({
+      await this.prismaService.category.delete({
         where: {
           id,
         },
       });
 
       return {
-        message: 'Deleted author successfully',
+        message: 'Deleted category successfully',
       };
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
-        message: 'Failed to delete author',
+        message: 'Failed to delete category',
       });
     }
   }
