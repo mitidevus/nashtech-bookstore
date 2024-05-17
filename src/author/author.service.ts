@@ -14,7 +14,7 @@ export class AuthorService {
     try {
       const author = await this.prismaService.author.create({
         data: {
-          name: dto.name,
+          ...dto,
         },
       });
 
