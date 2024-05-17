@@ -1,0 +1,40 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Book {
+  id: ID!
+  slug: String!
+  name: String!
+  description: String!
+  image: String!
+  price: Float!
+  discountPrice: Float!
+  discountPercentage: Float!
+  totalStars: Float!
+  totalReviews: Int!
+  soldQuantity: Int!
+  promotionListId: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  books: [Book!]!
+}
+
+type Mutation {
+  createBook(data: CreateBookInput!): Book!
+}
+
+input CreateBookInput {
+  name: String!
+  description: String!
+  image: String!
+  price: Float!
+}
