@@ -1,6 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoryService {
@@ -45,7 +50,7 @@ export class CategoryService {
         ...conditions,
         ...pageOption,
       }),
-      this.prismaService.author.count({
+      this.prismaService.category.count({
         ...conditions,
       }),
     ]);
@@ -55,5 +60,37 @@ export class CategoryService {
       totalPages: Math.ceil(totalCount / dto.take),
       totalCount,
     };
+  }
+
+  async updateCategory(id: number, dto: UpdateCategoryDto) {
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException({
+        message: 'category not found',
+      });
+    }
+
+    try {
+      const updatedCategory = await this.prismaService.category.update({
+        where: {
+          id,
+        },
+        data: {
+          name: dto.name,
+        },
+      });
+
+      return updatedCategory;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to update category',
+      });
+    }
   }
 }
