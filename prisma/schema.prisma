@@ -23,24 +23,21 @@ model User {
 
 model Book {
   id                 Int            @id @default(autoincrement())
-  slug               String         @unique
+  slug               String?        @unique
   name               String
   description        String
   image              String
   price              Float
   discountPrice      Float
   discountPercentage Float
-  authorId           Int            @map("author_id")
-  promotionListId    Int?           @map("promotion_list_id")
   totalStars         Float
   totalReviews       Int
-  availableQuantity  Int
   soldQuantity       Int
   createdAt          DateTime       @default(now()) @map("created_at")
   updatedAt          DateTime       @updatedAt @map("updated_at")
-  author             Author         @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author")
+  promotionListId    Int?           @map("promotion_list_id")
   promotionList      PromotionList? @relation(fields: [promotionListId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_book_promotion_list")
-  bookAuthor         BookAuthor[]
+  BookAuthor         BookAuthor[]
   BookCategory       BookCategory[]
   RatingReview       RatingReview[]
   OrderItem          OrderItem[]
@@ -53,8 +50,7 @@ model Author {
   name       String
   createdAt  DateTime     @default(now()) @map("created_at")
   updatedAt  DateTime     @updatedAt @map("updated_at")
-  books      Book[]
-  bookAuthor BookAuthor[]
+  BookAuthor BookAuthor[]
 
   @@map("authors")
 }
