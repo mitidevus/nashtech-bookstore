@@ -1,17 +1,15 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
-import { Roles } from 'src/auth/decorator';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { AuthorService } from './author.service';
+import { AuthorPageOptionsDto } from './dto';
 
 @Controller('authors')
 export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
 
   @UseGuards(JwtGuard, RolesGuard)
-  @Roles(UserRole.admin)
   @Get()
-  getAuthors() {
-    return this.authorService.getAuthors();
+  getAuthors(@Query() dto: AuthorPageOptionsDto) {
+    return this.authorService.getAuthors(dto);
   }
 }
