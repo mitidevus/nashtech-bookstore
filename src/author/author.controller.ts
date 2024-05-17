@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -39,5 +40,12 @@ export class AuthorController {
     @Body() dto: UpdateAuthorDto,
   ) {
     return await this.authorService.updateAuthor(id, dto);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':id')
+  async deleteAuthor(@Param('id', ParseIntPipe) id: number) {
+    return await this.authorService.deleteAuthor(id);
   }
 }

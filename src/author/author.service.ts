@@ -20,7 +20,7 @@ export class AuthorService {
 
       return author;
     } catch (error) {
-      console.log(error);
+      console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to create author',
       });
@@ -86,9 +86,40 @@ export class AuthorService {
 
       return updatedAuthor;
     } catch (error) {
-      console.log(error);
+      console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to update author',
+      });
+    }
+  }
+
+  async deleteAuthor(id: number) {
+    const author = await this.prismaService.author.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!author) {
+      throw new NotFoundException({
+        message: 'Author not found',
+      });
+    }
+
+    try {
+      await this.prismaService.author.delete({
+        where: {
+          id,
+        },
+      });
+
+      return {
+        message: 'Deleted author successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to delete author',
       });
     }
   }
