@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -16,6 +17,9 @@ export class CategoryService {
       const category = await this.prismaService.category.create({
         data: {
           ...dto,
+          slug: slugify(dto.name, {
+            lower: true,
+          }),
         },
       });
 

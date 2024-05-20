@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
 
@@ -15,6 +16,9 @@ export class AuthorService {
       const author = await this.prismaService.author.create({
         data: {
           ...dto,
+          slug: slugify(dto.name, {
+            lower: true,
+          }),
         },
       });
 
