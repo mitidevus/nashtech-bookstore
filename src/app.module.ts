@@ -7,6 +7,7 @@ import { AuthorModule } from './author/author.module';
 import { BookModule } from './book/book.module';
 import { CategoryModule } from './category/category.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { PromotionListModule } from './promotion-list/promotion-list.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AuthModule,
     BookModule,
     CategoryModule,
+    PromotionListModule,
   ],
 })
 export class AppModule {}
