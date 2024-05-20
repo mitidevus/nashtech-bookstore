@@ -3,6 +3,7 @@ import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookInput } from './dto';
 import { FindAllBooksInput } from './dto/find-all-books.dto';
+import { UpdateBookInput } from './dto/update-book.dto';
 
 @Injectable()
 export class BookService {
@@ -85,10 +86,6 @@ export class BookService {
               })),
             },
           },
-          include: {
-            authors: true,
-            categories: true,
-          },
         });
 
         const slug = `${slugify(dto.name, { lower: true })}_${newBook.id}`;
@@ -126,6 +123,106 @@ export class BookService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to create book',
+      });
+    }
+  }
+
+  async updateBook(id: number, dto: UpdateBookInput) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    // Check if list of categories and authors are exist
+    if (dto.categoryIds && dto.categoryIds.length > 0) {
+      const categories = await this.prismaService.category.findMany({
+        where: { id: { in: dto.categoryIds } },
+      });
+
+      if (categories.length !== dto.categoryIds.length) {
+        throw new BadRequestException('Invalid category');
+      }
+    }
+
+    if (dto.authorIds && dto.authorIds.length > 0) {
+      const authors = await this.prismaService.author.findMany({
+        where: { id: { in: dto.authorIds } },
+      });
+
+      if (authors.length !== dto.authorIds.length) {
+        throw new BadRequestException('Invalid author');
+      }
+    }
+
+    try {
+      const result = await this.prismaService.$transaction(async (tx) => {
+        if (dto.categoryIds && dto.categoryIds.length > 0) {
+          await tx.bookCategory.deleteMany({
+            where: { bookId: id },
+          });
+
+          await tx.bookCategory.createMany({
+            data: dto.categoryIds.map((categoryId) => ({
+              bookId: id,
+              categoryId,
+            })),
+          });
+        }
+
+        if (dto.authorIds && dto.authorIds.length > 0) {
+          await tx.bookAuthor.deleteMany({
+            where: { bookId: id },
+          });
+
+          await tx.bookAuthor.createMany({
+            data: dto.authorIds.map((authorId) => ({
+              bookId: id,
+              authorId,
+            })),
+          });
+        }
+
+        const updatedBook = await tx.book.update({
+          where: { id },
+          data: {
+            name: dto.name,
+            description: dto.description,
+            image: dto.image,
+            price: dto.price,
+          },
+          include: {
+            categories: {
+              select: {
+                category: true,
+              },
+            },
+            authors: {
+              select: {
+                author: true,
+              },
+            },
+          },
+        });
+
+        return updatedBook;
+      });
+
+      const categories = result.categories.map((item) => item.category);
+
+      const authors = result.authors.map((item) => item.author);
+
+      return {
+        ...result,
+        categories,
+        authors,
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to update book',
       });
     }
   }

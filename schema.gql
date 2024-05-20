@@ -63,6 +63,7 @@ enum Order {
 
 type Mutation {
   createBook(input: CreateBookInput!): Book!
+  updateBook(id: Int!, input: UpdateBookInput!): Book!
 }
 
 input CreateBookInput {
@@ -72,4 +73,13 @@ input CreateBookInput {
   price: Float!
   categoryIds: [Int!]!
   authorIds: [Int!]!
+}
+
+input UpdateBookInput {
+  name: String
+  description: String
+  image: String
+  price: Float
+  categoryIds: [Int!]
+  authorIds: [Int!]
 }
