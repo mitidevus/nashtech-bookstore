@@ -2,13 +2,44 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookInput } from './dto';
+import { FindAllBooksInput } from './dto/find-all-books.dto';
 
 @Injectable()
 export class BookService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getBooks() {
-    return await this.prismaService.book.findMany();
+  async getBooks(dto: FindAllBooksInput) {
+    const conditions = {
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: books,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
   }
 
   async createBook(dto: CreateBookInput) {

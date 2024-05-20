@@ -40,12 +40,29 @@ type Book {
   authors: [Author!]!
 }
 
+type BookList {
+  data: [Book!]!
+  totalPages: Int!
+  totalCount: Int!
+}
+
 type Query {
-  books: [Book!]!
+  books(input: FindAllBooksInput!): BookList!
+}
+
+input FindAllBooksInput {
+  order: Order = DESC
+  page: Int
+  take: Int
+}
+
+enum Order {
+  ASC
+  DESC
 }
 
 type Mutation {
-  createBook(data: CreateBookInput!): Book!
+  createBook(input: CreateBookInput!): Book!
 }
 
 input CreateBookInput {

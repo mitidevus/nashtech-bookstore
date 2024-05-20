@@ -52,3 +52,15 @@ export class Book {
   @Field(() => [Author])
   authors: Author[];
 }
+
+@ObjectType('BookList')
+export class BookList {
+  @Field(() => [Book])
+  data: Book[];
+
+  @Field(() => Int)
+  totalPages: number;
+
+  @Field(() => Int)
+  totalCount: number;
+}
