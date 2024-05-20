@@ -1,5 +1,5 @@
-import { Field, Float, InputType } from '@nestjs/graphql';
-import { IsNumber, IsString } from 'class-validator';
+import { Field, Float, InputType, Int } from '@nestjs/graphql';
+import { ArrayMinSize, IsArray, IsNumber, IsString } from 'class-validator';
 
 @InputType()
 export class CreateBookInput {
@@ -18,4 +18,14 @@ export class CreateBookInput {
   @Field(() => Float)
   @IsNumber()
   price: number;
+
+  @Field(() => [Int])
+  @IsArray()
+  @ArrayMinSize(1)
+  categoryIds: number[];
+
+  @Field(() => [Int])
+  @IsArray()
+  @ArrayMinSize(1)
+  authorIds: number[];
 }
