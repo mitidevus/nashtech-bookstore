@@ -74,23 +74,22 @@ export class BookService {
             totalStars: 0,
             totalReviews: 0,
             soldQuantity: 0,
+            categories: {
+              create: dto.categoryIds.map((categoryId) => ({
+                categoryId,
+              })),
+            },
+            authors: {
+              create: dto.authorIds.map((authorId) => ({
+                authorId,
+              })),
+            },
+          },
+          include: {
+            authors: true,
+            categories: true,
           },
         });
-
-        const bookCategoriesData = dto.categoryIds.map((categoryId) => ({
-          bookId: newBook.id,
-          categoryId,
-        }));
-
-        const bookAuthorsData = dto.authorIds.map((authorId) => ({
-          bookId: newBook.id,
-          authorId,
-        }));
-
-        await Promise.all([
-          tx.bookCategory.createMany({ data: bookCategoriesData }),
-          tx.bookAuthor.createMany({ data: bookAuthorsData }),
-        ]);
 
         const slug = `${slugify(dto.name, { lower: true })}_${newBook.id}`;
 
@@ -98,12 +97,12 @@ export class BookService {
           where: { id: newBook.id },
           data: { slug },
           include: {
-            BookAuthor: {
+            authors: {
               select: {
                 author: true,
               },
             },
-            BookCategory: {
+            categories: {
               select: {
                 category: true,
               },
@@ -114,9 +113,9 @@ export class BookService {
         return updatedBook;
       });
 
-      const categories = result.BookCategory.map((item) => item.category);
+      const categories = result.categories.map((item) => item.category);
 
-      const authors = result.BookAuthor.map((item) => item.author);
+      const authors = result.authors.map((item) => item.author);
 
       return {
         ...result,
