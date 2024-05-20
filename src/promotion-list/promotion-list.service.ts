@@ -174,6 +174,8 @@ export class PromotionListService {
           },
           data: {
             promotionListId: null,
+            discountPrice: 0,
+            discountPercentage: 0,
           },
         }),
         this.prismaService.promotionList.delete({
