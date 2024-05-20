@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePromotionListDto } from './dto';
+import { CreatePromotionListDto, PromotionListPageOptionsDto } from './dto';
 
 @Injectable()
 export class PromotionListService {
@@ -42,5 +42,39 @@ export class PromotionListService {
         message: 'Failed to create promotion list',
       });
     }
+  }
+
+  async getPromotionLists(dto: PromotionListPageOptionsDto) {
+    const conditions = {
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [promotionLists, totalCount] = await Promise.all([
+      this.prismaService.promotionList.findMany({
+        ...conditions,
+        ...pageOption,
+      }),
+      this.prismaService.promotionList.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: promotionLists,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
   }
 }
