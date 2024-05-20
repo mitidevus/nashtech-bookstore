@@ -13,6 +13,18 @@ export class CategoryService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createCategory(dto: CreateCategoryDto) {
+    const categoryExist = await this.prismaService.category.findFirst({
+      where: {
+        name: dto.name,
+      },
+    });
+
+    if (categoryExist) {
+      throw new BadRequestException({
+        message: 'Category already exists',
+      });
+    }
+
     try {
       const category = await this.prismaService.category.create({
         data: {
