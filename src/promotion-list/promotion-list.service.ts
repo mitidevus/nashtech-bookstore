@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePromotionListDto, PromotionListPageOptionsDto } from './dto';
+import {
+  CreatePromotionListDto,
+  PromotionListPageOptionsDto,
+  UpdatePromotionListDto,
+} from './dto';
 
 @Injectable()
 export class PromotionListService {
@@ -95,5 +99,60 @@ export class PromotionListService {
     }
 
     return promotionList;
+  }
+
+  async updatePromotionList(id: number, dto: UpdatePromotionListDto) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const promotionListExist = await this.prismaService.promotionList.findFirst(
+      {
+        where: {
+          name: dto.name,
+          NOT: {
+            id,
+          },
+        },
+      },
+    );
+
+    if (promotionListExist) {
+      throw new BadRequestException({
+        message: 'Promotion list already exists',
+      });
+    }
+
+    try {
+      const promotionList = await this.prismaService.promotionList.update({
+        where: {
+          id,
+        },
+        data: {
+          ...dto,
+          slug: slugify(dto.name, {
+            lower: true,
+          }),
+        },
+        include: {
+          books: true,
+        },
+      });
+
+      return promotionList;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to update promotion list',
+      });
+    }
   }
 }

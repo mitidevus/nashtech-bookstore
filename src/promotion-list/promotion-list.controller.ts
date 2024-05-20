@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -11,7 +12,11 @@ import {
 import { UserRole } from '@prisma/client';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-import { CreatePromotionListDto, PromotionListPageOptionsDto } from './dto';
+import {
+  CreatePromotionListDto,
+  PromotionListPageOptionsDto,
+  UpdatePromotionListDto,
+} from './dto';
 import { PromotionListService } from './promotion-list.service';
 
 @Controller('promotion-lists')
@@ -33,5 +38,15 @@ export class PromotionListController {
   @Get(':id')
   getPromotionList(@Param('id', ParseIntPipe) id: number) {
     return this.promotionListService.getPromotionList(id);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Patch(':id')
+  async updatePromotionList(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePromotionListDto,
+  ) {
+    return await this.promotionListService.updatePromotionList(id, dto);
   }
 }
