@@ -64,6 +64,7 @@ enum Order {
 type Mutation {
   createBook(input: CreateBookInput!): Book!
   updateBook(id: Int!, input: UpdateBookInput!): Book!
+  deleteBook(id: Int!): [Book!]!
 }
 
 input CreateBookInput {

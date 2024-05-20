@@ -226,4 +226,39 @@ export class BookService {
       });
     }
   }
+
+  async deleteBook(id: number) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    try {
+      const result = await this.prismaService.$transaction(async (tx) => {
+        await tx.bookCategory.deleteMany({
+          where: { bookId: id },
+        });
+
+        await tx.bookAuthor.deleteMany({
+          where: { bookId: id },
+        });
+
+        await tx.book.delete({
+          where: { id },
+        });
+
+        return tx.book.findMany();
+      });
+
+      return result;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to delete book',
+      });
+    }
+  }
 }
