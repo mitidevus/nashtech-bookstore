@@ -77,4 +77,23 @@ export class PromotionListService {
       totalCount,
     };
   }
+
+  async getPromotionList(id: number) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        books: true,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    return promotionList;
+  }
 }
