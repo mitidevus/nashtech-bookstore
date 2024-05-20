@@ -37,20 +37,21 @@ model Book {
   updatedAt          DateTime       @updatedAt @map("updated_at")
   promotionListId    Int?           @map("promotion_list_id")
   promotionList      PromotionList? @relation(fields: [promotionListId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_book_promotion_list")
-  BookAuthor         BookAuthor[]
-  BookCategory       BookCategory[]
-  RatingReview       RatingReview[]
+  authors            BookAuthor[]
+  categories         BookCategory[]
+  ratingReviews      RatingReview[]
   OrderItem          OrderItem[]
 
   @@map("books")
 }
 
 model Author {
-  id         Int          @id @default(autoincrement())
-  name       String
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
-  BookAuthor BookAuthor[]
+  id        Int          @id @default(autoincrement())
+  slug      String?      @unique
+  name      String
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  books     BookAuthor[]
 
   @@map("authors")
 }
@@ -66,11 +67,12 @@ model BookAuthor {
 }
 
 model Category {
-  id           Int            @id @default(autoincrement())
-  name         String
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  BookCategory BookCategory[]
+  id        Int            @id @default(autoincrement())
+  slug      String?        @unique
+  name      String
+  createdAt DateTime       @default(now()) @map("created_at")
+  updatedAt DateTime       @updatedAt @map("updated_at")
+  books     BookCategory[]
 
   @@map("categories")
 }
@@ -102,7 +104,7 @@ model PromotionList {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-  Book      Book[]
+  books     Book[]
 
   @@map("promotion_lists")
 }

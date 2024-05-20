@@ -1,4 +1,6 @@
 import { Field, Float, ID, Int, ObjectType } from '@nestjs/graphql';
+import { Author } from './author.model';
+import { Category } from './category.model';
 
 @ObjectType('Book')
 export class Book {
@@ -43,4 +45,22 @@ export class Book {
 
   @Field()
   updatedAt: Date;
+
+  @Field(() => [Category])
+  categories: Category[];
+
+  @Field(() => [Author])
+  authors: Author[];
+}
+
+@ObjectType('BookList')
+export class BookList {
+  @Field(() => [Book])
+  data: Book[];
+
+  @Field(() => Int)
+  totalPages: number;
+
+  @Field(() => Int)
+  totalCount: number;
 }
