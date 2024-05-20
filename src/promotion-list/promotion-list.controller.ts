@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -48,5 +49,12 @@ export class PromotionListController {
     @Body() dto: UpdatePromotionListDto,
   ) {
     return await this.promotionListService.updatePromotionList(id, dto);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':id')
+  async deletePromotionList(@Param('id', ParseIntPipe) id: number) {
+    return await this.promotionListService.deletePromotionList(id);
   }
 }

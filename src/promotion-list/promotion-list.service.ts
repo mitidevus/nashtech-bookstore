@@ -152,4 +152,45 @@ export class PromotionListService {
       });
     }
   }
+
+  async deletePromotionList(id: number) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    try {
+      await this.prismaService.$transaction([
+        this.prismaService.book.updateMany({
+          where: {
+            promotionListId: id,
+          },
+          data: {
+            promotionListId: null,
+          },
+        }),
+        this.prismaService.promotionList.delete({
+          where: {
+            id,
+          },
+        }),
+      ]);
+
+      return {
+        message: 'Deleted promotion list successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to delete promotion list',
+      });
+    }
+  }
 }
