@@ -78,13 +78,28 @@ export class AuthorService {
       });
     }
 
+    const authorExists = await this.prismaService.author.findFirst({
+      where: {
+        name: dto.name,
+      },
+    });
+
+    if (authorExists) {
+      throw new BadRequestException({
+        message: 'Author already exists',
+      });
+    }
+
     try {
       const updatedAuthor = await this.prismaService.author.update({
         where: {
           id,
         },
         data: {
-          name: dto.name,
+          ...dto,
+          slug: slugify(dto.name, {
+            lower: true,
+          }),
         },
       });
 

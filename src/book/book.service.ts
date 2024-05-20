@@ -192,6 +192,7 @@ export class BookService {
             description: dto.description,
             image: dto.image,
             price: dto.price,
+            slug: slugify(dto.name, { lower: true }),
           },
           include: {
             categories: {

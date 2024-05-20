@@ -118,9 +118,6 @@ export class PromotionListService {
       {
         where: {
           name: dto.name,
-          NOT: {
-            id,
-          },
         },
       },
     );
