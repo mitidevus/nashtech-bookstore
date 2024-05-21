@@ -386,4 +386,58 @@ export class PromotionListService {
       });
     }
   }
+
+  async removeBookFromPromoList(promoId: number, bookId: number) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id: promoId,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    if (book.promotionListId !== promoId) {
+      throw new BadRequestException({
+        message: 'Book not in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          promotionListId: null,
+          discountPercentage: 0,
+          discountPrice: 0,
+        },
+      });
+
+      return {
+        message: 'Deleted book from promotion list successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to remove book from promotion list',
+      });
+    }
+  }
 }
