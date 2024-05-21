@@ -44,22 +44,28 @@ export class BookService {
   }
 
   async createBook(dto: CreateBookInput) {
-    // Check if list of categories and authors are exist
-    const [categories, authors] = await Promise.all([
-      this.prismaService.category.findMany({
-        where: { id: { in: dto.categoryIds } },
-      }),
-      this.prismaService.author.findMany({
-        where: { id: { in: dto.authorIds } },
-      }),
-    ]);
+    const hasCategory = dto.categoryIds && dto.categoryIds.length > 0;
+    const hasAuthor = dto.authorIds && dto.authorIds.length > 0;
 
-    if (categories.length !== dto.categoryIds.length) {
-      throw new BadRequestException('Invalid category');
+    // Check if list of categories and authors are exist
+    if (hasCategory) {
+      const categories = await this.prismaService.category.findMany({
+        where: { id: { in: dto.categoryIds } },
+      });
+
+      if (categories.length !== dto.categoryIds.length) {
+        throw new BadRequestException('Invalid category');
+      }
     }
 
-    if (authors.length !== dto.authorIds.length) {
-      throw new BadRequestException('Invalid author');
+    if (hasAuthor) {
+      const authors = await this.prismaService.author.findMany({
+        where: { id: { in: dto.authorIds } },
+      });
+
+      if (authors.length !== dto.authorIds.length) {
+        throw new BadRequestException('Invalid author');
+      }
     }
 
     try {
@@ -75,18 +81,26 @@ export class BookService {
             totalStars: 0,
             totalReviews: 0,
             soldQuantity: 0,
-            categories: {
-              create: dto.categoryIds.map((categoryId) => ({
-                categoryId,
-              })),
-            },
-            authors: {
-              create: dto.authorIds.map((authorId) => ({
-                authorId,
-              })),
-            },
           },
         });
+
+        if (hasCategory) {
+          await tx.bookCategory.createMany({
+            data: dto.categoryIds.map((categoryId) => ({
+              bookId: newBook.id,
+              categoryId,
+            })),
+          });
+        }
+
+        if (hasAuthor) {
+          await tx.bookAuthor.createMany({
+            data: dto.authorIds.map((authorId) => ({
+              bookId: newBook.id,
+              authorId,
+            })),
+          });
+        }
 
         const slug = `${slugify(dto.name, { lower: true })}_${newBook.id}`;
 
