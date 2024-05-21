@@ -1,10 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { calculateDiscountedPrice } from 'src/utils/calculation';
 import {
   AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
+  UpdateBookInPromoListDto,
   UpdatePromotionListDto,
 } from './dto';
 import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
@@ -243,10 +245,10 @@ export class PromotionListService {
         data: {
           promotionListId: id,
           discountPercentage: dto.discountPercentage,
-          discountPrice:
-            Math.round(
-              (book.price - (book.price * dto.discountPercentage) / 100) * 1000,
-            ) / 1000,
+          discountPrice: calculateDiscountedPrice(
+            book.price,
+            dto.discountPercentage,
+          ),
         },
       });
 
@@ -311,5 +313,77 @@ export class PromotionListService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async updateBookInPromoList(
+    promoId: number,
+    bookId: number,
+    dto: UpdateBookInPromoListDto,
+  ) {
+    if (Object.keys(dto).length === 0) {
+      throw new BadRequestException({
+        message: 'No data provided',
+      });
+    }
+
+    if (dto.discountPercentage && !Number.isInteger(dto.discountPercentage)) {
+      throw new BadRequestException({
+        message: 'Discount percentage must be an integer',
+      });
+    }
+
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id: promoId,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    if (book.promotionListId !== promoId) {
+      throw new BadRequestException({
+        message: 'Book not in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          discountPercentage: dto.discountPercentage,
+          discountPrice: calculateDiscountedPrice(
+            book.price,
+            dto.discountPercentage,
+          ),
+        },
+      });
+
+      return {
+        message: 'Updated book in promotion list successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to update book in promotion list',
+      });
+    }
   }
 }
