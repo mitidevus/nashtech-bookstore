@@ -1,7 +1,6 @@
-import { IsOptional, IsString } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreatePromotionListDto } from './create-promotion-list.dto';
 
-export class UpdatePromotionListDto {
-  @IsString()
-  @IsOptional()
-  name?: string;
-}
+export class UpdatePromotionListDto extends PartialType(
+  CreatePromotionListDto,
+) {}
