@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PromotionListModule } from './promotion-list/promotion-list.module';
 import { RatingReviewModule } from './rating-review/rating-review.module';
 import { OrderModule } from './order/order.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { OrderModule } from './order/order.module';
     PromotionListModule,
     RatingReviewModule,
     OrderModule,
+    UserModule,
   ],
 })
 export class AppModule {}
