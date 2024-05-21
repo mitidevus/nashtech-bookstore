@@ -190,4 +190,35 @@ export class OrderService {
       },
     });
   }
+
+  async deleteOrder(id: string) {
+    const order = await this.prismaService.order.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException({
+        message: 'Order not found',
+      });
+    }
+
+    try {
+      await this.prismaService.order.delete({
+        where: {
+          id,
+        },
+      });
+
+      return {
+        message: 'Deleted order successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to delete order',
+      });
+    }
+  }
 }
