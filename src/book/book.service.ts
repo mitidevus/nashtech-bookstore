@@ -1,7 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateBookInput, FindAllBooksInput, UpdateBookInput } from './dto';
+import {
+  CreateBookInput,
+  FindAllBooksInput,
+  RatingReviewInBookPageOptionsDto,
+  UpdateBookInput,
+} from './dto';
 
 @Injectable()
 export class BookService {
@@ -268,5 +273,61 @@ export class BookService {
         message: 'Failed to delete book',
       });
     }
+  }
+
+  async getRatingReviewsBySlug(
+    slug: string,
+    dto: RatingReviewInBookPageOptionsDto,
+  ) {
+    const book = await this.prismaService.book.findUnique({
+      where: { slug },
+    });
+
+    if (!book) {
+      throw new Error('Book not found');
+    }
+
+    const conditions = {
+      where: {
+        bookId: book.id,
+      },
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [ratingReviews, totalCount] = await Promise.all([
+      this.prismaService.ratingReview.findMany({
+        ...conditions,
+        ...pageOption,
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.ratingReview.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: ratingReviews,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
   }
 }
