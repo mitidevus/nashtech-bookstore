@@ -431,7 +431,7 @@ export class PromotionListService {
       });
 
       return {
-        message: 'Deleted book from promotion list successfully',
+        message: 'Removed book from promotion list successfully',
       };
     } catch (error) {
       console.log('Error:', error.message);

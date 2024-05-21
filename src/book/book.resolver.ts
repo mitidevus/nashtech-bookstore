@@ -4,9 +4,7 @@ import { UserRole } from '@prisma/client';
 import { Roles } from 'src/auth/decorator';
 import { JwtGqlGuard, RolesGqlGuard } from 'src/auth/guard';
 import { BookService } from './book.service';
-import { CreateBookInput } from './dto';
-import { FindAllBooksInput } from './dto/find-all-books.dto';
-import { UpdateBookInput } from './dto/update-book.dto';
+import { CreateBookInput, FindAllBooksInput, UpdateBookInput } from './dto';
 import { Book, BookList } from './models/book.model';
 
 @Resolver(() => Book)

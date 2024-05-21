@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateBookInput } from './dto';
-import { FindAllBooksInput } from './dto/find-all-books.dto';
-import { UpdateBookInput } from './dto/update-book.dto';
+import { CreateBookInput, FindAllBooksInput, UpdateBookInput } from './dto';
 
 @Injectable()
 export class BookService {
@@ -76,11 +74,6 @@ export class BookService {
             description: dto.description,
             image: dto.image,
             price: dto.price,
-            discountPrice: 0,
-            discountPercentage: 0,
-            totalStars: 0,
-            totalReviews: 0,
-            soldQuantity: 0,
           },
         });
 
