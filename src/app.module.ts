@@ -8,6 +8,7 @@ import { BookModule } from './book/book.module';
 import { CategoryModule } from './category/category.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PromotionListModule } from './promotion-list/promotion-list.module';
+import { RatingReviewModule } from './rating-review/rating-review.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { PromotionListModule } from './promotion-list/promotion-list.module';
     BookModule,
     CategoryModule,
     PromotionListModule,
+    RatingReviewModule,
   ],
 })
 export class AppModule {}

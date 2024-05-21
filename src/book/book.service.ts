@@ -1,9 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateBookInput } from './dto';
-import { FindAllBooksInput } from './dto/find-all-books.dto';
-import { UpdateBookInput } from './dto/update-book.dto';
+import {
+  AddRatingReviewToBookDto,
+  CreateBookInput,
+  FindAllBooksInput,
+  RatingReviewInBookPageOptionsDto,
+  UpdateBookInput,
+} from './dto';
 
 @Injectable()
 export class BookService {
@@ -76,11 +80,6 @@ export class BookService {
             description: dto.description,
             image: dto.image,
             price: dto.price,
-            discountPrice: 0,
-            discountPercentage: 0,
-            totalStars: 0,
-            totalReviews: 0,
-            soldQuantity: 0,
           },
         });
 
@@ -275,5 +274,116 @@ export class BookService {
         message: 'Failed to delete book',
       });
     }
+  }
+
+  async createRatingReview(
+    userId: string,
+    slug: string,
+    dto: AddRatingReviewToBookDto,
+  ) {
+    const book = await this.prismaService.book.findUnique({
+      where: { slug },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    try {
+      const result = await this.prismaService.$transaction(async (tx) => {
+        const newTotalReviews = book.totalReviews + 1;
+        const newAvgStars =
+          (book.avgStars * book.totalReviews + dto.star) / newTotalReviews;
+
+        await tx.book.update({
+          where: { id: book.id },
+          data: {
+            avgStars: newAvgStars,
+            totalReviews: newTotalReviews,
+          },
+        });
+
+        const ratingReview = await tx.ratingReview.create({
+          data: {
+            userId,
+            bookId: book.id,
+            star: dto.star,
+            content: dto.content,
+          },
+          include: {
+            book: true,
+          },
+        });
+
+        return ratingReview;
+      });
+
+      return result;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add rating review',
+      });
+    }
+  }
+
+  async getRatingReviewsBySlug(
+    slug: string,
+    dto: RatingReviewInBookPageOptionsDto,
+  ) {
+    const book = await this.prismaService.book.findUnique({
+      where: { slug },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    const conditions = {
+      where: {
+        bookId: book.id,
+      },
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [ratingReviews, totalCount] = await Promise.all([
+      this.prismaService.ratingReview.findMany({
+        ...conditions,
+        ...pageOption,
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.ratingReview.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: ratingReviews,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
   }
 }
