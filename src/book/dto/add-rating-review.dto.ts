@@ -1,10 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class CreateRatingReviewDto {
-  @IsNumber()
-  @IsNotEmpty()
-  bookId: number;
-
+export class AddRatingReviewToBookDto {
   @IsNumber()
   @IsNotEmpty()
   star: number;

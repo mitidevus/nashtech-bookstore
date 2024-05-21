@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
+  AddRatingReviewToBookDto,
   CreateBookInput,
   FindAllBooksInput,
   RatingReviewInBookPageOptionsDto,
@@ -275,6 +276,59 @@ export class BookService {
     }
   }
 
+  async createRatingReview(
+    userId: string,
+    slug: string,
+    dto: AddRatingReviewToBookDto,
+  ) {
+    const book = await this.prismaService.book.findUnique({
+      where: { slug },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    try {
+      const result = await this.prismaService.$transaction(async (tx) => {
+        const newTotalReviews = book.totalReviews + 1;
+        const newAvgStars =
+          (book.avgStars * book.totalReviews + dto.star) / newTotalReviews;
+
+        await tx.book.update({
+          where: { id: book.id },
+          data: {
+            avgStars: newAvgStars,
+            totalReviews: newTotalReviews,
+          },
+        });
+
+        const ratingReview = await tx.ratingReview.create({
+          data: {
+            userId,
+            bookId: book.id,
+            star: dto.star,
+            content: dto.content,
+          },
+          include: {
+            book: true,
+          },
+        });
+
+        return ratingReview;
+      });
+
+      return result;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add rating review',
+      });
+    }
+  }
+
   async getRatingReviewsBySlug(
     slug: string,
     dto: RatingReviewInBookPageOptionsDto,
@@ -284,7 +338,9 @@ export class BookService {
     });
 
     if (!book) {
-      throw new Error('Book not found');
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
     }
 
     const conditions = {
