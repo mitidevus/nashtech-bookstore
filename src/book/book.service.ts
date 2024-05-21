@@ -251,23 +251,11 @@ export class BookService {
     }
 
     try {
-      const result = await this.prismaService.$transaction(async (tx) => {
-        await tx.bookCategory.deleteMany({
-          where: { bookId: id },
-        });
-
-        await tx.bookAuthor.deleteMany({
-          where: { bookId: id },
-        });
-
-        await tx.book.delete({
-          where: { id },
-        });
-
-        return tx.book.findMany();
+      await this.prismaService.book.delete({
+        where: { id },
       });
 
-      return result;
+      return await this.prismaService.book.findMany();
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
