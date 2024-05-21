@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { GetUser, Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
@@ -23,5 +31,12 @@ export class OrderController {
   @Get()
   async getAllOrders(@Query() dto: OrderPageOptionsDto) {
     return this.orderService.getAllOrders(dto);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Get(':id')
+  async getOrderById(@Param('id') id: string) {
+    return this.orderService.getOrderById(id);
   }
 }

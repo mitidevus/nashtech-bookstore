@@ -125,4 +125,42 @@ export class OrderService {
       totalCount,
     };
   }
+
+  async getOrderById(id: string) {
+    const order = await this.prismaService.order.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        items: {
+          select: {
+            book: {
+              select: {
+                name: true,
+                slug: true,
+                image: true,
+                price: true,
+              },
+            },
+            price: true,
+            quantity: true,
+          },
+        },
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException({
+        message: 'Order not found',
+      });
+    }
+
+    return order;
+  }
 }
