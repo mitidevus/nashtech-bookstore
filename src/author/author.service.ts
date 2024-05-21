@@ -66,6 +66,12 @@ export class AuthorService {
   }
 
   async updateAuthor(id: number, dto: UpdateAuthorDto) {
+    if (!Object.keys(dto).length) {
+      throw new BadRequestException({
+        message: 'No data provided',
+      });
+    }
+
     const author = await this.prismaService.author.findUnique({
       where: {
         id,

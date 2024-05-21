@@ -79,6 +79,12 @@ export class CategoryService {
   }
 
   async updateCategory(id: number, dto: UpdateCategoryDto) {
+    if (!Object.keys(dto).length) {
+      throw new BadRequestException({
+        message: 'No data provided',
+      });
+    }
+
     const category = await this.prismaService.category.findUnique({
       where: {
         id,

@@ -29,7 +29,7 @@ model Book {
   image              String
   price              Float
   discountPrice      Float
-  discountPercentage Float
+  discountPercentage Int
   totalStars         Float
   totalReviews       Int
   soldQuantity       Int

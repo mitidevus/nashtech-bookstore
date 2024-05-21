@@ -14,10 +14,13 @@ import { UserRole } from '@prisma/client';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import {
+  AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
+  UpdateBookInPromoListDto,
   UpdatePromotionListDto,
 } from './dto';
+import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
 import { PromotionListService } from './promotion-list.service';
 
 @Controller('promotion-lists')
@@ -56,5 +59,54 @@ export class PromotionListController {
   @Delete(':id')
   async deletePromotionList(@Param('id', ParseIntPipe) id: number) {
     return await this.promotionListService.deletePromotionList(id);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Post(':id/books')
+  async addBookToPromoList(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBookToPromoListDto,
+  ) {
+    return await this.promotionListService.addBookToPromoList(id, dto);
+  }
+
+  @Get(':slug/books')
+  async getBooksFromPromoListBySlug(
+    @Param('slug') slug: string,
+    @Query() dto: BookInPromoListPageOptionsDto,
+  ) {
+    return await this.promotionListService.getBooksFromPromoListBySlug(
+      slug,
+      dto,
+    );
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Patch(':promoId/books/:bookId')
+  async updateBookInPromoList(
+    @Param('promoId', ParseIntPipe) promoId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @Body() dto: UpdateBookInPromoListDto,
+  ) {
+    return await this.promotionListService.updateBookInPromoList(
+      promoId,
+      bookId,
+      dto,
+    );
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':promoId/books/:bookId')
+  async removeBookFromPromoList(
+    @Param('promoId', ParseIntPipe) promoId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.promotionListService.removeBookFromPromoList(
+      promoId,
+      bookId,
+    );
   }
 }

@@ -1,11 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { calculateDiscountedPrice } from 'src/utils/calculation';
 import {
+  AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
+  UpdateBookInPromoListDto,
   UpdatePromotionListDto,
 } from './dto';
+import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
 
 @Injectable()
 export class PromotionListService {
@@ -192,6 +196,247 @@ export class PromotionListService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to delete promotion list',
+      });
+    }
+  }
+
+  async addBookToPromoList(id: number, dto: AddBookToPromoListDto) {
+    if (!Number.isInteger(dto.discountPercentage)) {
+      throw new BadRequestException({
+        message: 'Discount percentage must be an integer',
+      });
+    }
+
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: dto.bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    if (book.promotionListId) {
+      throw new BadRequestException({
+        message: 'Book already in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id: dto.bookId,
+        },
+        data: {
+          promotionListId: id,
+          discountPercentage: dto.discountPercentage,
+          discountPrice: calculateDiscountedPrice(
+            book.price,
+            dto.discountPercentage,
+          ),
+        },
+      });
+
+      return {
+        message: 'Added book to promotion list successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add book to promotion list',
+      });
+    }
+  }
+
+  async getBooksFromPromoListBySlug(
+    slug: string,
+    dto: BookInPromoListPageOptionsDto,
+  ) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        slug,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const conditions = {
+      where: {
+        promotionListId: promotionList.id,
+      },
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: books,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
+  }
+
+  async updateBookInPromoList(
+    promoId: number,
+    bookId: number,
+    dto: UpdateBookInPromoListDto,
+  ) {
+    if (Object.keys(dto).length === 0) {
+      throw new BadRequestException({
+        message: 'No data provided',
+      });
+    }
+
+    if (dto.discountPercentage && !Number.isInteger(dto.discountPercentage)) {
+      throw new BadRequestException({
+        message: 'Discount percentage must be an integer',
+      });
+    }
+
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id: promoId,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    if (book.promotionListId !== promoId) {
+      throw new BadRequestException({
+        message: 'Book not in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          discountPercentage: dto.discountPercentage,
+          discountPrice: calculateDiscountedPrice(
+            book.price,
+            dto.discountPercentage,
+          ),
+        },
+      });
+
+      return {
+        message: 'Updated book in promotion list successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to update book in promotion list',
+      });
+    }
+  }
+
+  async removeBookFromPromoList(promoId: number, bookId: number) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id: promoId,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    if (book.promotionListId !== promoId) {
+      throw new BadRequestException({
+        message: 'Book not in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          promotionListId: null,
+          discountPercentage: 0,
+          discountPrice: 0,
+        },
+      });
+
+      return {
+        message: 'Deleted book from promotion list successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to remove book from promotion list',
       });
     }
   }
