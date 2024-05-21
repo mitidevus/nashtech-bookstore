@@ -14,6 +14,7 @@ import { UserRole } from '@prisma/client';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import {
+  AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
@@ -56,5 +57,15 @@ export class PromotionListController {
   @Delete(':id')
   async deletePromotionList(@Param('id', ParseIntPipe) id: number) {
     return await this.promotionListService.deletePromotionList(id);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Post(':id/books')
+  async addBookToPromoList(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBookToPromoListDto,
+  ) {
+    return await this.promotionListService.addBookToPromoList(id, dto);
   }
 }
