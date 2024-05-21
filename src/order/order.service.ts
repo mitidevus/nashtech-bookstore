@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateOrderDto } from './dto';
+import { CreateOrderDto, OrderPageOptionsDto } from './dto';
 
 @Injectable()
 export class OrderService {
@@ -82,5 +82,47 @@ export class OrderService {
         message: 'Failed to create order',
       });
     }
+  }
+
+  async getAllOrders(dto: OrderPageOptionsDto) {
+    const conditions = {
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [orders, totalCount] = await Promise.all([
+      this.prismaService.order.findMany({
+        ...conditions,
+        ...pageOption,
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.order.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: orders,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
   }
 }
