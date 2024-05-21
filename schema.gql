@@ -72,8 +72,8 @@ input CreateBookInput {
   description: String!
   image: String!
   price: Float!
-  categoryIds: [Int!]!
-  authorIds: [Int!]!
+  categoryIds: [Int!]
+  authorIds: [Int!]
 }
 
 input UpdateBookInput {
