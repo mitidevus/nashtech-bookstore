@@ -1,6 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateOrderDto, OrderPageOptionsDto } from './dto';
+import {
+  CreateOrderDto,
+  OrderPageOptionsDto,
+  UpdateOrderStatusDto,
+} from './dto';
 
 @Injectable()
 export class OrderService {
@@ -162,5 +166,28 @@ export class OrderService {
     }
 
     return order;
+  }
+
+  async updateOrder(id: string, dto: UpdateOrderStatusDto) {
+    const order = await this.prismaService.order.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException({
+        message: 'Order not found',
+      });
+    }
+
+    return await this.prismaService.order.update({
+      where: {
+        id,
+      },
+      data: {
+        status: dto.status,
+      },
+    });
   }
 }

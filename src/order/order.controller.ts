@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -10,7 +11,11 @@ import {
 import { UserRole } from '@prisma/client';
 import { GetUser, Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
-import { CreateOrderDto, OrderPageOptionsDto } from './dto';
+import {
+  CreateOrderDto,
+  OrderPageOptionsDto,
+  UpdateOrderStatusDto,
+} from './dto';
 import { OrderService } from './order.service';
 
 @Controller('orders')
@@ -38,5 +43,15 @@ export class OrderController {
   @Get(':id')
   async getOrderById(@Param('id') id: string) {
     return this.orderService.getOrderById(id);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Patch(':id')
+  async updateOrder(
+    @Param('id') id: string,
+    @Body() dto: UpdateOrderStatusDto,
+  ) {
+    return this.orderService.updateOrder(id, dto);
   }
 }
