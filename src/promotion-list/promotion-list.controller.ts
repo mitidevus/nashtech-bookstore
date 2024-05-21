@@ -19,6 +19,7 @@ import {
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
 } from './dto';
+import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
 import { PromotionListService } from './promotion-list.service';
 
 @Controller('promotion-lists')
@@ -67,5 +68,16 @@ export class PromotionListController {
     @Body() dto: AddBookToPromoListDto,
   ) {
     return await this.promotionListService.addBookToPromoList(id, dto);
+  }
+
+  @Get(':slug/books')
+  async getBooksFromPromoListBySlug(
+    @Param('slug') slug: string,
+    @Query() dto: BookInPromoListPageOptionsDto,
+  ) {
+    return await this.promotionListService.getBooksFromPromoListBySlug(
+      slug,
+      dto,
+    );
   }
 }
