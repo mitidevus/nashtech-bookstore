@@ -16,7 +16,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"tri2@gmail.com\",\n    \"password\": \"Tri0123@\",\n    \"name\": \"Tri Do\"\n}",
+							"raw": "{\n    \"email\": \"tri3@gmail.com\",\n    \"password\": \"Tri0123@\",\n    \"name\": \"Tri Do\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -199,7 +199,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Tony Buổi Sáng\"\n}",
+							"raw": "{\n    \"name\": \"Vũ Trọng Phụng\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -375,7 +375,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Vũ Trọng Phụng\"\n}",
+							"raw": "{   \n    \"name\": \"Nam Cao\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -383,13 +383,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{URL}}/authors/1",
+							"raw": "{{URL}}/authors/4",
 							"host": [
 								"{{URL}}"
 							],
 							"path": [
 								"authors",
-								"1"
+								"4"
 							]
 						}
 					},
@@ -562,7 +562,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Kỹ năng sống\"\n}",
+							"raw": "{\n    \"name\": \"Sách thiếu nhi\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -738,7 +738,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Văn học\"\n}",
+							"raw": "{\n    \"name\": \"Sức khoẻ\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -892,6 +892,939 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "Promotion List",
+			"item": [
+				{
+					"name": "CRUD",
+					"item": [
+						{
+							"name": "Create promotion list",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Super sale\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/promotion-lists",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Create promotion list",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Popular\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{URL}}/promotion-lists",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "132"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"84-2CU/AhbZpPZZ/OL6HBdhovAcqRU\""
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 20 May 2024 14:41:45 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"id\": 34,\n    \"slug\": \"popular\",\n    \"name\": \"Popular\",\n    \"createdAt\": \"2024-05-20T14:41:45.171Z\",\n    \"updatedAt\": \"2024-05-20T14:41:45.171Z\",\n    \"books\": []\n}"
+								}
+							]
+						},
+						{
+							"name": "Get promotion lists",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/promotion-lists",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get promotion lists",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{URL}}/promotion-lists",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "290"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"122-3SWeH4vrPTjsq6qlpdG7FcS6DYs\""
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 20 May 2024 14:37:22 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": [\n        {\n            \"id\": 2,\n            \"slug\": \"recommended\",\n            \"name\": \"Recommended\",\n            \"createdAt\": \"2024-05-20T10:54:43.450Z\",\n            \"updatedAt\": \"2024-05-20T10:54:43.450Z\"\n        },\n        {\n            \"id\": 1,\n            \"slug\": \"on-sale\",\n            \"name\": \"On Sale\",\n            \"createdAt\": \"2024-05-20T10:53:50.889Z\",\n            \"updatedAt\": \"2024-05-20T10:53:50.889Z\"\n        }\n    ],\n    \"totalPages\": 1,\n    \"totalCount\": 2\n}"
+								}
+							]
+						},
+						{
+							"name": "Get promotion list by id",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/promotion-lists/1",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"1"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Get promotion list by id",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{URL}}/promotion-lists/34",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"34"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "132"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"84-2CU/AhbZpPZZ/OL6HBdhovAcqRU\""
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 20 May 2024 14:45:36 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"id\": 34,\n    \"slug\": \"popular\",\n    \"name\": \"Popular\",\n    \"createdAt\": \"2024-05-20T14:41:45.171Z\",\n    \"updatedAt\": \"2024-05-20T14:41:45.171Z\",\n    \"books\": []\n}"
+								}
+							]
+						},
+						{
+							"name": "Update promotion list",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Popular\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/promotion-lists/34",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"34"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "Update promotion list",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Popular\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{URL}}/promotion-lists/34",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"34"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "132"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"84-8l01dLDs8LRTPCbL+2BfSy4B7LM\""
+										},
+										{
+											"key": "Date",
+											"value": "Mon, 20 May 2024 15:02:58 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"id\": 34,\n    \"slug\": \"popular\",\n    \"name\": \"Popular\",\n    \"createdAt\": \"2024-05-20T14:41:45.171Z\",\n    \"updatedAt\": \"2024-05-20T15:02:58.149Z\",\n    \"books\": []\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete promotion list",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/promotion-lists/36",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"36"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{URL}}/promotion-lists/36",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"36"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "49"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"31-nYcUHaIq0Rt+A1qeQMicsDpLE7k\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 21 May 2024 03:58:28 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Deleted promotion list successfully\"\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Handle books",
+					"item": [
+						{
+							"name": "Add book to promo list",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"bookId\": 15,\n    \"discountPercentage\": 50\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/promotion-lists/1/books",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"1",
+										"books"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"bookId\": 5,\n    \"discountPrice\": 20\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{URL}}/promotion-lists/1/books",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"1",
+												"books"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "55"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"37-Jqql8hyEmqrBwhSnVDtQ0EdFN5M\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 21 May 2024 04:04:31 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Added book to promotion list successfully\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Get books from promotion list",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/promotion-lists/on-sale/books?take=4&page=2",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"on-sale",
+										"books"
+									],
+									"query": [
+										{
+											"key": "take",
+											"value": "4"
+										},
+										{
+											"key": "page",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{URL}}/promotion-lists/on-sale/books?take=4&page=2",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"on-sale",
+												"books"
+											],
+											"query": [
+												{
+													"key": "take",
+													"value": "4"
+												},
+												{
+													"key": "page",
+													"value": "2"
+												}
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "1227"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"4cb-odPPEUedRTn7+dXH8lQjlDgu8bk\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 21 May 2024 04:54:36 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"data\": [\n        {\n            \"id\": 11,\n            \"slug\": \"sach-hay_11\",\n            \"name\": \"Sách hay\",\n            \"description\": \"Rất hay\",\n            \"image\": \"Link\",\n            \"price\": 99.5,\n            \"discountPrice\": 79.6,\n            \"discountPercentage\": 20,\n            \"totalStars\": 0,\n            \"totalReviews\": 0,\n            \"soldQuantity\": 0,\n            \"createdAt\": \"2024-05-21T02:44:10.470Z\",\n            \"updatedAt\": \"2024-05-21T04:25:05.580Z\",\n            \"promotionListId\": 1\n        },\n        {\n            \"id\": 10,\n            \"slug\": \"sach-hay_10\",\n            \"name\": \"Sách hay\",\n            \"description\": \"Rất hay\",\n            \"image\": \"Link\",\n            \"price\": 99.5,\n            \"discountPrice\": 80,\n            \"discountPercentage\": 20,\n            \"totalStars\": 0,\n            \"totalReviews\": 0,\n            \"soldQuantity\": 0,\n            \"createdAt\": \"2024-05-21T02:42:52.247Z\",\n            \"updatedAt\": \"2024-05-21T04:20:10.101Z\",\n            \"promotionListId\": 1\n        },\n        {\n            \"id\": 8,\n            \"slug\": \"sach-hay_8\",\n            \"name\": \"Sách hay\",\n            \"description\": \"Rất hay\",\n            \"image\": \"Link\",\n            \"price\": 100,\n            \"discountPrice\": 80,\n            \"discountPercentage\": 20,\n            \"totalStars\": 0,\n            \"totalReviews\": 0,\n            \"soldQuantity\": 0,\n            \"createdAt\": \"2024-05-21T02:35:27.430Z\",\n            \"updatedAt\": \"2024-05-21T04:18:34.805Z\",\n            \"promotionListId\": 1\n        },\n        {\n            \"id\": 6,\n            \"slug\": \"sach-hay_6\",\n            \"name\": \"Sách hay\",\n            \"description\": \"Sách rất hay\",\n            \"image\": \"Link sách\",\n            \"price\": 100,\n            \"discountPrice\": 37.8,\n            \"discountPercentage\": 63,\n            \"totalStars\": 0,\n            \"totalReviews\": 0,\n            \"soldQuantity\": 0,\n            \"createdAt\": \"2024-05-20T08:44:21.290Z\",\n            \"updatedAt\": \"2024-05-21T04:09:39.335Z\",\n            \"promotionListId\": 1\n        }\n    ],\n    \"totalPages\": 3,\n    \"totalCount\": 10\n}"
+								}
+							]
+						},
+						{
+							"name": "Update book in promotion list",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"discountPercentage\": 32\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/promotion-lists/1/books/8",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"1",
+										"books",
+										"8"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"discountPercentage\": 32\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{URL}}/promotion-lists/1/books/8",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"1",
+												"books",
+												"8"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "57"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"39-Xlu3xCXWzeLmmw8mOzgUV9hX6VQ\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 21 May 2024 06:15:05 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Updated book in promotion list successfully\"\n}"
+								}
+							]
+						},
+						{
+							"name": "Delete book in promotion list",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/promotion-lists/1/books/8",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"promotion-lists",
+										"1",
+										"books",
+										"8"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "New Request",
+									"originalRequest": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{URL}}/promotion-lists/1/books/8",
+											"host": [
+												"{{URL}}"
+											],
+											"path": [
+												"promotion-lists",
+												"1",
+												"books",
+												"8"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "X-Powered-By",
+											"value": "Express"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json; charset=utf-8"
+										},
+										{
+											"key": "Content-Length",
+											"value": "40"
+										},
+										{
+											"key": "ETag",
+											"value": "W/\"28-Pu2N1WY4PAxUA5Oq221KLBl0raU\""
+										},
+										{
+											"key": "Date",
+											"value": "Tue, 21 May 2024 06:22:21 GMT"
+										},
+										{
+											"key": "Connection",
+											"value": "keep-alive"
+										},
+										{
+											"key": "Keep-Alive",
+											"value": "timeout=5"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"message\": \"Book not in promotion list\"\n}"
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Book",
+			"item": [
+				{
+					"name": "Add rating review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjZTYyNmNiMy05ZjdjLTQ4ODEtODBkNC1jMjI4NWVmMmJjOGIiLCJlbWFpbCI6InRyaTNAZ21haWwuY29tIiwiaWF0IjoxNzE2MjgwMzc0LCJleHAiOjE3MjQ5MjAzNzR9.DTwcEEMXQzqYlfaPz3-m-D1T3hTNYcbu-yuhCSatGtU",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bookId\": 1,\n    \"star\": 5,\n    \"content\": \"Very good\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/books/lam-ban-voi-bau-troi_1/rating-reviews",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"books",
+								"lam-ban-voi-bau-troi_1",
+								"rating-reviews"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Create rating review",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"bookId\": 1,\n    \"star\": 5,\n    \"content\": \"Very good\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/books/lam-ban-voi-bau-troi_1/rating-reviews",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"books",
+										"lam-ban-voi-bau-troi_1",
+										"rating-reviews"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "605"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"25d-bDUmlYk/c4NyecYMcB8mPvoONfw\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 21 May 2024 09:56:09 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": 4,\n    \"bookId\": 1,\n    \"userId\": \"ce626cb3-9f7c-4881-80d4-c2285ef2bc8b\",\n    \"star\": 5,\n    \"content\": \"Very good\",\n    \"createdAt\": \"2024-05-21T09:56:09.334Z\",\n    \"updatedAt\": \"2024-05-21T09:56:09.334Z\",\n    \"book\": {\n        \"id\": 1,\n        \"slug\": \"lam-ban-voi-bau-troi_1\",\n        \"name\": \"Làm Bạn Với Bầu Trời\",\n        \"description\": \"Sách rất hay\",\n        \"image\": \"https://salt.tikicdn.com/cache/750x750/ts/product/af/a1/4b/92477ec9b6688060b2b5d2022a60d3e6.jpg.webp\",\n        \"price\": 78.9,\n        \"discountPrice\": 0,\n        \"discountPercentage\": 0,\n        \"avgStars\": 5,\n        \"totalReviews\": 4,\n        \"soldQuantity\": 0,\n        \"createdAt\": \"2024-05-20T06:32:48.984Z\",\n        \"updatedAt\": \"2024-05-21T09:56:09.334Z\",\n        \"promotionListId\": 1\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get rating reviews by slug",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/books/lam-ban-voi-bau-troi_1/rating-reviews",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"books",
+								"lam-ban-voi-bau-troi_1",
+								"rating-reviews"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Get rating reviews by slug",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{URL}}/books/lam-ban-voi-bau-troi_1/rating-reviews",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"books",
+										"lam-ban-voi-bau-troi_1",
+										"rating-reviews"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "948"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"3b4-3kwoIXfEJ2aIR1okFeNs7WZe/P8\""
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 21 May 2024 09:56:17 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 4,\n            \"bookId\": 1,\n            \"userId\": \"ce626cb3-9f7c-4881-80d4-c2285ef2bc8b\",\n            \"star\": 5,\n            \"content\": \"Very good\",\n            \"createdAt\": \"2024-05-21T09:56:09.334Z\",\n            \"updatedAt\": \"2024-05-21T09:56:09.334Z\",\n            \"user\": {\n                \"name\": \"Tri Do\",\n                \"email\": \"tri3@gmail.com\"\n            }\n        },\n        {\n            \"id\": 3,\n            \"bookId\": 1,\n            \"userId\": \"ce626cb3-9f7c-4881-80d4-c2285ef2bc8b\",\n            \"star\": 5,\n            \"content\": \"Very good\",\n            \"createdAt\": \"2024-05-21T08:39:02.086Z\",\n            \"updatedAt\": \"2024-05-21T08:39:02.086Z\",\n            \"user\": {\n                \"name\": \"Tri Do\",\n                \"email\": \"tri3@gmail.com\"\n            }\n        },\n        {\n            \"id\": 2,\n            \"bookId\": 1,\n            \"userId\": \"ce626cb3-9f7c-4881-80d4-c2285ef2bc8b\",\n            \"star\": 5,\n            \"content\": \"Very good\",\n            \"createdAt\": \"2024-05-21T08:35:34.220Z\",\n            \"updatedAt\": \"2024-05-21T08:35:34.220Z\",\n            \"user\": {\n                \"name\": \"Tri Do\",\n                \"email\": \"tri3@gmail.com\"\n            }\n        },\n        {\n            \"id\": 1,\n            \"bookId\": 1,\n            \"userId\": \"ce626cb3-9f7c-4881-80d4-c2285ef2bc8b\",\n            \"star\": 5,\n            \"content\": \"Very good\",\n            \"createdAt\": \"2024-05-21T08:33:38.979Z\",\n            \"updatedAt\": \"2024-05-21T08:33:38.979Z\",\n            \"user\": {\n                \"name\": \"Tri Do\",\n                \"email\": \"tri3@gmail.com\"\n            }\n        }\n    ],\n    \"totalPages\": 1,\n    \"totalCount\": 4\n}"
+						}
+					]
+				}
+			]
 		}
 	],
 	"auth": {
@@ -899,7 +1832,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NTE4YjU0Yi05OTRjLTRjYmMtODZiOC05MWU1NTc4OGE1NmEiLCJlbWFpbCI6InRyaTFAZ21haWwuY29tIiwiaWF0IjoxNzE1OTM2ODE5LCJleHAiOjE3MjQ1NzY4MTl9.IV2iweT1MMA6LbuyATej7j2NQamg1Wr-hN5QwOWdwdE",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3Y2FlNDU1Zi05MzI2LTQ0ZTMtOGJkMC1iOGZlYjY5ZTQzODAiLCJlbWFpbCI6InRyaTJAZ21haWwuY29tIiwiaWF0IjoxNzE2MTg2NDk0LCJleHAiOjE3MjQ4MjY0OTR9.h1zJKz_XydN9tDq9L75jkvwMK3bcRJJ67At78wlCTHw",
 				"type": "string"
 			}
 		]
