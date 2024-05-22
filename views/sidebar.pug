@@ -1,0 +1,55 @@
+aside#sidebar
+    .flex.align-center
+        button.toggle-btn(type="button")
+            i.lni.lni-grid-alt 
+        .sidebar-logo
+            a(href="#") Nash Bookstore
+
+    ul.sidebar-nav
+        li.sidebar-item
+            a.sidebar-link(href="#books")
+                i.lni.lni-book.text-3xl
+                span Book
+
+        li.sidebar-item
+            a.sidebar-link(href="#authors")
+                i.lni.lni-pencil.text-3xl
+                span Author
+
+        li.sidebar-item
+            a.sidebar-link(href="#categories")
+                i.lni.lni-layers.text-3xl
+                span Category
+
+        li.sidebar-item
+            a.sidebar-link(href="#promotion-lists")
+                i.lni.lni-offer.text-3xl
+                span Promotion List
+
+        li.sidebar-item
+            a.sidebar-link(href="#orders")
+                i.lni.lni-cart.text-3xl
+                span Order
+
+        li.sidebar-item
+            a.sidebar-link(href="#rating-reviews")
+                i.lni.lni-thumbs-up.text-3xl
+                span Rating Review
+
+        li.sidebar-item
+            a.sidebar-link(href="#users")
+                i.lni.lni-user.text-3xl
+                span Users
+
+    .sidebar-footer
+        a.sidebar-link(href="#")
+            i.lni.lni-exit.text-3xl
+            span Logout
+
+
+script.
+    const hamBurger = document.querySelector(".toggle-btn");
+
+    hamBurger.addEventListener("click", function () {
+        document.querySelector("#sidebar").classList.toggle("expand");
+    });
