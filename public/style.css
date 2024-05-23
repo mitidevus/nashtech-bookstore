@@ -171,3 +171,14 @@ a.sidebar-link:hover {
 
 @media (min-width: 768px) {
 }
+
+.modal-input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  color: #4b5563;
+  line-height: 1.5;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}

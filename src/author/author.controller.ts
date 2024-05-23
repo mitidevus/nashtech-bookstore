@@ -55,8 +55,8 @@ export class AuthorController {
   }
 
   @Get('/authors')
-  @Render('authors/index')
-  async renderAuthors(@Query() dto: AuthorPageOptionsDto) {
+  @Render('authors/list')
+  async getAuthorListPage(@Query() dto: AuthorPageOptionsDto) {
     dto.page = dto.page || 1;
     dto.take = dto.take || DEFAULT_AUTHOR_PAGE_SIZE;
 
