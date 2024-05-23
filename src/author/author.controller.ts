@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
   Query,
+  Render,
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
@@ -16,25 +17,25 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { AuthorService } from './author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
 
-@Controller('authors')
+@Controller()
 export class AuthorController {
   constructor(private readonly authorService: AuthorService) {}
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
-  @Post()
+  @Post('/api/authors')
   createAuthor(@Body() dto: CreateAuthorDto) {
     return this.authorService.createAuthor(dto);
   }
 
-  @Get()
+  @Get('/api/authors')
   getAuthors(@Query() dto: AuthorPageOptionsDto) {
     return this.authorService.getAuthors(dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
-  @Patch(':id')
+  @Patch('/api/authors/:id')
   async updateAuthor(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateAuthorDto,
@@ -44,8 +45,21 @@ export class AuthorController {
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
-  @Delete(':id')
+  @Delete('/api/authors/:id')
   async deleteAuthor(@Param('id', ParseIntPipe) id: number) {
     return await this.authorService.deleteAuthor(id);
+  }
+
+  @Get('/authors')
+  @Render('authors/index')
+  async renderAuthors(@Query() dto: AuthorPageOptionsDto) {
+    const result = await this.authorService.getAuthors(dto);
+
+    return {
+      currentPage: dto.page,
+      data: result.data,
+      totalPages: 10,
+      totalCount: 1000,
+    };
   }
 }
