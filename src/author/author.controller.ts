@@ -12,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
+import { DEFAULT_AUTHOR_PAGE_SIZE } from 'constants/author';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { AuthorService } from './author.service';
@@ -53,13 +54,14 @@ export class AuthorController {
   @Get('/authors')
   @Render('authors/index')
   async renderAuthors(@Query() dto: AuthorPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_AUTHOR_PAGE_SIZE;
+
     const result = await this.authorService.getAuthors(dto);
 
     return {
+      ...result,
       currentPage: dto.page,
-      data: result.data,
-      totalPages: 10,
-      totalCount: 1000,
     };
   }
 }
