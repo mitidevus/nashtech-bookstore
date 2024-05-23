@@ -3,28 +3,13 @@ extends ../layout
 block content
     div(class="main p-3")
         div(class="w-full h-full flex flex-col items-center px-20")
-            div(class="w-full border rounded-lg overflow-hidden shadow-md")
-                table(class="min-w-full divide-y divide-gray-200")
-                    thead(class="bg-gray-50")
-                        tr
-                            th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider") ID
-                            th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider") Slug
-                            th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider") Name
-                            th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider") Created At
-                            th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider") Updated At
-                    tbody(class="bg-white divide-y divide-gray-200")
-                        if data.length
-                            each author in data
-                                tr
-                                    td(class="py-4 px-6 text-sm font-medium.text-gray-900")= author.id
-                                    td(class="py-4 px-6 text-sm text-gray-500")= author.slug
-                                    td(class="py-4 px-6 text-sm text-gray-500")= author.name
-                                    td(class="py-4 px-6 text-sm text-gray-500")= author.createdAt
-                                    td(class="py-4 px-6 text-sm text-gray-500")= author.updatedAt
-                            tr
-                                td(class="py-4 px-6" colspan="5")
-                                    include ../partials/pagination.pug
-                        else
-                            tr
-                                td(class="py-4 px-6 text-sm text-gray-500 text-center" colspan="5") No authors found
+            div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                - var columns = ['ID', 'Slug', 'Name', 'Created At', 'Updated At']
+                - var rows = data.map(author => [author.id, author.slug, author.name, author.createdAt, author.updatedAt])
+                include ../partials/table.pug
+
+
+                div(class="py-4 px-6")
+                    include ../partials/pagination.pug
+
 

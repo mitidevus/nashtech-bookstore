@@ -1,0 +1,14 @@
+table(class="min-w-full divide-y divide-gray-200")
+    thead(class="bg-gray-50")
+        tr
+            each column in columns
+                th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider")= column
+    tbody(class="bg-white divide-y divide-gray-200")
+        if rows && rows.length
+            each row in rows
+                tr
+                    each cell in row
+                        td(class="py-4 px-6 text-sm text-gray-500")= cell
+        else
+            tr
+                td(class="py-4 px-6 text-sm text-gray-500 text-center" colspan=columns.length) There aren't any records to display.
