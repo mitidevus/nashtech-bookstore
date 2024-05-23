@@ -13,8 +13,11 @@ import {
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import { DEFAULT_AUTHOR_PAGE_SIZE } from 'constants/author';
+
+import { DateFormat } from 'constants/app';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { formatDate } from 'src/utils';
 import { AuthorService } from './author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
 
@@ -57,7 +60,24 @@ export class AuthorController {
     dto.page = dto.page || 1;
     dto.take = dto.take || DEFAULT_AUTHOR_PAGE_SIZE;
 
-    const result = await this.authorService.getAuthors(dto);
+    const res = await this.authorService.getAuthors(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((author) => {
+        return {
+          ...author,
+          createdAt: formatDate({
+            date: author.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: author.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
+    };
 
     return {
       ...result,
