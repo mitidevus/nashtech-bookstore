@@ -10,6 +10,7 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
 import { DEFAULT_PAGE_SIZE, DateFormat } from 'constants/app';
 import { Response } from 'express';
 import { AuthExceptionFilter } from './auth/filters';
@@ -31,6 +32,8 @@ import {
 import { PromotionListService } from './promotion-list/promotion-list.service';
 import { RatingReviewsPageOptionsDto } from './rating-review/dto';
 import { RatingReviewService } from './rating-review/rating-review.service';
+import { UserPageOptionsDto } from './user/dto';
+import { UserService } from './user/user.service';
 import { formatDate } from './utils';
 
 @Controller()
@@ -42,6 +45,7 @@ export class AppController {
     private readonly promotionListService: PromotionListService,
     private readonly orderService: OrderService,
     private readonly ratingReviewService: RatingReviewService,
+    private readonly userService: UserService,
   ) {}
 
   @UseGuards(UnauthenticatedGuard)
@@ -236,6 +240,40 @@ export class AppController {
             date: ratingReview.updatedAt,
             targetFormat: DateFormat.TIME_DATE,
           }),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  // @UseGuards(AuthenticatedGuard)
+  @Get('/users')
+  @Render('users/list')
+  async getUsersPage(@Query() dto: UserPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+    dto.role = UserRole.user;
+
+    const res = await this.userService.getUsers(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((user) => {
+        return {
+          ...user,
+          createdAt: formatDate({
+            date: user.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: user.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
         };
       }),
     };

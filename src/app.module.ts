@@ -17,6 +17,7 @@ import { PromotionListService } from './promotion-list/promotion-list.service';
 import { RatingReviewModule } from './rating-review/rating-review.module';
 import { RatingReviewService } from './rating-review/rating-review.service';
 import { UserModule } from './user/user.module';
+import { UserService } from './user/user.service';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { UserModule } from './user/user.module';
     PromotionListService,
     OrderService,
     RatingReviewService,
+    UserService,
   ],
 })
 export class AppModule {}

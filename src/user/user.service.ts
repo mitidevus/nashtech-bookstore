@@ -8,6 +8,9 @@ export class UserService {
 
   async getUsers(dto: UserPageOptionsDto) {
     const conditions = {
+      where: {
+        role: dto?.role,
+      },
       orderBy: [
         {
           createdAt: dto.order,
