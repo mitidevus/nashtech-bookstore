@@ -36,6 +36,8 @@ block content
                                         p(class="text-gray-600 text-md font-bold")= review.title 
                                         p= review.content
                                     td(class="py-5 px-6")= review.createdAt
-
+                            else
+                                tr
+                                    td(class="py-4 px-6 text-sm text-gray-500 text-center" colspan=columns.length) There aren't any records to display.
                 div(class="py-4 px-6")
                     include ../partials/pagination.pug
