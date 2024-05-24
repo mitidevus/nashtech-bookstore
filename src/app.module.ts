@@ -15,6 +15,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PromotionListModule } from './promotion-list/promotion-list.module';
 import { PromotionListService } from './promotion-list/promotion-list.service';
 import { RatingReviewModule } from './rating-review/rating-review.module';
+import { RatingReviewService } from './rating-review/rating-review.service';
 import { UserModule } from './user/user.module';
 
 @Module({
@@ -43,6 +44,7 @@ import { UserModule } from './user/user.module';
     CategoryService,
     PromotionListService,
     OrderService,
+    RatingReviewService,
   ],
 })
 export class AppModule {}

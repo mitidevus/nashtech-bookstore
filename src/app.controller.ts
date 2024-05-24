@@ -29,6 +29,8 @@ import {
   PromotionListPageOptionsDto,
 } from './promotion-list/dto';
 import { PromotionListService } from './promotion-list/promotion-list.service';
+import { RatingReviewsPageOptionsDto } from './rating-review/dto';
+import { RatingReviewService } from './rating-review/rating-review.service';
 import { formatDate } from './utils';
 
 @Controller()
@@ -39,6 +41,7 @@ export class AppController {
     private readonly categoryService: CategoryService,
     private readonly promotionListService: PromotionListService,
     private readonly orderService: OrderService,
+    private readonly ratingReviewService: RatingReviewService,
   ) {}
 
   @UseGuards(UnauthenticatedGuard)
@@ -201,6 +204,38 @@ export class AppController {
             style: 'currency',
             currency: 'VND',
           }).format(order.totalPrice * 1000),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/rating-reviews')
+  @Render('rating-reviews/list')
+  async getRatingReviewsPage(@Query() dto: RatingReviewsPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.ratingReviewService.getRatingReviews(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((ratingReview) => {
+        return {
+          ...ratingReview,
+          createdAt: formatDate({
+            date: ratingReview.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: ratingReview.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
         };
       }),
     };

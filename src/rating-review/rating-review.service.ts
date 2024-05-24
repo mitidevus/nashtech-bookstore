@@ -27,6 +27,22 @@ export class RatingReviewService {
       this.prismaService.ratingReview.findMany({
         ...conditions,
         ...pageOption,
+        include: {
+          book: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
       }),
       this.prismaService.ratingReview.count({
         ...conditions,
