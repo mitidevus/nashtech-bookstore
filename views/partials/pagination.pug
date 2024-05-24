@@ -1,0 +1,36 @@
+- const maxPaginationPages = maxPages || 5;
+- const halfMaxPages = Math.floor(maxPaginationPages / 2);
+- const startPage = Math.max(1, currentPage - halfMaxPages);
+- const endPage = Math.min(totalPages, startPage + maxPaginationPages - 1);
+
+div(class="flex justify-between items-center")
+    if currentPage > 1
+        a(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" href=`?page=${currentPage - 1}`)
+            i.lni.lni-arrow-left
+            span Previous
+    else
+        button(class='flex items-center gap-2 py-2 px-4 border rounded-md bg-gray-100 text-gray-400 font-medium' disabled)
+            i.lni.lni-arrow-left
+            span Previous
+
+    ul(class="flex items-center list-none gap-2")
+        if startPage > 1
+            li
+                a(class='py-2 px-4 rounded-md hover:bg-gray-50' href=`?page=1`) ... 
+
+        each page in Array.from(Array(endPage - startPage + 1).keys()).map(i => startPage + i)
+            li(key=page)
+                a(class=`py-2 px-4 rounded-md ${currentPage === page ? 'bg-[#7F56D9] text-white hover:bg-[#926FDF]' : 'hover:bg-gray-50'}` href=`?page=${page}`)= page
+
+        if endPage < totalPages
+            li
+                a(class='py-2 px-4 rounded-md hover:bg-gray-50' href=`?page=${totalPages}`) ...
+
+    if currentPage < totalPages
+        a(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" href=`?page=${currentPage + 1}`)
+            span Next
+            i.lni.lni-arrow-right
+    else    
+        button(class='flex items-center gap-2 py-2 px-4 border rounded-md bg-gray-100 text-gray-400 font-medium' disabled)
+            span Next
+            i.lni.lni-arrow-right

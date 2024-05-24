@@ -1,0 +1,1 @@
+export const DEFAULT_AUTHOR_PAGE_SIZE = 8;
