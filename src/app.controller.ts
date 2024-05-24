@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
@@ -9,8 +10,7 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { DateFormat } from 'constants/app';
-import { DEFAULT_AUTHOR_PAGE_SIZE } from 'constants/author';
+import { DEFAULT_PAGE_SIZE, DateFormat } from 'constants/app';
 import { Response } from 'express';
 import { AuthExceptionFilter } from './auth/filters';
 import {
@@ -20,12 +20,17 @@ import {
 } from './auth/guard';
 import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto } from './author/dto';
+import { CategoryService } from './category/category.service';
+import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
 import { formatDate } from './utils';
 
 @Controller()
 @UseFilters(AuthExceptionFilter)
 export class AppController {
-  constructor(private readonly authorService: AuthorService) {}
+  constructor(
+    private readonly authorService: AuthorService,
+    private readonly categoryService: CategoryService,
+  ) {}
 
   @UseGuards(UnauthenticatedGuard)
   @Get('/login')
@@ -52,7 +57,7 @@ export class AppController {
   @Render('authors/list')
   async getAuthorListPage(@Query() dto: AuthorPageOptionsDto) {
     dto.page = dto.page || 1;
-    dto.take = dto.take || DEFAULT_AUTHOR_PAGE_SIZE;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
 
     const res = await this.authorService.getAuthors(dto);
 
@@ -77,6 +82,44 @@ export class AppController {
       ...result,
       currentPage: dto.page,
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/categories')
+  @Render('categories/list')
+  async getCategoryListPage(@Query() dto: CategoryPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.categoryService.getCategories(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((category) => {
+        return {
+          ...category,
+          createdAt: formatDate({
+            date: category.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: category.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/categories')
+  createCategory(@Body() dto: CreateCategoryDto) {
+    return this.categoryService.createCategory(dto);
   }
 
   @Get('/logout')

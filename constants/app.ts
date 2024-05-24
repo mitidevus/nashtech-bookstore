@@ -5,6 +5,7 @@ export enum Order {
 
 export const MAX_ITEMS_PER_PAGE = 20;
 
+export const DEFAULT_PAGE_SIZE = 8;
 export const MAX_PAGINATION_PAGES = 5;
 
 export enum DateFormat {
