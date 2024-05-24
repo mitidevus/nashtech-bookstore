@@ -8,6 +8,7 @@ import { AuthorModule } from './author/author.module';
 import { AuthorService } from './author/author.service';
 import { BookModule } from './book/book.module';
 import { CategoryModule } from './category/category.module';
+import { CategoryService } from './category/category.service';
 import { OrderModule } from './order/order.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PromotionListModule } from './promotion-list/promotion-list.module';
@@ -35,6 +36,6 @@ import { UserModule } from './user/user.module';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AuthorService],
+  providers: [AuthorService, CategoryService],
 })
 export class AppModule {}
