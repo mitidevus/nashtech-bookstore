@@ -19,9 +19,14 @@ import {
   UnauthenticatedGuard,
 } from './auth/guard';
 import { AuthorService } from './author/author.service';
-import { AuthorPageOptionsDto } from './author/dto';
+import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
+import {
+  CreatePromotionListDto,
+  PromotionListPageOptionsDto,
+} from './promotion-list/dto';
+import { PromotionListService } from './promotion-list/promotion-list.service';
 import { formatDate } from './utils';
 
 @Controller()
@@ -30,6 +35,7 @@ export class AppController {
   constructor(
     private readonly authorService: AuthorService,
     private readonly categoryService: CategoryService,
+    private readonly promotionListService: PromotionListService,
   ) {}
 
   @UseGuards(UnauthenticatedGuard)
@@ -85,6 +91,12 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Post('/authors')
+  createAuthor(@Body() dto: CreateAuthorDto) {
+    return this.authorService.createAuthor(dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/categories')
   @Render('categories/list')
   async getCategoryListPage(@Query() dto: CategoryPageOptionsDto) {
@@ -120,6 +132,44 @@ export class AppController {
   @Post('/categories')
   createCategory(@Body() dto: CreateCategoryDto) {
     return this.categoryService.createCategory(dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/promotion-lists')
+  @Render('promotion-lists/list')
+  async getPromotionListsPage(@Query() dto: PromotionListPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.promotionListService.getPromotionLists(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((promotionList) => {
+        return {
+          ...promotionList,
+          createdAt: formatDate({
+            date: promotionList.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: promotionList.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/promotion-lists')
+  createPromotionList(@Body() dto: CreatePromotionListDto) {
+    return this.promotionListService.createPromotionList(dto);
   }
 
   @Get('/logout')

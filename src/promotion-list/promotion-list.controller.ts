@@ -23,7 +23,7 @@ import {
 import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
 import { PromotionListService } from './promotion-list.service';
 
-@Controller('promotion-lists')
+@Controller('/api/promotion-lists')
 export class PromotionListController {
   constructor(private readonly promotionListService: PromotionListService) {}
 
