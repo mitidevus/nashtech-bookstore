@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { DEFAULT_IMAGE_URL } from 'constants/app';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
@@ -15,7 +16,8 @@ export class AuthorService {
     try {
       const author = await this.prismaService.author.create({
         data: {
-          ...dto,
+          name: dto.name,
+          image: dto.image || DEFAULT_IMAGE_URL,
           slug: slugify(dto.name, {
             lower: true,
           }),
@@ -60,7 +62,7 @@ export class AuthorService {
 
     return {
       data: authors,
-      totalPages: Math.ceil(totalCount / dto.take),
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
   }
