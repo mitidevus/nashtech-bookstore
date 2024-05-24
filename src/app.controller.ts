@@ -250,7 +250,7 @@ export class AppController {
     };
   }
 
-  // @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard)
   @Get('/users')
   @Render('users/list')
   async getUsersPage(@Query() dto: UserPageOptionsDto) {
