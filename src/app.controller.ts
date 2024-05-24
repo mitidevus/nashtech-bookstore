@@ -81,7 +81,13 @@ export class AppController {
 
   @Get('/logout')
   logout(@Request() req, @Res() res: Response): void {
-    req.logout();
-    res.redirect('/login');
+    req.logout((error) => {
+      if (error) {
+        console.error('Logout error', error);
+        res.status(500).send('An error occurred during logout');
+      } else {
+        res.redirect('/login');
+      }
+    });
   }
 }
