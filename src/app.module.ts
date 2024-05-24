@@ -12,6 +12,7 @@ import { CategoryService } from './category/category.service';
 import { OrderModule } from './order/order.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PromotionListModule } from './promotion-list/promotion-list.module';
+import { PromotionListService } from './promotion-list/promotion-list.service';
 import { RatingReviewModule } from './rating-review/rating-review.module';
 import { UserModule } from './user/user.module';
 
@@ -36,6 +37,6 @@ import { UserModule } from './user/user.module';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AuthorService, CategoryService],
+  providers: [AuthorService, CategoryService, PromotionListService],
 })
 export class AppModule {}
