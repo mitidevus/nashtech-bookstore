@@ -88,7 +88,7 @@ export class OrderService {
     }
   }
 
-  async getAllOrders(dto: OrderPageOptionsDto) {
+  async getOrders(dto: OrderPageOptionsDto) {
     const conditions = {
       orderBy: [
         {

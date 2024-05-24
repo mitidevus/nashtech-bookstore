@@ -35,8 +35,8 @@ export class OrderController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Get()
-  async getAllOrders(@Query() dto: OrderPageOptionsDto) {
-    return this.orderService.getAllOrders(dto);
+  async getOrders(@Query() dto: OrderPageOptionsDto) {
+    return this.orderService.getOrders(dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

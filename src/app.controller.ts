@@ -22,6 +22,8 @@ import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
+import { OrderPageOptionsDto } from './order/dto';
+import { OrderService } from './order/order.service';
 import {
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
@@ -36,6 +38,7 @@ export class AppController {
     private readonly authorService: AuthorService,
     private readonly categoryService: CategoryService,
     private readonly promotionListService: PromotionListService,
+    private readonly orderService: OrderService,
   ) {}
 
   @UseGuards(UnauthenticatedGuard)
@@ -170,6 +173,42 @@ export class AppController {
   @Post('/promotion-lists')
   createPromotionList(@Body() dto: CreatePromotionListDto) {
     return this.promotionListService.createPromotionList(dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/orders')
+  @Render('orders/list')
+  async getOrdersPage(@Query() dto: OrderPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.orderService.getOrders(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((order) => {
+        return {
+          ...order,
+          createdAt: formatDate({
+            date: order.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: order.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          totalPrice: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(order.totalPrice * 1000),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
   }
 
   @Get('/logout')
