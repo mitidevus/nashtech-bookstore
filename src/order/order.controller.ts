@@ -19,7 +19,7 @@ import {
 } from './dto';
 import { OrderService } from './order.service';
 
-@Controller('orders')
+@Controller('/api/orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -35,8 +35,8 @@ export class OrderController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Get()
-  async getAllOrders(@Query() dto: OrderPageOptionsDto) {
-    return this.orderService.getAllOrders(dto);
+  async getOrders(@Query() dto: OrderPageOptionsDto) {
+    return this.orderService.getOrders(dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

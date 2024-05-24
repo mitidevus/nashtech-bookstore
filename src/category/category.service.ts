@@ -73,7 +73,7 @@ export class CategoryService {
 
     return {
       data: categories,
-      totalPages: Math.ceil(totalCount / dto.take),
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
   }

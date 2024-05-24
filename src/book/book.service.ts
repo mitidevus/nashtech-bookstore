@@ -297,8 +297,7 @@ export class BookService {
           data: {
             userId,
             bookId: book.id,
-            star: dto.star,
-            content: dto.content,
+            ...dto,
           },
           include: {
             book: true,

@@ -10,6 +10,7 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
+import { UserRole } from '@prisma/client';
 import { DEFAULT_PAGE_SIZE, DateFormat } from 'constants/app';
 import { Response } from 'express';
 import { AuthExceptionFilter } from './auth/filters';
@@ -22,11 +23,17 @@ import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
+import { OrderPageOptionsDto } from './order/dto';
+import { OrderService } from './order/order.service';
 import {
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
 } from './promotion-list/dto';
 import { PromotionListService } from './promotion-list/promotion-list.service';
+import { RatingReviewsPageOptionsDto } from './rating-review/dto';
+import { RatingReviewService } from './rating-review/rating-review.service';
+import { UserPageOptionsDto } from './user/dto';
+import { UserService } from './user/user.service';
 import { formatDate } from './utils';
 
 @Controller()
@@ -36,6 +43,9 @@ export class AppController {
     private readonly authorService: AuthorService,
     private readonly categoryService: CategoryService,
     private readonly promotionListService: PromotionListService,
+    private readonly orderService: OrderService,
+    private readonly ratingReviewService: RatingReviewService,
+    private readonly userService: UserService,
   ) {}
 
   @UseGuards(UnauthenticatedGuard)
@@ -170,6 +180,108 @@ export class AppController {
   @Post('/promotion-lists')
   createPromotionList(@Body() dto: CreatePromotionListDto) {
     return this.promotionListService.createPromotionList(dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/orders')
+  @Render('orders/list')
+  async getOrdersPage(@Query() dto: OrderPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.orderService.getOrders(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((order) => {
+        return {
+          ...order,
+          createdAt: formatDate({
+            date: order.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: order.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          totalPrice: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(order.totalPrice * 1000),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/rating-reviews')
+  @Render('rating-reviews/list')
+  async getRatingReviewsPage(@Query() dto: RatingReviewsPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.ratingReviewService.getRatingReviews(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((ratingReview) => {
+        return {
+          ...ratingReview,
+          createdAt: formatDate({
+            date: ratingReview.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: ratingReview.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/users')
+  @Render('users/list')
+  async getUsersPage(@Query() dto: UserPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+    dto.role = UserRole.user;
+
+    const res = await this.userService.getUsers(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((user) => {
+        return {
+          ...user,
+          createdAt: formatDate({
+            date: user.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: user.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
   }
 
   @Get('/logout')

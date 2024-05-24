@@ -5,7 +5,7 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { UserPageOptionsDto } from './dto';
 import { UserService } from './user.service';
 
-@Controller('users')
+@Controller('/api/users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
