@@ -1,0 +1,79 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Orders', href: '/orders' }, `${id}`]
+    include ../partials/breadcrumbs
+
+    div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
+        div(class="w-full grid grid-cols-1 xl:grid-cols-2 gap-8")
+            - var wrapperTitle = 'Order details'
+            include ../partials/wrapper
+                block content
+                div(class="pt-4 pb-6 px-6")
+                    div(class="grid grid-cols-1 md:grid-cols-4 gap-4")
+                        div(class="md:col-span-3")
+                            label(for="id" class="modal-label") ID
+                            input(id="id" type="text" class="modal-input" value=id readonly) 
+
+                        div(class="md:col-span-1")
+                            label(for="status" class="modal-label") Status
+                            input(id="status" type="text" class="modal-input capitalize" value=status readonly)
+
+                        div(class="md:col-span-2")
+                            label(for="createdAt" class="modal-label") Created At
+                            input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+
+                        div(class="md:col-span-2")
+                            label(for="updatedAt" class="modal-label") Updated At
+                            input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+
+            - var wrapperTitle = `Customer`
+            include ../partials/wrapper
+                block content
+                div(class="pt-4 pb-6 px-6")
+                    div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+                        div(class="md:col-span-1")
+                            label(class="modal-label") Name
+                            input(id="name" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=user.name readonly onclick=`window.location='/users/${user.id}'`) 
+
+                        div(class="md:col-span-1")
+                            label(for="email" class="modal-label") Email
+                            input(id="email" type="text" class="modal-input" value=user.email readonly)
+
+                        div(class="md:col-span-1")
+                            label(for="phone" class="modal-label") Phone
+                            input(id="phone" type="text" class="modal-input" value=phone readonly) 
+
+                        div(class="md:col-span-3")
+                            label(for="shippingAddress" class="modal-label") Shipping Address
+                            input(id="shippingAddress" type="text" class="modal-input" value=shippingAddress readonly)
+
+        - var wrapperTitle = `Items`
+        include ../partials/wrapper
+            block content
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Name', 'Price', 'Quantity', 'Total']
+                include ../partials/head-table
+
+                - var rows = items
+                include ../partials/body-table
+                    block items
+                        each item in items
+                            tr(key=item.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${item.book.id}'`)  
+                                td(class="py-4 px-6")= item.book.id
+                                td(class="py-4 px-6 flex items-center gap-4")
+                                    img(src=`${item.book.image}` alt=item.book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
+                                    span(class="block")= item.book.name
+                                td(class="py-4 px-6")
+                                    if item.discountPrice
+                                        span(class="block text-gray-400 line-through")= item.price
+                                        span(class="block")= item.discountPrice
+                                    else
+                                        span(class="block")= item.price
+                                td(class="py-4 px-6")= item.quantity
+                                td(class="py-4 px-6")= item.totalPrice
+                        tr(class="text-gray-800")
+                            td(colspan=3)
+                            td(class="py-4 px-6 text-gray-800") Total:
+                            td(class="py-4 px-6 text-gray-800 font-semibold")= totalPrice
+

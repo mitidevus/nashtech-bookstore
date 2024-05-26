@@ -177,7 +177,7 @@ export class AppController {
   @Get('/categories/:id')
   @Render('categories/detail')
   async getCategoryDetailPage(@Param('id', ParseIntPipe) id: number) {
-    const category = await this.categoryService.getCategory(id);
+    const category = await this.categoryService.getCategoryById(id);
 
     return {
       ...category,
@@ -246,7 +246,8 @@ export class AppController {
   @Get('/promotion-lists/:id')
   @Render('promotion-lists/detail')
   async getPromotionListDetailPage(@Param('id', ParseIntPipe) id: number) {
-    const promotionList = await this.promotionListService.getPromotionList(id);
+    const promotionList =
+      await this.promotionListService.getPromotionListById(id);
 
     return {
       ...promotionList,
@@ -313,6 +314,48 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @Get('/orders/:id')
+  @Render('orders/detail')
+  async getOrderDetailPage(@Param('id') id: string) {
+    const order = await this.orderService.getOrderById(id);
+
+    return {
+      ...order,
+      createdAt: formatDate({
+        date: order.createdAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      updatedAt: formatDate({
+        date: order.updatedAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      totalPrice: new Intl.NumberFormat('us-EN', {
+        style: 'currency',
+        currency: 'VND',
+      }).format(order.totalPrice * 1000),
+      items: order.items.map((item) => {
+        return {
+          ...item,
+          price: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(item.price * 1000),
+          discountPrice:
+            item.discountPrice > 0
+              ? new Intl.NumberFormat('us-EN', {
+                  style: 'currency',
+                  currency: 'VND',
+                }).format(item.discountPrice * 1000)
+              : null,
+          totalPrice: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(item.totalPrice * 1000),
+        };
+      }),
     };
   }
 

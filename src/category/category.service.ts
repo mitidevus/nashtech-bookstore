@@ -78,7 +78,7 @@ export class CategoryService {
     };
   }
 
-  async getCategory(id: number) {
+  async getCategoryById(id: number) {
     const category = await this.prismaService.category.findUnique({
       where: {
         id,

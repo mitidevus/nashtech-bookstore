@@ -35,7 +35,7 @@ export class CategoryController {
 
   @Get(':id')
   getCategory(@Param('id', ParseIntPipe) id: number) {
-    return this.categoryService.getCategory(id);
+    return this.categoryService.getCategoryById(id);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

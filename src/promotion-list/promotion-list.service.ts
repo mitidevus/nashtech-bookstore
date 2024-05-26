@@ -86,7 +86,7 @@ export class PromotionListService {
     };
   }
 
-  async getPromotionList(id: number) {
+  async getPromotionListById(id: number) {
     const promotionList = await this.prismaService.promotionList.findUnique({
       where: {
         id,
