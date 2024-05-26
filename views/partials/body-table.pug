@@ -1,0 +1,6 @@
+tbody(class="bg-white divide-y divide-gray-200 text-sm text-gray-500")
+    if rows && rows.length
+        block items
+    else
+        tr
+            td(class="py-4 px-6 text-sm text-gray-500 text-center" colspan=columns.length) There aren't any records to display.

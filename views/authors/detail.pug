@@ -1,0 +1,49 @@
+extends ../partials/dashboard-layout
+
+block content
+    div(class="main p-3")
+        div(class="w-full h-full flex flex-col items-center gap-8 px-20 mt-6")
+            - var wrapperTitle = name
+            include ../partials/wrapper
+                block content
+                div(class="pt-4 pb-6 px-6")
+                    div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+                        div
+                            label(for="id" class="modal-label") ID
+                            input(id="id" type="text" class="modal-input" value=id readonly) 
+
+                        div
+                            label(for="slug" class="modal-label") Slug
+                            input(id="slug" type="text" class="modal-input" value=slug readonly)
+
+                        div
+                            label(for="createdAt" class="modal-label") Created At
+                            input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+
+                        div
+                            label(for="updatedAt" class="modal-label") Updated At
+                            input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+
+                        div
+                            label(for="image" class="modal-label") Image
+                            img(src=image alt=image class="w-48 h-48 object-cover rounded-lg")
+
+            - var wrapperTitle = `Books of ${name}`
+            include ../partials/wrapper
+                block content
+                table(class="min-w-full divide-y divide-gray-200")
+                    - var columns = ['ID', 'Name', 'Created At', 'Updated At']
+                    include ../partials/head-table
+
+                    - var rows = books
+                    include ../partials/body-table
+                        block items
+                            each book in books
+                                tr  
+                                    td(class="py-5 px-6")= book.id
+                                    td(class="py-5 px-6 max-w-[300px]")
+                                        a(href=`/books/${book.id}` class="flex items-center gap-4 hover:text-[#7F56D9]")
+                                            img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
+                                            span(class="block font-semibold")= book.name
+                                    td(class="py-5 px-6")= book.createdAt 
+                                    td(class="py-5 px-6")= book.updatedAt
