@@ -8,16 +8,19 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(uuid())
-  email        String         @unique
-  password     String
-  name         String
-  role         UserRole       @default(user)
-  refreshToken String?        @map("refresh_token")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  Order        Order[]
-  RatingReview RatingReview[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  name          String
+  image         String
+  address       String         @default("")
+  phone         String         @default("")
+  role          UserRole       @default(user)
+  refreshToken  String?        @map("refresh_token")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  orders        Order[]
+  ratingReviews RatingReview[]
 
   @@map("users")
 }
