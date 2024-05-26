@@ -12,10 +12,17 @@ block content
                     i.lni.lni-plus
                     span Add List
 
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At']
+                include ../partials/head-table
 
-            - var columns = ['ID', 'Slug', 'Name', 'Created At', 'Updated At']
-            - var rows = data.map(promoList => [promoList.id, promoList.slug, promoList.name, promoList.createdAt, promoList.updatedAt])
-            include ../partials/table.pug
+                - var rows = data
+                include ../partials/body-table
+                    block items
+                        each promotionList in data
+                            tr(key=promotionList.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+                                each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
+                                    td(class="py-4 px-6")= promotionList[prop]
 
 
             div(class="py-4 px-6")

@@ -41,11 +41,10 @@ block content
                 include ../partials/body-table
                     block items
                         each book in books
-                            tr  
-                                td(class="py-5 px-6")= book.id
-                                td(class="py-5 px-6 max-w-[300px]")
-                                    a(href=`/books/${book.id}` class="flex items-center gap-4 hover:text-[#7F56D9]")
-                                        img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
-                                        span(class="block font-semibold")= book.name
-                                td(class="py-5 px-6")= book.createdAt 
-                                td(class="py-5 px-6")= book.updatedAt
+                            tr(key=book.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${book.id}'`)  
+                                td(class="py-4 px-6")= book.id
+                                td(class="py-4 px-6 flex items-center gap-4")
+                                    img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
+                                    span(class="block")= book.name
+                                td(class="py-4 px-6")= book.createdAt
+                                td(class="py-4 px-6")= book.updatedAt

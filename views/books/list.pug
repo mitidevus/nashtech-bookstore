@@ -9,28 +9,24 @@ block content
             div(class="flex items-center justify-between py-4 px-6")
                 h1(class="text-lg font-semibold text-gray-800") Books
 
-            - var columns = ['ID', 'Name', 'Price', 'Discount Price', 'Sold', 'Created At', 'Updated At']
             table(class="min-w-full divide-y divide-gray-200")
-                thead(class="bg-gray-100")
-                    tr
-                        each column in columns
-                            th(class="py-3 px-6 text-left text-xs font-medium text-gray-500 tracking-wider")= column
-                tbody(class="bg-white divide-y divide-gray-200 text-sm text-gray-500")
-                    if data && data.length
+                - var columns = ['ID', 'Name', 'Price', 'Discount', 'Sold', 'Created At', 'Updated At']
+                include ../partials/head-table
+
+                - var rows = data
+                include ../partials/body-table
+                    block items
                         each book in data
-                            tr  
-                                td(class="py-5 px-6")= book.id
-                                td(class="py-5 px-6 max-w-[300px]")
-                                    a(href=`/books/${book.id}` class="flex items-center gap-4 hover:text-[#7F56D9]")
-                                        img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
-                                        span(class="block font-semibold")= book.name
-                                td(class="py-5 px-6")= book.price
-                                td(class="py-5 px-6")= book.discountPrice
-                                td(class="py-5 px-6")= book.soldQuantity
-                                td(class="py-5 px-6")= book.createdAt
-                                td(class="py-5 px-6")= book.updatedAt
-                        else
-                            tr
-                                td(class="py-4 px-6 text-sm text-gray-500 text-center" colspan=columns.length) There aren't any records to display.
+                            tr(key=book.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${book.id}'`)  
+                                td(class="py-4 px-6")= book.id
+                                td(class="py-4 px-6 max-w-[300px] flex items-center gap-4")
+                                    img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
+                                    span(class="block")= book.name
+                                td(class="py-4 px-6")= book.discountPrice || book.price
+                                td(class="py-4 px-6")= `${book.discountPercentage}%`
+                                td(class="py-4 px-6")= book.soldQuantity
+                                td(class="py-4 px-6")= book.createdAt
+                                td(class="py-4 px-6")= book.updatedAt
+
             div(class="py-4 px-6")
                 include ../partials/pagination.pug

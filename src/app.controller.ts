@@ -354,10 +354,13 @@ export class AppController {
             style: 'currency',
             currency: 'VND',
           }).format(book.price * 1000),
-          discountPrice: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.discountPrice * 1000),
+          discountPrice:
+            book.discountPrice > 0
+              ? new Intl.NumberFormat('us-EN', {
+                  style: 'currency',
+                  currency: 'VND',
+                }).format(book.discountPrice * 1000)
+              : null,
         };
       }),
     };

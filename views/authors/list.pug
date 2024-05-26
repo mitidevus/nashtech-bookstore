@@ -12,10 +12,17 @@ block content
                     i.lni.lni-plus
                     span Add Author
 
-            - var columns = ['ID', 'Slug', 'Name', 'Created At', 'Updated At']
-            - var rows = data.map(author => [author.id, author.slug, author.name, author.createdAt, author.updatedAt])
-            include ../partials/table.pug
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At']
+                include ../partials/head-table
 
+                - var rows = data
+                include ../partials/body-table
+                    block items
+                        each author in data
+                            tr(key=author.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
+                                each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
+                                    td(class="py-4 px-6")= author[prop]
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
@@ -30,9 +37,7 @@ block content
 
                 div(class="flex gap-2 justify-end")
                     button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
-
                     button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
-
 
     script.
         async function addAuthor(event) {

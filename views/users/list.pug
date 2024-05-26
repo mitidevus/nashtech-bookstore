@@ -9,9 +9,17 @@ block content
             div(class="flex items-center justify-between py-4 px-6")
                 h1(class="text-lg font-semibold text-gray-800") Users
 
-            - var columns = ['ID', 'Name', 'Email', 'Role', 'Created At', 'Updated At']
-            - var rows = data.map(user => [user.id, user.name, user.email, user.role, user.createdAt, user.updatedAt])
-            include ../partials/table.pug
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Name', 'Email', 'Role', 'Created At', 'Updated At']
+                include ../partials/head-table
+
+                - var rows = data
+                include ../partials/body-table
+                    block items
+                        each promotionList in data
+                            tr(key=promotionList.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+                                each prop in ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt']
+                                    td(class="py-4 px-6")= promotionList[prop]
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
