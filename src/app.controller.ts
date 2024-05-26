@@ -392,7 +392,7 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('/users')
+  @Get('/customers')
   @Render('users/list')
   async getUsersPage(@Query() dto: UserPageOptionsDto) {
     dto.page = dto.page || 1;
@@ -422,6 +422,54 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @Get('/customers/:id')
+  @Render('users/detail')
+  async getUserDetailPage(@Param('id') id: string) {
+    const user = await this.userService.getUserById(id);
+
+    return {
+      ...user,
+      createdAt: formatDate({
+        date: user.createdAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      updatedAt: formatDate({
+        date: user.updatedAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      orders: user.orders.map((order) => {
+        return {
+          ...order,
+          createdAt: formatDate({
+            date: order.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: order.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          totalPrice: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(order.totalPrice * 1000),
+        };
+      }),
+      ratingReviews: user.ratingReviews.map((ratingReview) => {
+        return {
+          ...ratingReview,
+          createdAt: formatDate({
+            date: ratingReview.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: ratingReview.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
     };
   }
 

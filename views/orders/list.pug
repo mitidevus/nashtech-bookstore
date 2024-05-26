@@ -19,8 +19,9 @@ block content
                         th(class="py-3 px-6 text-left tracking-wider text-center") Status
                         th(class="py-3 px-6 text-left tracking-wider") Created At
                         th(class="py-3 px-6 text-left tracking-wider") Updated At
-                tbody(class="bg-white divide-y divide-gray-200 text-sm text-gray-500")
-                    if data && data.length
+                - var rows = data
+                include ../partials/body-table
+                    block items
                         each order in data
                             tr(key=order.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/orders/${order.id}'`)   
                                 td(class="py-5 px-6")= order.id
@@ -32,9 +33,6 @@ block content
                                     span(class=`block w-full py-1.5 px-4 bg-[${statusColor}] bg-opacity-10 border border-[${statusColor}] border-opacity-20 rounded-full text-[${statusColor}] text-sm capitalize`)= order.status
                                 td(class="py-5 px-6")= order.createdAt
                                 td(class="py-5 px-6")= order.updatedAt   
-                    else
-                        tr
-                            td(class="py-4 px-6 text-sm text-gray-500 text-center" colspan=7) There aren't any records to display.
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
