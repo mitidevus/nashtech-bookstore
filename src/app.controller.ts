@@ -243,6 +243,37 @@ export class AppController {
     };
   }
 
+  @Get('/promotion-lists/:id')
+  @Render('promotion-lists/detail')
+  async getPromotionListDetailPage(@Param('id', ParseIntPipe) id: number) {
+    const promotionList = await this.promotionListService.getPromotionList(id);
+
+    return {
+      ...promotionList,
+      createdAt: formatDate({
+        date: promotionList.createdAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      updatedAt: formatDate({
+        date: promotionList.updatedAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      books: promotionList.books.map((book) => {
+        return {
+          ...book,
+          createdAt: formatDate({
+            date: book.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: book.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
+    };
+  }
+
   @UseGuards(AuthenticatedGuard)
   @Post('/promotion-lists')
   createPromotionList(@Body() dto: CreatePromotionListDto) {
