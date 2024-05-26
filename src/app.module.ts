@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthorModule } from './author/author.module';
 import { AuthorService } from './author/author.service';
 import { BookModule } from './book/book.module';
+import { BookService } from './book/book.service';
 import { CategoryModule } from './category/category.module';
 import { CategoryService } from './category/category.service';
 import { OrderModule } from './order/order.module';
@@ -47,6 +48,7 @@ import { UserService } from './user/user.service';
     OrderService,
     RatingReviewService,
     UserService,
+    BookService,
   ],
 })
 export class AppModule {}

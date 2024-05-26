@@ -34,6 +34,28 @@ export class BookService {
       this.prismaService.book.findMany({
         ...conditions,
         ...pageOption,
+        include: {
+          authors: {
+            select: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
       }),
       this.prismaService.book.count({
         ...conditions,
@@ -41,7 +63,11 @@ export class BookService {
     ]);
 
     return {
-      data: books,
+      data: books.map((book) => ({
+        ...book,
+        authors: book.authors.map((item) => item.author),
+        categories: book.categories.map((item) => item.category),
+      })),
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
