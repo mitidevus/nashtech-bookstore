@@ -78,6 +78,32 @@ export class CategoryService {
     };
   }
 
+  async getCategory(id: number) {
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        books: {
+          select: {
+            book: true,
+          },
+        },
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException({
+        message: 'Category not found',
+      });
+    }
+
+    return {
+      ...category,
+      books: category.books.map((item) => item.book),
+    };
+  }
+
   async updateCategory(id: number, dto: UpdateCategoryDto) {
     if (!Object.keys(dto).length) {
       throw new BadRequestException({
