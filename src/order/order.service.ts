@@ -26,7 +26,9 @@ export class OrderService {
       });
     }
 
-    const bookPriceMap = new Map(books.map((book) => [book.id, book.price]));
+    const bookPriceMap = new Map(
+      books.map((book) => [book.id, book.discountPrice || book.price]),
+    );
 
     try {
       return await this.prismaService.$transaction(async (tx) => {
@@ -40,7 +42,8 @@ export class OrderService {
           orderId: order.id,
           bookId: item.bookId,
           quantity: item.quantity,
-          price: bookPriceMap.get(item.bookId) * item.quantity,
+          purchasePrice: bookPriceMap.get(item.bookId),
+          totalPrice: bookPriceMap.get(item.bookId) * item.quantity,
         }));
 
         await tx.orderItem.createMany({
@@ -49,7 +52,7 @@ export class OrderService {
 
         // Update total price of the order
         const totalPrice = orderItems.reduce(
-          (sum, item) => sum + item.price,
+          (sum, item) => sum + item.totalPrice,
           0,
         );
 
@@ -68,10 +71,10 @@ export class OrderService {
                     name: true,
                     slug: true,
                     image: true,
-                    price: true,
                   },
                 },
-                price: true,
+                purchasePrice: true,
+                totalPrice: true,
                 quantity: true,
               },
             },
@@ -143,10 +146,10 @@ export class OrderService {
                 name: true,
                 slug: true,
                 image: true,
-                price: true,
               },
             },
-            price: true,
+            purchasePrice: true,
+            totalPrice: true,
             quantity: true,
           },
         },
