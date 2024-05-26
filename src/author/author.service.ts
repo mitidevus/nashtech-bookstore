@@ -67,6 +67,32 @@ export class AuthorService {
     };
   }
 
+  async getAuthor(id: number) {
+    const author = await this.prismaService.author.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        books: {
+          select: {
+            book: true,
+          },
+        },
+      },
+    });
+
+    if (!author) {
+      throw new NotFoundException({
+        message: 'Author not found',
+      });
+    }
+
+    return {
+      ...author,
+      books: author.books.map((item) => item.book),
+    };
+  }
+
   async updateAuthor(id: number, dto: UpdateAuthorDto) {
     if (!Object.keys(dto).length) {
       throw new BadRequestException({
