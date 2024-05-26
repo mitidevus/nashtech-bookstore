@@ -1,15 +1,17 @@
 extends ../partials/dashboard-layout
 
 block content
-    div(class="main p-3")
-        div(class="w-full h-full flex flex-col items-center px-20 mt-10")
-            div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
-                div(class="flex items-center justify-between py-4 px-6")
-                    h1(class="text-lg font-semibold text-gray-800") Users
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'Users']
+    include ../partials/breadcrumbs
 
-                - var columns = ['ID', 'Name', 'Email', 'Role', 'Created At', 'Updated At']
-                - var rows = data.map(user => [user.id, user.name, user.email, user.role, user.createdAt, user.updatedAt])
-                include ../partials/table.pug
+    div(class="w-full h-full flex flex-col items-center mt-4")
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Users
 
-                div(class="py-4 px-6")
-                    include ../partials/pagination.pug
+            - var columns = ['ID', 'Name', 'Email', 'Role', 'Created At', 'Updated At']
+            - var rows = data.map(user => [user.id, user.name, user.email, user.role, user.createdAt, user.updatedAt])
+            include ../partials/table.pug
+
+            div(class="py-4 px-6")
+                include ../partials/pagination.pug
