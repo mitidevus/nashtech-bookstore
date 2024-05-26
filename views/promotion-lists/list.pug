@@ -1,23 +1,32 @@
 extends ../partials/dashboard-layout
 
 block content
-    div(class="main p-3")
-        div(class="w-full h-full flex flex-col items-center px-20 mt-10")
-            div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
-                div(class="flex items-center justify-between py-4 px-6")
-                    h1(class="text-lg font-semibold text-gray-800") Promotion lists
-                    button(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" onclick="openModal()")
-                        i.lni.lni-plus
-                        span Add List
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'Promotion Lists']
+    include ../partials/breadcrumbs
+
+    div(class="w-full h-full flex flex-col items-center mt-4")
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Promotion lists
+                button(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" onclick="openModal()")
+                    i.lni.lni-plus
+                    span Add List
+
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At']
+                include ../partials/head-table
+
+                - var rows = data
+                include ../partials/body-table
+                    block items
+                        each promotionList in data
+                            tr(key=promotionList.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+                                each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
+                                    td(class="py-4 px-6")= promotionList[prop]
 
 
-                - var columns = ['ID', 'Slug', 'Name', 'Created At', 'Updated At']
-                - var rows = data.map(promoList => [promoList.id, promoList.slug, promoList.name, promoList.createdAt, promoList.updatedAt])
-                include ../partials/table.pug
-
-
-                div(class="py-4 px-6")
-                    include ../partials/pagination.pug
+            div(class="py-4 px-6")
+                include ../partials/pagination.pug
 
     - var modalTitle = 'Add Promotion List'
     include ../partials/modal

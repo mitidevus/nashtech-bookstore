@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  ParseIntPipe,
   Post,
   Query,
   Render,
@@ -71,7 +73,7 @@ export class AppController {
     return { user: req.user };
   }
 
-  @UseGuards(AuthenticatedGuard)
+  // @UseGuards(AuthenticatedGuard)
   @Get('/authors')
   @Render('authors/list')
   async getAuthorListPage(@Query() dto: AuthorPageOptionsDto) {
@@ -100,6 +102,45 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @Get('/authors/:id')
+  @Render('authors/detail')
+  async getAuthorDetailPage(@Param('id', ParseIntPipe) id: number) {
+    const author = await this.authorService.getAuthor(id);
+
+    return {
+      ...author,
+      createdAt: formatDate({
+        date: author.createdAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      updatedAt: formatDate({
+        date: author.updatedAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      books: author.books.map((book) => {
+        return {
+          ...book,
+          createdAt: formatDate({
+            date: book.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: book.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          price: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(book.price * 1000),
+          discountPrice: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(book.discountPrice * 1000),
+        };
+      }),
     };
   }
 
@@ -287,7 +328,7 @@ export class AppController {
     };
   }
 
-  // @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard)
   @Get('/books')
   @Render('books/list')
   async getBooksPage(@Query() dto: BookPageOptionsDto) {
@@ -313,10 +354,13 @@ export class AppController {
             style: 'currency',
             currency: 'VND',
           }).format(book.price * 1000),
-          discountPrice: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.discountPrice * 1000),
+          discountPrice:
+            book.discountPrice > 0
+              ? new Intl.NumberFormat('us-EN', {
+                  style: 'currency',
+                  currency: 'VND',
+                }).format(book.discountPrice * 1000)
+              : null,
         };
       }),
     };

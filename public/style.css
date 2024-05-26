@@ -172,6 +172,14 @@ a.sidebar-link:hover {
 @media (min-width: 768px) {
 }
 
+.modal-label {
+  display: block;
+  color: #4b5563;
+  font-weight: 500;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
 .modal-input {
   width: 100%;
   border: 1px solid #d1d5db;

@@ -33,6 +33,11 @@ export class AuthorController {
     return this.authorService.getAuthors(dto);
   }
 
+  @Get(':id')
+  getAuthor(@Param('id', ParseIntPipe) id: number) {
+    return this.authorService.getAuthor(id);
+  }
+
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Patch(':id')
