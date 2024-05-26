@@ -131,14 +131,6 @@ export class AppController {
             date: book.updatedAt,
             targetFormat: DateFormat.TIME_DATE,
           }),
-          price: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.price * 1000),
-          discountPrice: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.discountPrice * 1000),
         };
       }),
     };
@@ -179,6 +171,37 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @Get('/categories/:id')
+  @Render('categories/detail')
+  async getCategoryDetailPage(@Param('id', ParseIntPipe) id: number) {
+    const category = await this.categoryService.getCategory(id);
+
+    return {
+      ...category,
+      createdAt: formatDate({
+        date: category.createdAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      updatedAt: formatDate({
+        date: category.updatedAt,
+        targetFormat: DateFormat.TIME_DATE,
+      }),
+      books: category.books.map((book) => {
+        return {
+          ...book,
+          createdAt: formatDate({
+            date: book.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: book.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+        };
+      }),
     };
   }
 
