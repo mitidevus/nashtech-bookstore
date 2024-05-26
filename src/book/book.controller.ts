@@ -12,12 +12,18 @@ import { JwtGuard } from 'src/auth/guard';
 import { BookService } from './book.service';
 import {
   AddRatingReviewToBookDto,
+  BookPageOptionsDto,
   RatingReviewInBookPageOptionsDto,
 } from './dto';
 
-@Controller('books')
+@Controller('/api/books')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
+
+  @Get()
+  async getBooks(@Query() dto: BookPageOptionsDto) {
+    return this.bookService.getBooks(dto);
+  }
 
   @UseGuards(JwtGuard)
   @Post(':slug/rating-reviews')

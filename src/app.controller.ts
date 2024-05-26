@@ -21,6 +21,8 @@ import {
 } from './auth/guard';
 import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
+import { BookService } from './book/book.service';
+import { BookPageOptionsDto } from './book/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
 import { OrderPageOptionsDto } from './order/dto';
@@ -46,6 +48,7 @@ export class AppController {
     private readonly orderService: OrderService,
     private readonly ratingReviewService: RatingReviewService,
     private readonly userService: UserService,
+    private readonly bookService: BookService,
   ) {}
 
   @UseGuards(UnauthenticatedGuard)
@@ -274,6 +277,46 @@ export class AppController {
             targetFormat: DateFormat.TIME_DATE,
           }),
           role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
+        };
+      }),
+    };
+
+    return {
+      ...result,
+      currentPage: dto.page,
+    };
+  }
+
+  // @UseGuards(AuthenticatedGuard)
+  @Get('/books')
+  @Render('books/list')
+  async getBooksPage(@Query() dto: BookPageOptionsDto) {
+    dto.page = dto.page || 1;
+    dto.take = dto.take || DEFAULT_PAGE_SIZE;
+
+    const res = await this.bookService.getBooks(dto);
+
+    const result = {
+      ...res,
+      data: res.data.map((book) => {
+        return {
+          ...book,
+          createdAt: formatDate({
+            date: book.createdAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          updatedAt: formatDate({
+            date: book.updatedAt,
+            targetFormat: DateFormat.TIME_DATE,
+          }),
+          price: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(book.price * 1000),
+          discountPrice: new Intl.NumberFormat('us-EN', {
+            style: 'currency',
+            currency: 'VND',
+          }).format(book.discountPrice * 1000),
         };
       }),
     };
