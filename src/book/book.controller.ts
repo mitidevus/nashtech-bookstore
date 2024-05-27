@@ -3,16 +3,20 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { GetUser } from 'src/auth/decorator';
-import { JwtGuard } from 'src/auth/guard';
+import { UserRole } from '@prisma/client';
+import { GetUser, Roles } from 'src/auth/decorator';
+import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { BookService } from './book.service';
 import {
   AddRatingReviewToBookDto,
   BookPageOptionsDto,
+  CreateBookInput,
   RatingReviewInBookPageOptionsDto,
 } from './dto';
 
@@ -20,9 +24,31 @@ import {
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Post()
+  async createBook(@Body() dto: CreateBookInput) {
+    return this.bookService.createBook(dto);
+  }
+
   @Get()
   async getBooks(@Query() dto: BookPageOptionsDto) {
     return this.bookService.getBooks(dto);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Get(':id')
+  async getBookById(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() reviewsDto: RatingReviewsPageOptionsDto,
+  ) {
+    return this.bookService.getBookById(id, reviewsDto);
+  }
+
+  @Get('slug/:slug')
+  async getBookBySlug(@Param('slug') slug: string) {
+    return this.bookService.getBookBySlug(slug);
   }
 
   @UseGuards(JwtGuard)

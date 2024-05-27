@@ -34,6 +34,7 @@ model Book {
   price              Float
   discountPrice      Float          @default(0) @map("discount_price")
   discountPercentage Int            @default(0) @map("discount_percentage")
+  discountDate       DateTime?      @map("discount_date")
   avgStars           Float          @default(0) @map("avg_stars")
   totalReviews       Int            @default(0) @map("total_reviews")
   soldQuantity       Int            @default(0) @map("sold_quantity")
