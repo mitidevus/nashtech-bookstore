@@ -396,6 +396,38 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Get('/books/:id')
+  @Render('books/detail')
+  async getBookDetailPage(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() reviewsDto: RatingReviewsPageOptionsDto,
+  ) {
+    const book = await this.bookService.getBookById(id, reviewsDto);
+
+    return {
+      ...book,
+      createdAt: toTimeDate(book.createdAt),
+      updatedAt: toTimeDate(book.updatedAt),
+      price: formatCurrency(book.price * 1000),
+      discountPrice:
+        book.discountPrice > 0
+          ? formatCurrency(book.discountPrice * 1000)
+          : null,
+      discountDate: toTimeDate(book.discountDate),
+      ratingReviews: {
+        ...book.ratingReviews,
+        data: book.ratingReviews.data.map((ratingReview) => {
+          return {
+            ...ratingReview,
+            createdAt: toTimeDate(ratingReview.createdAt),
+          };
+        }),
+        currentPage: reviewsDto.page || 1,
+      },
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/logout')
   logout(@Request() req, @Res() res: Response): void {
     req.logout((error) => {
