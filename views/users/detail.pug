@@ -38,6 +38,9 @@ block content
                         label(for="updatedAt" class="modal-label") Updated At
                         input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
+                    div(class="md:col-span-4")
+                        label(for="image" class="modal-label") Image
+                        img(src=image alt=name class="w-48 h-48 object-cover rounded-lg border border-gray-200")
 
         - var wrapperTitle = 'Orders'
         include ../partials/wrapper
