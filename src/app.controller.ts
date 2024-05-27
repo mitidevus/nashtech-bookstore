@@ -3,17 +3,22 @@ import {
   Controller,
   Get,
   Param,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Post,
   Query,
   Render,
   Request,
   Res,
+  UploadedFile,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserRole } from '@prisma/client';
 import { DEFAULT_PAGE_SIZE } from 'constants/app';
+import { FILE_TYPES_REGEX } from 'constants/image';
 import { Response } from 'express';
 import { AuthExceptionFilter } from './auth/filters';
 import {
@@ -121,8 +126,21 @@ export class AppController {
 
   @UseGuards(AuthenticatedGuard)
   @Post('/authors')
-  createAuthor(@Body() dto: CreateAuthorDto) {
-    return this.authorService.createAuthor(dto);
+  @UseInterceptors(FileInterceptor('image'))
+  createAuthor(
+    @Body() dto: CreateAuthorDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return this.authorService.createAuthor(dto, image);
   }
 
   @UseGuards(AuthenticatedGuard)

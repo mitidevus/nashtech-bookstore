@@ -4,14 +4,19 @@ import {
   Delete,
   Get,
   Param,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Patch,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FILE_TYPES_REGEX } from 'constants/image';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { AuthorService } from './author.service';
@@ -24,8 +29,21 @@ export class AuthorController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Post()
-  createAuthor(@Body() dto: CreateAuthorDto) {
-    return this.authorService.createAuthor(dto);
+  @UseInterceptors(FileInterceptor('image'))
+  createAuthor(
+    @Body() dto: CreateAuthorDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return this.authorService.createAuthor(dto, image);
   }
 
   @Get()

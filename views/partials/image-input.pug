@@ -1,0 +1,37 @@
+div(class="mb-4")
+    label(for="image" class="block text-gray-700 text-sm font-medium mb-2") Upload Image
+    div(class="relative")
+        input(id="image" type="file" name="image" class="modal-input" onchange="previewImage(event)")
+        button(type="button" id="cancel-image-btn" onclick="cancelImage()" class="absolute py-0.5 px-2 bg-gray-200 text-gray-700 rounded-md right-4 -translate-y-1/2 top-1/2 hidden") x
+
+div(class="mb-8")
+    img(id="image-preview" src="#" alt="Image Preview" class="hidden w-32 h-32 object-cover border rounded-md")
+
+script.
+    function previewImage(event) {
+        const imageInput = event.target;
+        const imagePreview = document.getElementById('image-preview');
+        const cancelImageBtn = document.getElementById('cancel-image-btn');
+
+        const file = imageInput.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.remove('hidden');
+                cancelImageBtn.classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function cancelImage() {
+        const imageInput = document.getElementById('image');
+        const imagePreview = document.getElementById('image-preview');
+        const cancelImageBtn = document.getElementById('cancel-image-btn');
+
+        imageInput.value = '';
+        imagePreview.src = '#';
+        imagePreview.classList.add('hidden');
+        cancelImageBtn.classList.add('hidden');
+    }
