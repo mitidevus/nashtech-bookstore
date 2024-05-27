@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { DEFAULT_BOOK_IMAGE_URL } from 'constants/app';
+import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
+import { deleteFilesFromFirebase } from 'src/services/files/delete';
+import { uploadFilesFromFirebase } from 'src/services/files/upload';
 import {
   AddRatingReviewToBookDto,
   CreateBookInput,
@@ -14,45 +18,76 @@ import {
 export class BookService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createBook(dto: CreateBookInput) {
+  async createBook(dto: CreateBookInput, image?: Express.Multer.File) {
     const hasCategory = dto.categoryIds && dto.categoryIds.length > 0;
     const hasAuthor = dto.authorIds && dto.authorIds.length > 0;
 
-    // Check if list of categories and authors are exist
+    let categoryIds = [];
+    let authorIds = [];
+
     if (hasCategory) {
+      categoryIds = dto.categoryIds.split(',').map(Number);
+
+      // Remove duplicates
+      categoryIds = [...new Set(categoryIds)];
+
       const categories = await this.prismaService.category.findMany({
-        where: { id: { in: dto.categoryIds } },
+        where: { id: { in: categoryIds } },
       });
 
-      if (categories.length !== dto.categoryIds.length) {
+      if (categories.length !== categoryIds.length) {
         throw new BadRequestException('Invalid category');
       }
     }
 
     if (hasAuthor) {
+      authorIds = dto.authorIds.split(',').map(Number);
+
+      // Remove duplicates
+      authorIds = [...new Set(authorIds)];
+
       const authors = await this.prismaService.author.findMany({
-        where: { id: { in: dto.authorIds } },
+        where: { id: { in: authorIds } },
       });
 
-      if (authors.length !== dto.authorIds.length) {
+      if (authors.length !== authorIds.length) {
         throw new BadRequestException('Invalid author');
       }
     }
+    const price = Number(dto.price);
+    if (isNaN(price)) {
+      throw new BadRequestException('Price must be a number!');
+    }
+
+    let imageUrls = [];
 
     try {
+      if (image && image.buffer.byteLength > 0) {
+        const uploadImagesData = await uploadFilesFromFirebase(
+          [image],
+          EUploadFolder.book,
+        );
+
+        if (!uploadImagesData.success) {
+          throw new Error('Failed to upload images!');
+        }
+
+        imageUrls = uploadImagesData.urls;
+      }
+
       const result = await this.prismaService.$transaction(async (tx) => {
         const newBook = await tx.book.create({
           data: {
             name: dto.name,
             description: dto.description,
-            image: dto.image,
-            price: dto.price,
+            image: imageUrls.length ? imageUrls[0] : DEFAULT_BOOK_IMAGE_URL,
+            price: price,
           },
         });
 
         if (hasCategory) {
           await tx.bookCategory.createMany({
-            data: dto.categoryIds.map((categoryId) => ({
+            data: categoryIds.map((categoryId) => ({
               bookId: newBook.id,
               categoryId,
             })),
@@ -61,7 +96,7 @@ export class BookService {
 
         if (hasAuthor) {
           await tx.bookAuthor.createMany({
-            data: dto.authorIds.map((authorId) => ({
+            data: authorIds.map((authorId) => ({
               bookId: newBook.id,
               authorId,
             })),
@@ -101,6 +136,9 @@ export class BookService {
       };
     } catch (error) {
       console.log('Error:', error.message);
+
+      if (image && !imageUrls.length) await deleteFilesFromFirebase(imageUrls);
+
       throw new BadRequestException({
         message: 'Failed to create book',
       });

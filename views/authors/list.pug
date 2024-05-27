@@ -8,7 +8,7 @@ block content
         div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
                 h1(class="text-lg font-semibold text-gray-800") Authors
-                button(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" onclick="openModal()")
+                button(class="primary-btn" onclick="openModal()")
                     i.lni.lni-plus
                     span Add Author
 
@@ -35,6 +35,8 @@ block content
                     label(for="name" class="block text-gray-700 text-sm font-medium mb-2") Name
                     input(id="name" type="text" name="name" class="modal-input" autocomplete="off")
 
+                include ../partials/image-input
+
                 div(class="flex gap-2 justify-end")
                     button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
                     button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
@@ -43,16 +45,13 @@ block content
         async function addAuthor(event) {
             event.preventDefault();
 
-            const name = document.getElementById('name').value;
+            const form = document.getElementById('add-author-form');
+            const formData = new FormData(form);
 
-            const data = { name }; 
             try {
                 const response = await fetch('/authors', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 if (response.ok) {
@@ -66,4 +65,3 @@ block content
                 console.error('Failed to add author');
             }
         }
-

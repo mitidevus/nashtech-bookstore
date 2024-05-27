@@ -70,10 +70,9 @@ type Mutation {
 input CreateBookInput {
   name: String!
   description: String!
-  image: String!
-  price: Float!
-  categoryIds: [Int!]
-  authorIds: [Int!]
+  price: String!
+  categoryIds: String
+  authorIds: String
 }
 
 input UpdateBookInput {

@@ -4,20 +4,38 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DEFAULT_IMAGE_URL } from 'constants/app';
+import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { deleteFilesFromFirebase } from 'src/services/files/delete';
+import { uploadFilesFromFirebase } from 'src/services/files/upload';
 import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
 
 @Injectable()
 export class AuthorService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createAuthor(dto: CreateAuthorDto) {
+  async createAuthor(dto: CreateAuthorDto, image?: Express.Multer.File) {
+    let imageUrls = [];
+
     try {
+      if (image && image.buffer.byteLength > 0) {
+        const uploadImagesData = await uploadFilesFromFirebase(
+          [image],
+          EUploadFolder.author,
+        );
+
+        if (!uploadImagesData.success) {
+          throw new Error('Failed to upload images!');
+        }
+
+        imageUrls = uploadImagesData.urls;
+      }
+
       const author = await this.prismaService.author.create({
         data: {
           name: dto.name,
-          image: dto.image || DEFAULT_IMAGE_URL,
+          image: image ? imageUrls[0] : DEFAULT_IMAGE_URL,
           slug: slugify(dto.name, {
             lower: true,
           }),
@@ -27,6 +45,9 @@ export class AuthorService {
       return author;
     } catch (error) {
       console.log('Error:', error.message);
+
+      if (image && !imageUrls.length) await deleteFilesFromFirebase(imageUrls);
+
       throw new BadRequestException({
         message: 'Failed to create author',
       });
@@ -65,6 +86,10 @@ export class AuthorService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async getAllAuthors() {
+    return this.prismaService.author.findMany();
   }
 
   async getAuthor(id: number) {

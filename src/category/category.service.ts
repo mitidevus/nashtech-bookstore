@@ -78,6 +78,10 @@ export class CategoryService {
     };
   }
 
+  async getAllCategories() {
+    return this.prismaService.category.findMany();
+  }
+
   async getCategoryById(id: number) {
     const category = await this.prismaService.category.findUnique({
       where: {

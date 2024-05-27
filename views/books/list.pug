@@ -8,6 +8,10 @@ block content
         div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
                 h1(class="text-lg font-semibold text-gray-800") Books
+                button(id="add-book-btn" class="primary-btn" onclick="openModal()")
+                    i.lni.lni-plus
+                    span Add Book
+
 
             table(class="min-w-full divide-y divide-gray-200")
                 - var columns = ['ID', 'Name', 'Price', 'Discount', 'Sold', 'Created At', 'Updated At']
@@ -35,3 +39,72 @@ block content
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
+
+    - var modalTitle = 'Add Book'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-book-form" onsubmit="addBook(event)")
+                div(class="grid grid-cols-2 gap-4")
+                    div(class="col-span-2")
+                        label(for="name" class="block text-gray-700 text-sm font-medium mb-2") Name
+                        input(id="name" type="text" name="name" class="modal-input" autocomplete="off")
+
+                    div(class="col-span-2")
+                        label(for="price" class="block text-gray-700 text-sm font-medium mb-2") Price
+                        input(id="price" type="text" name="price" class="modal-input" autocomplete="off")
+
+                    div(class="col-span-2")
+                        label(for="categories" class="block text-gray-700 text-sm font-medium mb-2") Categories
+                        select(id="categories" name="categories" class="modal-input" multiple size=2.5)
+                            each category in categories
+                                option(value=category.id)= category.name
+
+                    div(class="col-span-2")
+                        label(for="authors" class="block text-gray-700 text-sm font-medium mb-2") Authors
+                        select(id="authors" name="authors" class="modal-input" multiple size=2.5)
+                            each author in authors
+                                option(value=author.id)= author.name
+
+                    div(class="col-span-4")
+                        label(for="description" class="block text-gray-700 text-sm font-medium mb-2") Description
+                        textarea(id="description" type="text" name="description" class="modal-input" autocomplete="off" rows="2")
+
+                    div(class="col-span-4")
+                        include ../partials/image-input
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        async function addBook(event) {
+            event.preventDefault();
+
+            const form = document.getElementById('add-book-form');
+            const formData = new FormData(form);
+
+            const categorySelect = document.getElementById('categories');
+            const selectedCategories = Array.from(categorySelect.selectedOptions).map(option => option.value);
+            formData.set('categoryIds', selectedCategories.join(','));
+
+            const authorSelect = document.getElementById('authors');
+            const selectedAuthors = Array.from(authorSelect.selectedOptions).map(option => option.value);
+            formData.set('authorIds', selectedAuthors.join(','));
+
+            try {
+                const response = await fetch('/books', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    console.log('Added book successfully');
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book');
+                }
+            } catch (error) {
+                console.error('Failed to add book');
+            }
+        }

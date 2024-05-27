@@ -9,7 +9,10 @@ export const DEFAULT_PAGE_SIZE = 8;
 export const MAX_PAGINATION_PAGES = 5;
 
 export const DEFAULT_IMAGE_URL =
-  'https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg';
+  'https://firebasestorage.googleapis.com/v0/b/bookstore-70c15.appspot.com/o/storage%2Fdefault-user.jpeg?alt=media';
+
+export const DEFAULT_BOOK_IMAGE_URL =
+  'https://firebasestorage.googleapis.com/v0/b/bookstore-70c15.appspot.com/o/storage%2Fno-book.jpeg?alt=media';
 
 export enum DateFormat {
   DATE = 'DD-MM-YYYY',

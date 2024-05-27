@@ -5,11 +5,11 @@
 
 div(class="flex justify-between items-center")
     if currentPage > 1
-        a(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" href=`?page=${currentPage - 1}`)
+        a(class="primary-btn" href=`?page=${currentPage - 1}`)
             i.lni.lni-arrow-left
             span Previous
     else
-        button(class='flex items-center gap-2 py-2 px-4 border rounded-md bg-gray-100 text-gray-400 font-medium' disabled)
+        button(class='disabled-btn' disabled)
             i.lni.lni-arrow-left
             span Previous
 
@@ -27,10 +27,10 @@ div(class="flex justify-between items-center")
                 a(class='py-2 px-4 rounded-md hover:bg-gray-50' href=`?page=${totalPages}`) ...
 
     if currentPage < totalPages
-        a(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]" href=`?page=${currentPage + 1}`)
+        a(class="primary-btn" href=`?page=${currentPage + 1}`)
             span Next
             i.lni.lni-arrow-right
     else    
-        button(class='flex items-center gap-2 py-2 px-4 border rounded-md bg-gray-100 text-gray-400 font-medium' disabled)
+        button(class='disabled-btn' disabled)
             span Next
             i.lni.lni-arrow-right

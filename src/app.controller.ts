@@ -3,17 +3,22 @@ import {
   Controller,
   Get,
   Param,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Post,
   Query,
   Render,
   Request,
   Res,
+  UploadedFile,
   UseFilters,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserRole } from '@prisma/client';
 import { DEFAULT_PAGE_SIZE } from 'constants/app';
+import { FILE_TYPES_REGEX } from 'constants/image';
 import { Response } from 'express';
 import { AuthExceptionFilter } from './auth/filters';
 import {
@@ -24,7 +29,7 @@ import {
 import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
 import { BookService } from './book/book.service';
-import { BookPageOptionsDto } from './book/dto';
+import { BookPageOptionsDto, CreateBookInput } from './book/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
 import { OrderPageOptionsDto } from './order/dto';
@@ -121,8 +126,21 @@ export class AppController {
 
   @UseGuards(AuthenticatedGuard)
   @Post('/authors')
-  createAuthor(@Body() dto: CreateAuthorDto) {
-    return this.authorService.createAuthor(dto);
+  @UseInterceptors(FileInterceptor('image'))
+  createAuthor(
+    @Body() dto: CreateAuthorDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return this.authorService.createAuthor(dto, image);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -373,6 +391,9 @@ export class AppController {
 
     const res = await this.bookService.getBooks(dto);
 
+    const categories = await this.categoryService.getAllCategories();
+    const authors = await this.authorService.getAllAuthors();
+
     const result = {
       ...res,
       data: res.data.map((book) => {
@@ -387,6 +408,8 @@ export class AppController {
               : null,
         };
       }),
+      categories,
+      authors,
     };
 
     return {
@@ -425,6 +448,25 @@ export class AppController {
         currentPage: reviewsDto.page || 1,
       },
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/books')
+  @UseInterceptors(FileInterceptor('image'))
+  async createBook(
+    @Body() dto: CreateBookInput,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return this.bookService.createBook(dto, image);
   }
 
   @UseGuards(AuthenticatedGuard)
