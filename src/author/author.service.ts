@@ -88,6 +88,10 @@ export class AuthorService {
     };
   }
 
+  async getAllAuthors() {
+    return this.prismaService.author.findMany();
+  }
+
   async getAuthor(id: number) {
     const author = await this.prismaService.author.findUnique({
       where: {

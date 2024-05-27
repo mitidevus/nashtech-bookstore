@@ -29,7 +29,7 @@ import {
 import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
 import { BookService } from './book/book.service';
-import { BookPageOptionsDto } from './book/dto';
+import { BookPageOptionsDto, CreateBookInput } from './book/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
 import { OrderPageOptionsDto } from './order/dto';
@@ -391,6 +391,9 @@ export class AppController {
 
     const res = await this.bookService.getBooks(dto);
 
+    const categories = await this.categoryService.getAllCategories();
+    const authors = await this.authorService.getAllAuthors();
+
     const result = {
       ...res,
       data: res.data.map((book) => {
@@ -405,6 +408,8 @@ export class AppController {
               : null,
         };
       }),
+      categories,
+      authors,
     };
 
     return {
@@ -443,6 +448,25 @@ export class AppController {
         currentPage: reviewsDto.page || 1,
       },
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/books')
+  @UseInterceptors(FileInterceptor('image'))
+  async createBook(
+    @Body() dto: CreateBookInput,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return this.bookService.createBook(dto, image);
   }
 
   @UseGuards(AuthenticatedGuard)
