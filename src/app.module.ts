@@ -25,6 +25,7 @@ import { UserService } from './user/user.service';
     PrismaModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      cache: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
