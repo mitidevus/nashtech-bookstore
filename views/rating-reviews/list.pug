@@ -23,7 +23,7 @@ block content
                                     img(src=`${review.book.image}` alt=review.book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block font-semibold")= review.book.name
                             td(class="py-5 px-6")
-                                a(href=`/users/${review.user.id}` class="flex flex-col hover:text-[#7F56D9]")
+                                a(href=`/customers/${review.user.id}` class="flex flex-col hover:text-[#7F56D9]")
                                     span(class="block font-semibold")= review.user.name
                                     span(class="block text-gray-500")= review.user.email
                             td(class="py-5 px-6 max-w-[300px]")
