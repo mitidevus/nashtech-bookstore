@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import {
   AddRatingReviewToBookDto,
   CreateBookInput,
@@ -12,66 +13,6 @@ import {
 @Injectable()
 export class BookService {
   constructor(private readonly prismaService: PrismaService) {}
-
-  async getBooks(dto: FindAllBooksInput) {
-    const conditions = {
-      orderBy: [
-        {
-          createdAt: dto.order,
-        },
-      ],
-    };
-
-    const pageOption =
-      dto.page && dto.take
-        ? {
-            skip: dto.skip,
-            take: dto.take,
-          }
-        : undefined;
-
-    const [books, totalCount] = await Promise.all([
-      this.prismaService.book.findMany({
-        ...conditions,
-        ...pageOption,
-        include: {
-          authors: {
-            select: {
-              author: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-          categories: {
-            select: {
-              category: {
-                select: {
-                  id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-      this.prismaService.book.count({
-        ...conditions,
-      }),
-    ]);
-
-    return {
-      data: books.map((book) => ({
-        ...book,
-        authors: book.authors.map((item) => item.author),
-        categories: book.categories.map((item) => item.category),
-      })),
-      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
-      totalCount,
-    };
-  }
 
   async createBook(dto: CreateBookInput) {
     const hasCategory = dto.categoryIds && dto.categoryIds.length > 0;
@@ -164,6 +105,168 @@ export class BookService {
         message: 'Failed to create book',
       });
     }
+  }
+
+  async getBooks(dto: FindAllBooksInput) {
+    const conditions = {
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        ...pageOption,
+        include: {
+          authors: {
+            select: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: books.map((book) => ({
+        ...book,
+        authors: book.authors.map((item) => item.author),
+        categories: book.categories.map((item) => item.category),
+      })),
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
+  }
+
+  async getBookById(id: number, reviewsDto: RatingReviewsPageOptionsDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id },
+      include: {
+        authors: {
+          select: {
+            author: true,
+          },
+        },
+        categories: {
+          select: {
+            category: true,
+          },
+        },
+        promotionList: true,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    const conditions = {
+      where: {
+        bookId: id,
+      },
+      orderBy: [
+        {
+          createdAt: reviewsDto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      reviewsDto.page && reviewsDto.take
+        ? {
+            skip: reviewsDto.skip,
+            take: reviewsDto.take,
+          }
+        : undefined;
+
+    const [ratingReviews, totalCount] = await Promise.all([
+      this.prismaService.ratingReview.findMany({
+        ...conditions,
+        ...pageOption,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.ratingReview.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      ...book,
+      authors: book.authors.map((item) => item.author),
+      categories: book.categories.map((item) => item.category),
+      ratingReviews: {
+        data: ratingReviews,
+        totalPages: reviewsDto.take
+          ? Math.ceil(totalCount / reviewsDto.take)
+          : 1,
+        totalCount,
+      },
+    };
+  }
+
+  async getBookBySlug(slug: string) {
+    const book = await this.prismaService.book.findUnique({
+      where: { slug },
+      include: {
+        authors: {
+          select: {
+            author: true,
+          },
+        },
+        categories: {
+          select: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    return {
+      ...book,
+      authors: book.authors.map((item) => item.author),
+      categories: book.categories.map((item) => item.category),
+    };
   }
 
   async updateBook(id: number, dto: UpdateBookInput) {

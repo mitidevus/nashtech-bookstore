@@ -27,7 +27,13 @@ export class OrderService {
     }
 
     const bookPriceMap = new Map(
-      books.map((book) => [book.id, book.discountPrice || book.price]),
+      books.map((book) => [
+        book.id,
+        {
+          price: book.price,
+          discountPrice: book.discountPrice,
+        },
+      ]),
     );
 
     try {
@@ -35,16 +41,24 @@ export class OrderService {
         const order = await tx.order.create({
           data: {
             userId,
+            shippingAddress: dto.shippingAddress,
+            phone: dto.phone,
           },
         });
+        const orderItems = dto.items.map((item) => {
+          const { price, discountPrice } = bookPriceMap.get(item.bookId);
+          const purchasePrice = discountPrice || price;
+          const totalPrice = purchasePrice * item.quantity;
 
-        const orderItems = dto.items.map((item) => ({
-          orderId: order.id,
-          bookId: item.bookId,
-          quantity: item.quantity,
-          purchasePrice: bookPriceMap.get(item.bookId),
-          totalPrice: bookPriceMap.get(item.bookId) * item.quantity,
-        }));
+          return {
+            orderId: order.id,
+            bookId: item.bookId,
+            quantity: item.quantity,
+            price,
+            discountPrice,
+            totalPrice,
+          };
+        });
 
         await tx.orderItem.createMany({
           data: orderItems,
@@ -73,7 +87,8 @@ export class OrderService {
                     image: true,
                   },
                 },
-                purchasePrice: true,
+                price: true,
+                discountPrice: true,
                 totalPrice: true,
                 quantity: true,
               },
@@ -143,18 +158,21 @@ export class OrderService {
           select: {
             book: {
               select: {
+                id: true,
                 name: true,
                 slug: true,
                 image: true,
               },
             },
-            purchasePrice: true,
+            price: true,
+            discountPrice: true,
             totalPrice: true,
             quantity: true,
           },
         },
         user: {
           select: {
+            id: true,
             name: true,
             email: true,
           },

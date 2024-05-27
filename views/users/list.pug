@@ -1,13 +1,13 @@
 extends ../partials/dashboard-layout
 
 block content
-    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'Users']
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'Customers']
     include ../partials/breadcrumbs
 
     div(class="w-full h-full flex flex-col items-center mt-4")
         div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
-                h1(class="text-lg font-semibold text-gray-800") Users
+                h1(class="text-lg font-semibold text-gray-800") Customers
 
             table(class="min-w-full divide-y divide-gray-200")
                 - var columns = ['ID', 'Name', 'Email', 'Role', 'Created At', 'Updated At']
@@ -16,10 +16,10 @@ block content
                 - var rows = data
                 include ../partials/body-table
                     block items
-                        each promotionList in data
-                            tr(key=promotionList.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+                        each customer in data
+                            tr(key=customer.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/customers/${customer.id}'`) 
                                 each prop in ['id', 'name', 'email', 'role', 'createdAt', 'updatedAt']
-                                    td(class="py-4 px-6")= promotionList[prop]
+                                    td(class="py-4 px-6")= customer[prop]
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug

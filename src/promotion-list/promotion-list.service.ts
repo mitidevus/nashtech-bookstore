@@ -86,7 +86,7 @@ export class PromotionListService {
     };
   }
 
-  async getPromotionList(id: number) {
+  async getPromotionListById(id: number) {
     const promotionList = await this.prismaService.promotionList.findUnique({
       where: {
         id,
@@ -180,6 +180,7 @@ export class PromotionListService {
             promotionListId: null,
             discountPrice: 0,
             discountPercentage: 0,
+            discountDate: null,
           },
         }),
         this.prismaService.promotionList.delete({
@@ -249,6 +250,7 @@ export class PromotionListService {
             book.price,
             dto.discountPercentage,
           ),
+          discountDate: new Date(),
         },
       });
 

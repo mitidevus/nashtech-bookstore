@@ -22,7 +22,12 @@ block content
                                 td(class="py-4 px-6 max-w-[300px] flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= book.name
-                                td(class="py-4 px-6")= book.discountPrice || book.price
+                                td(class="py-4 px-6")
+                                    if book.discountPrice
+                                        span(class="block text-gray-400 line-through")= book.price
+                                        span(class="block")= book.discountPrice
+                                    else
+                                        span(class="block")= book.price
                                 td(class="py-4 px-6")= `${book.discountPercentage}%`
                                 td(class="py-4 px-6")= book.soldQuantity
                                 td(class="py-4 px-6")= book.createdAt

@@ -1,0 +1,136 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Books', href: '/books' }, `${name}`]
+    include ../partials/breadcrumbs
+
+    div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
+        div(class="w-full grid grid-cols-1 xl:grid-cols-3 gap-8")
+            div(class="xl:col-span-2")
+                div(class="flex flex-col gap-8")
+
+                    - var wrapperTitle = name
+                    include ../partials/wrapper
+                        block content
+                        div(class="pt-4 pb-6 px-6")
+                            div(class="grid grid-cols-1 md:grid-cols-4 gap-4")
+                                div(class="md:col-span-1")
+                                    label(for="id" class="modal-label") ID
+                                    input(id="id" type="text" class="modal-input" value=id readonly) 
+
+                                div(class="md:col-span-2")
+                                    label(for="slug" class="modal-label") Slug
+                                    input(id="slug" type="text" class="modal-input" value=slug readonly)
+
+                                div(class="md:col-span-1")
+                                    label(for="price" class="modal-label") Price
+                                    input(id="price" type="text" class="modal-input" value=price readonly)
+
+                                div(class="md:col-span-2")
+                                    label(for="createdAt" class="modal-label") Created At
+                                    input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+
+                                div(class="md:col-span-2")
+                                    label(for="updatedAt" class="modal-label") Updated At
+                                    input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+
+                                div(class="md:col-span-4")
+                                    label(for="description" class="modal-label") Description
+                                    textarea(id="description" class="modal-input" rows="5" readonly)= description
+
+                                div
+                                    label(for="image" class="modal-label") Image
+                                    img(src=image alt=name class="w-48 h-48 object-cover rounded-lg border border-gray-200")
+
+
+                    - var wrapperTitle = 'Rating Reviews'
+                    include ../partials/wrapper
+                        block content
+                            table(class="min-w-full divide-y divide-gray-200")
+                                - var columns = ['Reviewer', 'Review', 'Date']
+                                include ../partials/head-table
+
+                                - var rows = ratingReviews.data
+                                include ../partials/body-table
+                                    block items
+                                        each review in ratingReviews.data
+                                            tr  
+                                                td(class="py-5 px-6")
+                                                    a(href=`/customers/${review.user.id}` class="flex flex-col hover:text-[#7F56D9]")
+                                                        span(class="block font-semibold")= review.user.name
+                                                        span(class="block text-gray-500")= review.user.email
+                                                td(class="py-5 px-6 max-w-[300px]")
+                                                    div(class="flex items-center gap-1 mb-1")
+                                                        each val in [...Array(review.star).keys()]
+                                                            i(class="lni lni-star-fill text-yellow-400")
+                                                        each val in [...Array(5 - review.star).keys()]
+                                                            i(class="lni lni-star-fill text-gray-300")
+
+                                                    p(class="text-gray-600 text-md font-bold")= review.title 
+                                                    p= review.content
+                                                td(class="py-5 px-6")= review.createdAt
+
+                            - var totalPages = ratingReviews.totalPages 
+                            - var currentPage = ratingReviews.currentPage
+                            div(class="py-4 px-6")
+                                include ../partials/pagination.pug
+
+            div(class="xl:col-span-1")
+                div(class="flex flex-col gap-8")
+                    - var wrapperTitle = 'Authors'
+                    include ../partials/wrapper
+                        block content
+
+                        table(class="min-w-full divide-y divide-gray-200")
+                            - var columns = ['ID', 'Name']
+                            include ../partials/head-table
+
+                            - var rows = authors
+                            include ../partials/body-table
+                                block items
+                                    each author in authors
+                                        tr(key=author.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
+                                            td(class="py-4 px-6")= author.id
+                                            td(class="py-4 px-6")= author.name
+
+                    - var wrapperTitle = 'Categories'
+                    include ../partials/wrapper
+                        block content
+                        table(class="min-w-full divide-y divide-gray-200")
+                            - var columns = ['ID', 'Name']
+                            include ../partials/head-table
+
+                            - var rows = categories
+                            include ../partials/body-table
+                                block items
+                                    each category in categories
+                                        tr(key=category.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/categories/${category.id}'`) 
+                                            td(class="py-4 px-6")= category.id
+                                            td(class="py-4 px-6")= category.name
+
+                    - var wrapperTitle = 'Discount'
+                    include ../partials/wrapper
+                        block content
+                        div(class="pt-4 pb-6 px-6")
+                            div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+                                if promotionListId
+                                    div(class="md:col-span-1")
+                                        label(class="modal-label") Promotion List
+                                        input(id="promotionList" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=promotionList.name readonly onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+
+                                    div(class="md:col-span-1")
+                                        label(for="discountPercentage" class="modal-label") Percentage
+                                        input(id="discountPercentage" type="text" class="modal-input" value=`${discountPercentage}%` readonly)
+
+                                    div(class="md:col-span-1")
+                                        label(for="discountPrice" class="modal-label") Discount Price
+                                        input(id="discountPrice" type="text" class="modal-input" value=discountPrice readonly)
+
+                                    div(class="md:col-span-3")
+                                        label(for="discountDate" class="modal-label") Added At
+                                        input(id="discountDate" type="text" class="modal-input" value=discountDate readonly)
+                                else
+                                    div(class="md:col-span-3 flex items-center justify-center")
+                                        button(class="flex items-center gap-2 py-2 px-4 border rounded-md bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF]")
+                                            i.lni.lni-plus
+                                            span Add Discount

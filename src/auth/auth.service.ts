@@ -6,6 +6,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
+import { DEFAULT_IMAGE_URL } from 'constants/app';
 import { TokenType } from 'constants/auth';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { LoginRequestDto, SignUpRequestDto } from './dto';
@@ -38,6 +39,7 @@ export class AuthService {
           email: dto.email,
           password: hash,
           name: dto.name,
+          image: DEFAULT_IMAGE_URL,
         },
       });
 

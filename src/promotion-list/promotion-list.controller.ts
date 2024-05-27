@@ -41,7 +41,7 @@ export class PromotionListController {
 
   @Get(':id')
   getPromotionList(@Param('id', ParseIntPipe) id: number) {
-    return this.promotionListService.getPromotionList(id);
+    return this.promotionListService.getPromotionListById(id);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

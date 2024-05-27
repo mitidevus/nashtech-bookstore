@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
-import { DEFAULT_PAGE_SIZE, DateFormat } from 'constants/app';
+import { DEFAULT_PAGE_SIZE } from 'constants/app';
 import { Response } from 'express';
 import { AuthExceptionFilter } from './auth/filters';
 import {
@@ -38,7 +38,7 @@ import { RatingReviewsPageOptionsDto } from './rating-review/dto';
 import { RatingReviewService } from './rating-review/rating-review.service';
 import { UserPageOptionsDto } from './user/dto';
 import { UserService } from './user/user.service';
-import { formatDate } from './utils';
+import { formatCurrency, toTimeDate } from './utils';
 
 @Controller()
 @UseFilters(AuthExceptionFilter)
@@ -73,7 +73,7 @@ export class AppController {
     return { user: req.user };
   }
 
-  // @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard)
   @Get('/authors')
   @Render('authors/list')
   async getAuthorListPage(@Query() dto: AuthorPageOptionsDto) {
@@ -87,14 +87,8 @@ export class AppController {
       data: res.data.map((author) => {
         return {
           ...author,
-          createdAt: formatDate({
-            date: author.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: author.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
+          createdAt: toTimeDate(author.createdAt),
+          updatedAt: toTimeDate(author.updatedAt),
         };
       }),
     };
@@ -105,6 +99,7 @@ export class AppController {
     };
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Get('/authors/:id')
   @Render('authors/detail')
   async getAuthorDetailPage(@Param('id', ParseIntPipe) id: number) {
@@ -112,33 +107,13 @@ export class AppController {
 
     return {
       ...author,
-      createdAt: formatDate({
-        date: author.createdAt,
-        targetFormat: DateFormat.TIME_DATE,
-      }),
-      updatedAt: formatDate({
-        date: author.updatedAt,
-        targetFormat: DateFormat.TIME_DATE,
-      }),
+      createdAt: toTimeDate(author.createdAt),
+      updatedAt: toTimeDate(author.updatedAt),
       books: author.books.map((book) => {
         return {
           ...book,
-          createdAt: formatDate({
-            date: book.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: book.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          price: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.price * 1000),
-          discountPrice: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.discountPrice * 1000),
+          createdAt: toTimeDate(book.createdAt),
+          updatedAt: toTimeDate(book.updatedAt),
         };
       }),
     };
@@ -164,14 +139,8 @@ export class AppController {
       data: res.data.map((category) => {
         return {
           ...category,
-          createdAt: formatDate({
-            date: category.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: category.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
+          createdAt: toTimeDate(category.createdAt),
+          updatedAt: toTimeDate(category.updatedAt),
         };
       }),
     };
@@ -179,6 +148,26 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/categories/:id')
+  @Render('categories/detail')
+  async getCategoryDetailPage(@Param('id', ParseIntPipe) id: number) {
+    const category = await this.categoryService.getCategoryById(id);
+
+    return {
+      ...category,
+      createdAt: toTimeDate(category.createdAt),
+      updatedAt: toTimeDate(category.updatedAt),
+      books: category.books.map((book) => {
+        return {
+          ...book,
+          createdAt: toTimeDate(book.createdAt),
+          updatedAt: toTimeDate(book.updatedAt),
+        };
+      }),
     };
   }
 
@@ -202,14 +191,8 @@ export class AppController {
       data: res.data.map((promotionList) => {
         return {
           ...promotionList,
-          createdAt: formatDate({
-            date: promotionList.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: promotionList.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
+          createdAt: toTimeDate(promotionList.createdAt),
+          updatedAt: toTimeDate(promotionList.updatedAt),
         };
       }),
     };
@@ -217,6 +200,27 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/promotion-lists/:id')
+  @Render('promotion-lists/detail')
+  async getPromotionListDetailPage(@Param('id', ParseIntPipe) id: number) {
+    const promotionList =
+      await this.promotionListService.getPromotionListById(id);
+
+    return {
+      ...promotionList,
+      createdAt: toTimeDate(promotionList.createdAt),
+      updatedAt: toTimeDate(promotionList.updatedAt),
+      books: promotionList.books.map((book) => {
+        return {
+          ...book,
+          createdAt: toTimeDate(book.createdAt),
+          updatedAt: toTimeDate(book.updatedAt),
+        };
+      }),
     };
   }
 
@@ -240,18 +244,9 @@ export class AppController {
       data: res.data.map((order) => {
         return {
           ...order,
-          createdAt: formatDate({
-            date: order.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: order.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          totalPrice: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(order.totalPrice * 1000),
+          createdAt: toTimeDate(order.createdAt),
+          updatedAt: toTimeDate(order.updatedAt),
+          totalPrice: formatCurrency(order.totalPrice * 1000),
         };
       }),
     };
@@ -259,6 +254,31 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/orders/:id')
+  @Render('orders/detail')
+  async getOrderDetailPage(@Param('id') id: string) {
+    const order = await this.orderService.getOrderById(id);
+
+    return {
+      ...order,
+      createdAt: toTimeDate(order.createdAt),
+      updatedAt: toTimeDate(order.updatedAt),
+      totalPrice: formatCurrency(order.totalPrice * 1000),
+      items: order.items.map((item) => {
+        return {
+          ...item,
+          price: formatCurrency(item.price * 1000),
+          discountPrice:
+            item.discountPrice > 0
+              ? formatCurrency(item.discountPrice * 1000)
+              : null,
+          totalPrice: formatCurrency(item.totalPrice * 1000),
+        };
+      }),
     };
   }
 
@@ -276,14 +296,8 @@ export class AppController {
       data: res.data.map((ratingReview) => {
         return {
           ...ratingReview,
-          createdAt: formatDate({
-            date: ratingReview.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: ratingReview.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
+          createdAt: toTimeDate(ratingReview.createdAt),
+          updatedAt: toTimeDate(ratingReview.updatedAt),
         };
       }),
     };
@@ -295,7 +309,7 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
-  @Get('/users')
+  @Get('/customers')
   @Render('users/list')
   async getUsersPage(@Query() dto: UserPageOptionsDto) {
     dto.page = dto.page || 1;
@@ -309,14 +323,8 @@ export class AppController {
       data: res.data.map((user) => {
         return {
           ...user,
-          createdAt: formatDate({
-            date: user.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: user.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
+          createdAt: toTimeDate(user.createdAt),
+          updatedAt: toTimeDate(user.updatedAt),
           role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
         };
       }),
@@ -325,6 +333,34 @@ export class AppController {
     return {
       ...result,
       currentPage: dto.page,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/customers/:id')
+  @Render('users/detail')
+  async getUserDetailPage(@Param('id') id: string) {
+    const user = await this.userService.getUserById(id);
+
+    return {
+      ...user,
+      createdAt: toTimeDate(user.createdAt),
+      updatedAt: toTimeDate(user.updatedAt),
+      orders: user.orders.map((order) => {
+        return {
+          ...order,
+          createdAt: toTimeDate(order.createdAt),
+          updatedAt: toTimeDate(order.updatedAt),
+          totalPrice: formatCurrency(order.totalPrice * 1000),
+        };
+      }),
+      ratingReviews: user.ratingReviews.map((ratingReview) => {
+        return {
+          ...ratingReview,
+          createdAt: toTimeDate(ratingReview.createdAt),
+          updatedAt: toTimeDate(ratingReview.updatedAt),
+        };
+      }),
     };
   }
 
@@ -342,24 +378,12 @@ export class AppController {
       data: res.data.map((book) => {
         return {
           ...book,
-          createdAt: formatDate({
-            date: book.createdAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          updatedAt: formatDate({
-            date: book.updatedAt,
-            targetFormat: DateFormat.TIME_DATE,
-          }),
-          price: new Intl.NumberFormat('us-EN', {
-            style: 'currency',
-            currency: 'VND',
-          }).format(book.price * 1000),
+          createdAt: toTimeDate(book.createdAt),
+          updatedAt: toTimeDate(book.updatedAt),
+          price: formatCurrency(book.price * 1000),
           discountPrice:
             book.discountPrice > 0
-              ? new Intl.NumberFormat('us-EN', {
-                  style: 'currency',
-                  currency: 'VND',
-                }).format(book.discountPrice * 1000)
+              ? formatCurrency(book.discountPrice * 1000)
               : null,
         };
       }),
@@ -371,6 +395,39 @@ export class AppController {
     };
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @Get('/books/:id')
+  @Render('books/detail')
+  async getBookDetailPage(
+    @Param('id', ParseIntPipe) id: number,
+    @Query() reviewsDto: RatingReviewsPageOptionsDto,
+  ) {
+    const book = await this.bookService.getBookById(id, reviewsDto);
+
+    return {
+      ...book,
+      createdAt: toTimeDate(book.createdAt),
+      updatedAt: toTimeDate(book.updatedAt),
+      price: formatCurrency(book.price * 1000),
+      discountPrice:
+        book.discountPrice > 0
+          ? formatCurrency(book.discountPrice * 1000)
+          : null,
+      discountDate: toTimeDate(book.discountDate),
+      ratingReviews: {
+        ...book.ratingReviews,
+        data: book.ratingReviews.data.map((ratingReview) => {
+          return {
+            ...ratingReview,
+            createdAt: toTimeDate(ratingReview.createdAt),
+          };
+        }),
+        currentPage: reviewsDto.page || 1,
+      },
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/logout')
   logout(@Request() req, @Res() res: Response): void {
     req.logout((error) => {

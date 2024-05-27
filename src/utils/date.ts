@@ -1,3 +1,4 @@
+import { DateFormat } from 'constants/app';
 import * as moment from 'moment';
 
 export const formatDate = ({
@@ -12,3 +13,10 @@ export const formatDate = ({
   const t = moment(date, formatSpecification);
   return t.format(targetFormat);
 };
+
+export function toTimeDate(date: Date): string {
+  return formatDate({
+    date,
+    targetFormat: DateFormat.TIME_DATE,
+  });
+}

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserPageOptionsDto } from './dto';
 
@@ -41,5 +41,29 @@ export class UserService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async getUserById(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        orders: true,
+        ratingReviews: {
+          include: {
+            book: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException({
+        message: 'User not found',
+      });
+    }
+
+    return user;
   }
 }

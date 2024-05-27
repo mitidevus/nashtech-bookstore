@@ -1,7 +1,7 @@
 extends ../partials/dashboard-layout
 
 block content
-    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Authors', href: '/authors' }, `${name}`]
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Promotion lists', href: '/promotion-lists' }, `${name}`]
     include ../partials/breadcrumbs
 
     div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
@@ -26,11 +26,7 @@ block content
                         label(for="updatedAt" class="modal-label") Updated At
                         input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
-                    div
-                        label(for="image" class="modal-label") Image
-                        img(src=image alt=image class="w-48 h-48 object-cover rounded-lg border border-gray-200")
-
-        - var wrapperTitle = `Books of ${name}`
+        - var wrapperTitle = `Books`
         include ../partials/wrapper
             block content
             table(class="min-w-full divide-y divide-gray-200")
