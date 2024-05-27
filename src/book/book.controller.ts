@@ -3,12 +3,17 @@ import {
   Controller,
   Get,
   Param,
+  ParseFilePipeBuilder,
   ParseIntPipe,
   Post,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { UserRole } from '@prisma/client';
+import { FILE_TYPES_REGEX } from 'constants/image';
 import { GetUser, Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
@@ -27,8 +32,21 @@ export class BookController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Post()
-  async createBook(@Body() dto: CreateBookInput) {
-    return this.bookService.createBook(dto);
+  @UseInterceptors(FileInterceptor('image'))
+  async createBook(
+    @Body() dto: CreateBookInput,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return this.bookService.createBook(dto, image);
   }
 
   @Get()
