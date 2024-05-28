@@ -135,7 +135,7 @@ block content
                                         input(id="discountDate" type="text" class="modal-input" value=discountDate readonly)
                                 else
                                     div(class="md:col-span-3 flex items-center justify-center")
-                                        button(class="primary-btn" onclick="openModal()")
+                                        button(class="primary-btn" onclick="openModal('modal')")
                                             i.lni.lni-plus
                                             span Add Discount
 
@@ -148,7 +148,7 @@ block content
                     div(id="promotion-list-select")
 
                 div(class="flex gap-2 justify-end")
-                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
                     button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
 
     script.
@@ -183,7 +183,7 @@ block content
 
                 if (response.ok) {
                     console.log('Added book to promotion list successfully');
-                    closeModal();
+                    closeModal('modal');
                     window.location.reload();
                 } else {
                     console.error('Failed to add book to promotion list');
