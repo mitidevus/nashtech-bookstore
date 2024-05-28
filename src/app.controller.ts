@@ -312,6 +312,18 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Delete('/promotion-lists/:promotionListId/books/:bookId')
+  async removeBookFromPromotionList(
+    @Param('promotionListId', ParseIntPipe) promotionListId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.promotionListService.removeBookFromPromotionList(
+      promotionListId,
+      bookId,
+    );
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/orders')
   @Render('orders/list')
   async getOrdersPage(@Query() dto: OrderPageOptionsDto) {
