@@ -6,6 +6,7 @@ import {
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
+import { AddBooksToCategoryDto } from './dto/add-books.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
@@ -90,7 +91,14 @@ export class CategoryService {
       include: {
         books: {
           select: {
-            book: true,
+            book: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            createdAt: true,
           },
         },
       },
@@ -104,7 +112,10 @@ export class CategoryService {
 
     return {
       ...category,
-      books: category.books.map((item) => item.book),
+      books: category.books.map((item) => ({
+        ...item.book,
+        addedAt: item.createdAt,
+      })),
     };
   }
 
@@ -190,5 +201,88 @@ export class CategoryService {
         message: 'Failed to delete category',
       });
     }
+  }
+
+  async addBooksToCategory(id: number, dto: AddBooksToCategoryDto) {
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!category) {
+      throw new BadRequestException({
+        message: 'Category not found',
+      });
+    }
+
+    const books = await this.prismaService.book.findMany({
+      where: { id: { in: dto.bookIds } },
+    });
+
+    if (books.length !== dto.bookIds.length) {
+      throw new BadRequestException('Invalid book');
+    }
+
+    const bookCategory = await this.prismaService.bookCategory.findMany({
+      where: {
+        categoryId: id,
+        bookId: {
+          in: dto.bookIds,
+        },
+      },
+    });
+
+    if (bookCategory.length) {
+      throw new BadRequestException({
+        message: 'There are some books already in this category',
+      });
+    }
+
+    try {
+      await this.prismaService.bookCategory.createMany({
+        data: dto.bookIds.map((bookId) => ({
+          bookId,
+          categoryId: id,
+        })),
+      });
+
+      return {
+        message: 'Added books to category successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add books to category',
+      });
+    }
+  }
+
+  async getBooksNotInCategory(categoryId: number) {
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
+
+    if (!category) {
+      throw new BadRequestException({
+        message: 'Category not found',
+      });
+    }
+
+    const books = await this.prismaService.book.findMany({
+      where: {
+        NOT: {
+          categories: {
+            some: {
+              categoryId,
+            },
+          },
+        },
+      },
+    });
+
+    return books;
   }
 }

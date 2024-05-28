@@ -62,10 +62,12 @@ model Author {
 }
 
 model BookAuthor {
-  bookId   Int    @map("book_id")
-  authorId Int    @map("author_id")
-  book     Book   @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author_book")
-  author   Author @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author_author")
+  bookId    Int      @map("book_id")
+  authorId  Int      @map("author_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  book      Book     @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author_book")
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_author_author")
 
   @@id([bookId, authorId])
   @@map("book_author")
@@ -85,6 +87,8 @@ model Category {
 model BookCategory {
   bookId     Int      @map("book_id")
   categoryId Int      @map("category_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
   book       Book     @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_category_book")
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_book_category_category")
 

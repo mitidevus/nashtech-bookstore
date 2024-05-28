@@ -15,6 +15,7 @@ import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { CategoryService } from './category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
+import { AddBooksToCategoryDto } from './dto/add-books.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('/api/categories')
@@ -53,5 +54,15 @@ export class CategoryController {
   @Delete(':id')
   async deleteCategory(@Param('id', ParseIntPipe) id: number) {
     return await this.categoryService.deleteCategory(id);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Post(':id/books')
+  async addBooksToCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBooksToCategoryDto,
+  ) {
+    return await this.categoryService.addBooksToCategory(id, dto);
   }
 }

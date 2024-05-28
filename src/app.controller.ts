@@ -32,6 +32,7 @@ import { BookService } from './book/book.service';
 import { CreateBookInput, FindAllBooksInput } from './book/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
+import { AddBooksToCategoryDto } from './category/dto/add-books.dto';
 import { OrderPageOptionsDto } from './order/dto';
 import { OrderService } from './order/order.service';
 import {
@@ -176,6 +177,9 @@ export class AppController {
   async getCategoryDetailPage(@Param('id', ParseIntPipe) id: number) {
     const category = await this.categoryService.getCategoryById(id);
 
+    const booksNotInCategory =
+      await this.categoryService.getBooksNotInCategory(id);
+
     return {
       ...category,
       createdAt: toTimeDate(category.createdAt),
@@ -183,10 +187,10 @@ export class AppController {
       books: category.books.map((book) => {
         return {
           ...book,
-          createdAt: toTimeDate(book.createdAt),
-          updatedAt: toTimeDate(book.updatedAt),
+          addedAt: toTimeDate(book.addedAt),
         };
       }),
+      booksNotInCategory,
     };
   }
 
@@ -194,6 +198,15 @@ export class AppController {
   @Post('/categories')
   createCategory(@Body() dto: CreateCategoryDto) {
     return this.categoryService.createCategory(dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/categories/:id/books')
+  async addBooksToCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBooksToCategoryDto,
+  ) {
+    return await this.categoryService.addBooksToCategory(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)
