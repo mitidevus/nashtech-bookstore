@@ -9,25 +9,36 @@ block content
         include ../partials/wrapper
             block content
             div(class="pt-4 pb-6 px-6")
-                div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
-                    div
-                        label(for="id" class="modal-label") ID
-                        input(id="id" type="text" class="modal-input" value=id readonly) 
+                div(class="grid gap-4")
+                    div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+                        div
+                            label(for="id" class="modal-label") ID
+                            input(id="id" type="text" class="modal-input" value=id readonly) 
 
-                    div
-                        label(for="slug" class="modal-label") Slug
-                        input(id="slug" type="text" class="modal-input" value=slug readonly)
+                        div
+                            label(for="slug" class="modal-label") Slug
+                            input(id="slug" type="text" class="modal-input" value=slug readonly)
 
-                    div
-                        label(for="createdAt" class="modal-label") Created At
-                        input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+                        div
+                            label(for="discountPercentage" class="modal-label") Discount Percentage
+                            input(id="discountPercentage" type="text" class="modal-input" value=`${discountPercentage}%` readonly)
 
-                    div
-                        label(for="updatedAt" class="modal-label") Updated At
-                        input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+                    div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+                        div
+                            label(for="createdAt" class="modal-label") Created At
+                            input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
 
-        - var wrapperTitle = `Books`
-        include ../partials/wrapper
+                        div
+                            label(for="updatedAt" class="modal-label") Updated At
+                            input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Books
+                button(id="add-book-btn" class="primary-btn" onclick="openModal()")
+                    i.lni.lni-plus
+                    span Add Book
+
             block content
             table(class="min-w-full divide-y divide-gray-200")
                 - var columns = ['ID', 'Name', 'Created At', 'Updated At']
@@ -44,3 +55,58 @@ block content
                                     span(class="block")= book.name
                                 td(class="py-4 px-6")= book.createdAt
                                 td(class="py-4 px-6")= book.updatedAt
+
+
+    - var modalTitle = 'Add Book To Promotion List'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-book-form" onsubmit="addBook(event)")
+                div(class="mb-8")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Book
+                    div(id="book-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const nonPromotionalBooks = !{JSON.stringify(nonPromotionalBooks)};
+            VirtualSelect.init({
+                ele: '#book-select',
+                options: nonPromotionalBooks.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+            });
+        });
+
+        async function addBook(event) {
+            event.preventDefault();
+
+            const promotionListId = document.getElementById('id').value;
+            const bookId = document.getElementById('book-select').value;
+
+            const data = {
+                bookId: Number(bookId),
+            }
+
+            try {
+                const response = await fetch(`/promotion-lists/${promotionListId}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added book to promotion list successfully');
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book to promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to add book to promotion list');
+            }
+        }
