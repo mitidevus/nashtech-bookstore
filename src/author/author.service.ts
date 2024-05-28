@@ -38,6 +38,7 @@ export class AuthorService {
           image: image ? imageUrls[0] : DEFAULT_IMAGE_URL,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });
@@ -158,6 +159,7 @@ export class AuthorService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });

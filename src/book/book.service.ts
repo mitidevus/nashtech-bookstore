@@ -103,7 +103,7 @@ export class BookService {
           });
         }
 
-        const slug = `${slugify(dto.name, { lower: true })}_${newBook.id}`;
+        const slug = `${slugify(dto.name, { lower: true, locale: 'vi' })}_${newBook.id}`;
 
         const updatedBook = await tx.book.update({
           where: { id: newBook.id },
@@ -380,7 +380,7 @@ export class BookService {
             description: dto.description,
             image: dto.image,
             price: dto.price,
-            slug: slugify(dto.name, { lower: true }),
+            slug: slugify(dto.name, { lower: true, locale: 'vi' }),
           },
           include: {
             categories: {

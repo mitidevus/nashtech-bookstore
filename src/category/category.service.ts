@@ -32,6 +32,7 @@ export class CategoryService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });
@@ -159,6 +160,7 @@ export class CategoryService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });
