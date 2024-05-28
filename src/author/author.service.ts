@@ -304,4 +304,51 @@ export class AuthorService {
 
     return books;
   }
+
+  async removeBookFromAuthor(authorId: number, bookId: number) {
+    const author = await this.prismaService.author.findUnique({
+      where: {
+        id: authorId,
+      },
+    });
+
+    if (!author) {
+      throw new BadRequestException({
+        message: 'Author not found',
+      });
+    }
+
+    const bookauthor = await this.prismaService.bookAuthor.findFirst({
+      where: {
+        authorId,
+        bookId,
+      },
+    });
+
+    if (!bookauthor) {
+      throw new BadRequestException({
+        message: 'Book is not belong to this author',
+      });
+    }
+
+    try {
+      await this.prismaService.bookAuthor.delete({
+        where: {
+          bookId_authorId: {
+            bookId,
+            authorId,
+          },
+        },
+      });
+
+      return {
+        message: 'Removed book from author successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to remove book from author',
+      });
+    }
+  }
 }

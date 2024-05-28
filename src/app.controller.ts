@@ -162,6 +162,15 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Delete('/authors/:authorId/books/:bookId')
+  async removeBookFromAuthor(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.authorService.removeBookFromAuthor(authorId, bookId);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/categories')
   @Render('categories/list')
   async getCategoryListPage(@Query() dto: CategoryPageOptionsDto) {

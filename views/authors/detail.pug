@@ -38,19 +38,23 @@ block content
                     span Add Books
 
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Added At']
+                - var columns = ['ID', 'Name', 'Added At', '']
                 include ../partials/head-table
 
                 - var rows = books
                 include ../partials/body-table
                     block items
                         each book in books
-                            tr(key=book.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${book.id}'`)  
+                            tr(key=book.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${book.id}'`)  
                                 td(class="py-4 px-6")= book.id
                                 td(class="py-4 px-6 flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= book.name
                                 td(class="py-4 px-6")= book.addedAt
+                                td(class="py-4 px-10 relative")
+                                    - var modalName = 'remove-book-modal'
+                                    button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeBook(event, ${book.id})`)
+                                        i(class="lni lni-trash-can")
 
     - var modalTitle = 'Add Books To Author'
     include ../partials/modal
@@ -104,5 +108,26 @@ block content
                 }
             } catch (error) {
                 console.error('Failed to add book to author');
+            }
+        }
+
+        async function removeBook(event, bookId) {
+            event.stopPropagation();
+
+            const authorId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/authors/${authorId}/books/${bookId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    console.log('Removed book from author successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove book from author');
+                }
+            } catch (error) {
+                console.error('Failed to remove book from author');
             }
         }
