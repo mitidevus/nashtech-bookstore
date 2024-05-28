@@ -20,7 +20,12 @@ import { FILE_TYPES_REGEX } from 'constants/image';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { AuthorService } from './author.service';
-import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
+import {
+  AddBooksToAuthorDto,
+  AuthorPageOptionsDto,
+  CreateAuthorDto,
+  UpdateAuthorDto,
+} from './dto';
 
 @Controller('/api/authors')
 export class AuthorController {
@@ -52,8 +57,8 @@ export class AuthorController {
   }
 
   @Get(':id')
-  getAuthor(@Param('id', ParseIntPipe) id: number) {
-    return this.authorService.getAuthor(id);
+  getAuthorById(@Param('id', ParseIntPipe) id: number) {
+    return this.authorService.getAuthorById(id);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -71,5 +76,15 @@ export class AuthorController {
   @Delete(':id')
   async deleteAuthor(@Param('id', ParseIntPipe) id: number) {
     return await this.authorService.deleteAuthor(id);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Post(':id/books')
+  async addBooksToAuthor(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBooksToAuthorDto,
+  ) {
+    return await this.authorService.addBooksToAuthor(id, dto);
   }
 }

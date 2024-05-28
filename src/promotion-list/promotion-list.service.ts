@@ -41,6 +41,7 @@ export class PromotionListService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
         include: {
@@ -150,6 +151,7 @@ export class PromotionListService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
         include: {

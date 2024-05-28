@@ -4,6 +4,7 @@ block content
     - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Books', href: '/books' }, `${name}`]
     include ../partials/breadcrumbs
 
+    - var isPromotion = promotionListId && discountPrice
     div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
         div(class="w-full grid grid-cols-1 xl:grid-cols-3 gap-8")
             div(class="xl:col-span-2")
@@ -13,34 +14,41 @@ block content
                     include ../partials/wrapper
                         block content
                         div(class="pt-4 pb-6 px-6")
-                            div(class="grid grid-cols-1 md:grid-cols-4 gap-4")
-                                div(class="md:col-span-1")
-                                    label(for="id" class="modal-label") ID
-                                    input(id="id" type="text" class="modal-input" value=id readonly) 
+                            div(class="grid gap-4")
+                                div(class=`grid grid-cols-1 ${isPromotion ? "lg:grid-cols-5" : "lg:grid-cols-4"} gap-4`)
+                                    div(class="lg:col-span-1")
+                                        label(for="id" class="modal-label") ID
+                                        input(id="id" type="text" class="modal-input" value=id readonly) 
 
-                                div(class="md:col-span-2")
-                                    label(for="slug" class="modal-label") Slug
-                                    input(id="slug" type="text" class="modal-input" value=slug readonly)
+                                    div(class="lg:col-span-2")
+                                        label(for="slug" class="modal-label") Slug
+                                        input(id="slug" type="text" class="modal-input" value=slug readonly)
 
-                                div(class="md:col-span-1")
-                                    label(for="price" class="modal-label") Price
-                                    input(id="price" type="text" class="modal-input" value=price readonly)
+                                    div(class="lg:col-span-1")
+                                        label(for="price" class="modal-label") Price
+                                        input(id="price" type="text" class="modal-input" value=price readonly)
 
-                                div(class="md:col-span-2")
-                                    label(for="createdAt" class="modal-label") Created At
-                                    input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+                                    if isPromotion
+                                        div(class="lg:col-span-1")
+                                            label(class="modal-label") Discount Price
+                                            input(id="discountPrice" type="text" class="modal-input" value=discountPrice readonly)
 
-                                div(class="md:col-span-2")
-                                    label(for="updatedAt" class="modal-label") Updated At
-                                    input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+                                div(class="grid grid-cols-1 lg:grid-cols-4 gap-4")
+                                    div(class="lg:col-span-2")
+                                        label(for="createdAt" class="modal-label") Created At
+                                        input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
 
-                                div(class="md:col-span-4")
-                                    label(for="description" class="modal-label") Description
-                                    textarea(id="description" class="modal-input" rows="5" readonly)= description
+                                    div(class="lg:col-span-2")
+                                        label(for="updatedAt" class="modal-label") Updated At
+                                        input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
-                                div
-                                    label(for="image" class="modal-label") Image
-                                    img(src=image alt=name class="w-48 h-48 object-cover rounded-lg border border-gray-200")
+                                    div(class="lg:col-span-4")
+                                        label(for="description" class="modal-label") Description
+                                        textarea(id="description" class="modal-input" rows="5" readonly)= description
+
+                                    div
+                                        label(for="image" class="modal-label") Image
+                                        img(src=image alt=name class="w-48 h-48 object-cover rounded-lg border border-gray-200")
 
 
                     - var wrapperTitle = 'Rating Reviews'
@@ -112,8 +120,8 @@ block content
                     include ../partials/wrapper
                         block content
                         div(class="pt-4 pb-6 px-6")
-                            div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
-                                if promotionListId
+                            div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+                                if isPromotion
                                     div(class="md:col-span-1")
                                         label(class="modal-label") Promotion List
                                         input(id="promotionList" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=promotionList.name readonly onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
@@ -122,11 +130,7 @@ block content
                                         label(for="discountPercentage" class="modal-label") Percentage
                                         input(id="discountPercentage" type="text" class="modal-input" value=`${promotionList.discountPercentage}%` readonly)
 
-                                    div(class="md:col-span-1")
-                                        label(for="discountPrice" class="modal-label") Discount Price
-                                        input(id="discountPrice" type="text" class="modal-input" value=discountPrice readonly)
-
-                                    div(class="md:col-span-3")
+                                    div(class="md:col-span-2")
                                         label(for="discountDate" class="modal-label") Added At
                                         input(id="discountDate" type="text" class="modal-input" value=discountDate readonly)
                                 else

@@ -32,6 +32,7 @@ export class CategoryService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });
@@ -100,6 +101,9 @@ export class CategoryService {
             },
             createdAt: true,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
         },
       },
     });
@@ -159,6 +163,7 @@ export class CategoryService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });

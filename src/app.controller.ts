@@ -27,7 +27,11 @@ import {
   UnauthenticatedGuard,
 } from './auth/guard';
 import { AuthorService } from './author/author.service';
-import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
+import {
+  AddBooksToAuthorDto,
+  AuthorPageOptionsDto,
+  CreateAuthorDto,
+} from './author/dto';
 import { BookService } from './book/book.service';
 import { CreateBookInput, FindAllBooksInput } from './book/dto';
 import { CategoryService } from './category/category.service';
@@ -110,7 +114,9 @@ export class AppController {
   @Get('/authors/:id')
   @Render('authors/detail')
   async getAuthorDetailPage(@Param('id', ParseIntPipe) id: number) {
-    const author = await this.authorService.getAuthor(id);
+    const author = await this.authorService.getAuthorById(id);
+
+    const booksNotInAuthor = await this.authorService.getBooksNotInAuthor(id);
 
     return {
       ...author,
@@ -119,10 +125,10 @@ export class AppController {
       books: author.books.map((book) => {
         return {
           ...book,
-          createdAt: toTimeDate(book.createdAt),
-          updatedAt: toTimeDate(book.updatedAt),
+          addedAt: toTimeDate(book.addedAt),
         };
       }),
+      booksNotInAuthor,
     };
   }
 
@@ -143,6 +149,15 @@ export class AppController {
     image?: Express.Multer.File,
   ) {
     return this.authorService.createAuthor(dto, image);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/authors/:id/books')
+  async addBooksToAuthor(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBooksToAuthorDto,
+  ) {
+    return await this.authorService.addBooksToAuthor(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)

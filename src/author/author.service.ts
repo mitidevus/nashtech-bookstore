@@ -9,7 +9,12 @@ import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
-import { AuthorPageOptionsDto, CreateAuthorDto, UpdateAuthorDto } from './dto';
+import {
+  AddBooksToAuthorDto,
+  AuthorPageOptionsDto,
+  CreateAuthorDto,
+  UpdateAuthorDto,
+} from './dto';
 
 @Injectable()
 export class AuthorService {
@@ -38,6 +43,7 @@ export class AuthorService {
           image: image ? imageUrls[0] : DEFAULT_IMAGE_URL,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });
@@ -92,7 +98,7 @@ export class AuthorService {
     return this.prismaService.author.findMany();
   }
 
-  async getAuthor(id: number) {
+  async getAuthorById(id: number) {
     const author = await this.prismaService.author.findUnique({
       where: {
         id,
@@ -100,7 +106,17 @@ export class AuthorService {
       include: {
         books: {
           select: {
-            book: true,
+            book: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            createdAt: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
           },
         },
       },
@@ -114,7 +130,10 @@ export class AuthorService {
 
     return {
       ...author,
-      books: author.books.map((item) => item.book),
+      books: author.books.map((item) => ({
+        ...item.book,
+        addedAt: item.createdAt,
+      })),
     };
   }
 
@@ -158,6 +177,7 @@ export class AuthorService {
           ...dto,
           slug: slugify(dto.name, {
             lower: true,
+            locale: 'vi',
           }),
         },
       });
@@ -200,5 +220,88 @@ export class AuthorService {
         message: 'Failed to delete author',
       });
     }
+  }
+
+  async addBooksToAuthor(id: number, dto: AddBooksToAuthorDto) {
+    const author = await this.prismaService.author.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!author) {
+      throw new BadRequestException({
+        message: 'Author not found',
+      });
+    }
+
+    const books = await this.prismaService.book.findMany({
+      where: { id: { in: dto.bookIds } },
+    });
+
+    if (books.length !== dto.bookIds.length) {
+      throw new BadRequestException('Invalid book');
+    }
+
+    const bookAuthor = await this.prismaService.bookAuthor.findMany({
+      where: {
+        authorId: id,
+        bookId: {
+          in: dto.bookIds,
+        },
+      },
+    });
+
+    if (bookAuthor.length) {
+      throw new BadRequestException({
+        message: 'There are some books belong to this author',
+      });
+    }
+
+    try {
+      await this.prismaService.bookAuthor.createMany({
+        data: dto.bookIds.map((bookId) => ({
+          bookId,
+          authorId: id,
+        })),
+      });
+
+      return {
+        message: 'Added books to author successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add books to author',
+      });
+    }
+  }
+
+  async getBooksNotInAuthor(authorId: number) {
+    const author = await this.prismaService.author.findUnique({
+      where: {
+        id: authorId,
+      },
+    });
+
+    if (!author) {
+      throw new BadRequestException({
+        message: 'Author not found',
+      });
+    }
+
+    const books = await this.prismaService.book.findMany({
+      where: {
+        NOT: {
+          authors: {
+            some: {
+              authorId,
+            },
+          },
+        },
+      },
+    });
+
+    return books;
   }
 }
