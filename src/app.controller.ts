@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseFilePipeBuilder,
@@ -222,6 +223,18 @@ export class AppController {
     @Body() dto: AddBooksToCategoryDto,
   ) {
     return await this.categoryService.addBooksToCategory(id, dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Delete('/categories/:categoryId/books/:bookId')
+  async removeBookFromCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.categoryService.removeBookFromCategory(
+      categoryId,
+      bookId,
+    );
   }
 
   @UseGuards(AuthenticatedGuard)

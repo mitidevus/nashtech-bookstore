@@ -219,3 +219,18 @@ a.sidebar-link:hover {
   color: #d1d5db;
   font-weight: 500;
 }
+
+.delete-btn {
+  display: inline-flex;
+  padding: 0.5rem;
+  border: 1px solid #ea4c89;
+  border-radius: 0.375rem;
+  background-color: #ea4c89;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.delete-btn:hover {
+  background-color: #ed679b;
+}
