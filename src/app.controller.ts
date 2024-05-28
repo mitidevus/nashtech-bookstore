@@ -110,7 +110,7 @@ export class AppController {
   @Get('/authors/:id')
   @Render('authors/detail')
   async getAuthorDetailPage(@Param('id', ParseIntPipe) id: number) {
-    const author = await this.authorService.getAuthor(id);
+    const author = await this.authorService.getAuthorById(id);
 
     return {
       ...author,
@@ -119,8 +119,7 @@ export class AppController {
       books: author.books.map((book) => {
         return {
           ...book,
-          createdAt: toTimeDate(book.createdAt),
-          updatedAt: toTimeDate(book.updatedAt),
+          addedAt: toTimeDate(book.addedAt),
         };
       }),
     };
