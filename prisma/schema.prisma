@@ -26,26 +26,25 @@ model User {
 }
 
 model Book {
-  id                 Int            @id @default(autoincrement())
-  slug               String?        @unique
-  name               String
-  description        String
-  image              String
-  price              Float
-  discountPrice      Float          @default(0) @map("discount_price")
-  discountPercentage Int            @default(0) @map("discount_percentage")
-  discountDate       DateTime?      @map("discount_date")
-  avgStars           Float          @default(0) @map("avg_stars")
-  totalReviews       Int            @default(0) @map("total_reviews")
-  soldQuantity       Int            @default(0) @map("sold_quantity")
-  createdAt          DateTime       @default(now()) @map("created_at")
-  updatedAt          DateTime       @updatedAt @map("updated_at")
-  promotionListId    Int?           @map("promotion_list_id")
-  promotionList      PromotionList? @relation(fields: [promotionListId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_book_promotion_list")
-  authors            BookAuthor[]
-  categories         BookCategory[]
-  ratingReviews      RatingReview[]
-  OrderItem          OrderItem[]
+  id              Int            @id @default(autoincrement())
+  slug            String?        @unique
+  name            String
+  description     String
+  image           String
+  price           Float
+  discountPrice   Float          @default(0) @map("discount_price")
+  discountDate    DateTime?      @map("discount_date")
+  avgStars        Float          @default(0) @map("avg_stars")
+  totalReviews    Int            @default(0) @map("total_reviews")
+  soldQuantity    Int            @default(0) @map("sold_quantity")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  promotionListId Int?           @map("promotion_list_id")
+  promotionList   PromotionList? @relation(fields: [promotionListId], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_book_promotion_list")
+  authors         BookAuthor[]
+  categories      BookCategory[]
+  ratingReviews   RatingReview[]
+  OrderItem       OrderItem[]
 
   @@map("books")
 }
@@ -109,12 +108,13 @@ model RatingReview {
 }
 
 model PromotionList {
-  id        Int      @id @default(autoincrement())
-  slug      String?  @unique
-  name      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  books     Book[]
+  id                 Int      @id @default(autoincrement())
+  slug               String?  @unique
+  name               String
+  discountPercentage Int      @default(0) @map("discount_percentage")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  books              Book[]
 
   @@map("promotion_lists")
 }

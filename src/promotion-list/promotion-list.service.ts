@@ -6,7 +6,6 @@ import {
   AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
-  UpdateBookInPromoListDto,
   UpdatePromotionListDto,
 } from './dto';
 import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
@@ -16,6 +15,12 @@ export class PromotionListService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createPromotionList(dto: CreatePromotionListDto) {
+    if (!Number.isInteger(dto.discountPercentage)) {
+      throw new BadRequestException({
+        message: 'Discount percentage must be an integer',
+      });
+    }
+
     const promotionListExist = await this.prismaService.promotionList.findFirst(
       {
         where: {
@@ -84,6 +89,10 @@ export class PromotionListService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async getAllPromotionLists() {
+    return this.prismaService.promotionList.findMany();
   }
 
   async getPromotionListById(id: number) {
@@ -179,7 +188,6 @@ export class PromotionListService {
           data: {
             promotionListId: null,
             discountPrice: 0,
-            discountPercentage: 0,
             discountDate: null,
           },
         }),
@@ -202,12 +210,6 @@ export class PromotionListService {
   }
 
   async addBookToPromoList(id: number, dto: AddBookToPromoListDto) {
-    if (!Number.isInteger(dto.discountPercentage)) {
-      throw new BadRequestException({
-        message: 'Discount percentage must be an integer',
-      });
-    }
-
     const promotionList = await this.prismaService.promotionList.findUnique({
       where: {
         id,
@@ -245,10 +247,9 @@ export class PromotionListService {
         },
         data: {
           promotionListId: id,
-          discountPercentage: dto.discountPercentage,
           discountPrice: calculateDiscountedPrice(
             book.price,
-            dto.discountPercentage,
+            promotionList.discountPercentage,
           ),
           discountDate: new Date(),
         },
@@ -317,78 +318,6 @@ export class PromotionListService {
     };
   }
 
-  async updateBookInPromoList(
-    promoId: number,
-    bookId: number,
-    dto: UpdateBookInPromoListDto,
-  ) {
-    if (Object.keys(dto).length === 0) {
-      throw new BadRequestException({
-        message: 'No data provided',
-      });
-    }
-
-    if (dto.discountPercentage && !Number.isInteger(dto.discountPercentage)) {
-      throw new BadRequestException({
-        message: 'Discount percentage must be an integer',
-      });
-    }
-
-    const promotionList = await this.prismaService.promotionList.findUnique({
-      where: {
-        id: promoId,
-      },
-    });
-
-    if (!promotionList) {
-      throw new BadRequestException({
-        message: 'Promotion list not found',
-      });
-    }
-
-    const book = await this.prismaService.book.findUnique({
-      where: {
-        id: bookId,
-      },
-    });
-
-    if (!book) {
-      throw new BadRequestException({
-        message: 'Book not found',
-      });
-    }
-
-    if (book.promotionListId !== promoId) {
-      throw new BadRequestException({
-        message: 'Book not in promotion list',
-      });
-    }
-
-    try {
-      await this.prismaService.book.update({
-        where: {
-          id: bookId,
-        },
-        data: {
-          discountPercentage: dto.discountPercentage,
-          discountPrice: calculateDiscountedPrice(
-            book.price,
-            dto.discountPercentage,
-          ),
-        },
-      });
-
-      return {
-        message: 'Updated book in promotion list successfully',
-      };
-    } catch (error) {
-      console.log('Error:', error.message);
-      throw new BadRequestException({
-        message: 'Failed to update book in promotion list',
-      });
-    }
-  }
-
   async removeBookFromPromoList(promoId: number, bookId: number) {
     const promotionList = await this.prismaService.promotionList.findUnique({
       where: {
@@ -427,8 +356,8 @@ export class PromotionListService {
         },
         data: {
           promotionListId: null,
-          discountPercentage: 0,
           discountPrice: 0,
+          discountDate: null,
         },
       });
 

@@ -17,7 +17,6 @@ import {
   AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
-  UpdateBookInPromoListDto,
   UpdatePromotionListDto,
 } from './dto';
 import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
@@ -78,21 +77,6 @@ export class PromotionListController {
   ) {
     return await this.promotionListService.getBooksFromPromoListBySlug(
       slug,
-      dto,
-    );
-  }
-
-  @UseGuards(JwtGuard, RolesGuard)
-  @Roles(UserRole.admin)
-  @Patch(':promoId/books/:bookId')
-  async updateBookInPromoList(
-    @Param('promoId', ParseIntPipe) promoId: number,
-    @Param('bookId', ParseIntPipe) bookId: number,
-    @Body() dto: UpdateBookInPromoListDto,
-  ) {
-    return await this.promotionListService.updateBookInPromoList(
-      promoId,
-      bookId,
       dto,
     );
   }
