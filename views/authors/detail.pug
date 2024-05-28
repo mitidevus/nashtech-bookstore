@@ -30,11 +30,15 @@ block content
                         label(for="image" class="modal-label") Image
                         img(src=image alt=image class="w-48 h-48 object-cover rounded-lg border border-gray-200")
 
-        - var wrapperTitle = `Books of ${name}`
-        include ../partials/wrapper
-            block content
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Books
+                button(id="add-book-btn" class="primary-btn" onclick="openModal()")
+                    i.lni.lni-plus
+                    span Add Books
+
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Added At']
                 include ../partials/head-table
 
                 - var rows = books
@@ -46,5 +50,59 @@ block content
                                 td(class="py-4 px-6 flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= book.name
-                                td(class="py-4 px-6")= book.createdAt
-                                td(class="py-4 px-6")= book.updatedAt
+                                td(class="py-4 px-6")= book.addedAt
+
+    - var modalTitle = 'Add Books To Author'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-books-form" onsubmit="addBooks(event)")
+                div(class="mb-8 max-w-[400px]")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Books
+                    div(id="books-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const booksNotInAuthor = !{JSON.stringify(booksNotInAuthor)};
+            VirtualSelect.init({
+                ele: '#books-select',
+                options: booksNotInAuthor.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+        });
+
+        async function addBooks(event) {
+            event.preventDefault();
+
+            const authorId = document.getElementById('id').value;
+            const bookIds = document.getElementById('books-select').value;
+
+            const data = {
+                bookIds: bookIds.map(id => Number(id)),
+            }
+
+            try {
+                const response = await fetch(`/authors/${authorId}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added book to author successfully');
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book to author');
+                }
+            } catch (error) {
+                console.error('Failed to add book to author');
+            }
+        }

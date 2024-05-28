@@ -101,6 +101,9 @@ export class CategoryService {
             },
             createdAt: true,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
         },
       },
     });

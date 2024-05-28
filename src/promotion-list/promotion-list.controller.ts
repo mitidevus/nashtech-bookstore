@@ -39,7 +39,7 @@ export class PromotionListController {
   }
 
   @Get(':id')
-  getPromotionList(@Param('id', ParseIntPipe) id: number) {
+  getPromotionListById(@Param('id', ParseIntPipe) id: number) {
     return this.promotionListService.getPromotionListById(id);
   }
 

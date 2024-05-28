@@ -115,6 +115,9 @@ export class AuthorService {
             },
             createdAt: true,
           },
+          orderBy: {
+            createdAt: 'desc',
+          },
         },
       },
     });
@@ -240,7 +243,7 @@ export class AuthorService {
       throw new BadRequestException('Invalid book');
     }
 
-    const bookauthor = await this.prismaService.bookAuthor.findMany({
+    const bookAuthor = await this.prismaService.bookAuthor.findMany({
       where: {
         authorId: id,
         bookId: {
@@ -249,7 +252,7 @@ export class AuthorService {
       },
     });
 
-    if (bookauthor.length) {
+    if (bookAuthor.length) {
       throw new BadRequestException({
         message: 'There are some books belong to this author',
       });
