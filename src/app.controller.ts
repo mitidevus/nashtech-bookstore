@@ -29,12 +29,13 @@ import {
 import { AuthorService } from './author/author.service';
 import { AuthorPageOptionsDto, CreateAuthorDto } from './author/dto';
 import { BookService } from './book/book.service';
-import { BookPageOptionsDto, CreateBookInput } from './book/dto';
+import { CreateBookInput, FindAllBooksInput } from './book/dto';
 import { CategoryService } from './category/category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './category/dto';
 import { OrderPageOptionsDto } from './order/dto';
 import { OrderService } from './order/order.service';
 import {
+  AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
 } from './promotion-list/dto';
@@ -228,6 +229,8 @@ export class AppController {
     const promotionList =
       await this.promotionListService.getPromotionListById(id);
 
+    const nonPromotionalBooks = await this.bookService.getNonPromotionalBooks();
+
     return {
       ...promotionList,
       createdAt: toTimeDate(promotionList.createdAt),
@@ -239,6 +242,7 @@ export class AppController {
           updatedAt: toTimeDate(book.updatedAt),
         };
       }),
+      nonPromotionalBooks,
     };
   }
 
@@ -246,6 +250,15 @@ export class AppController {
   @Post('/promotion-lists')
   createPromotionList(@Body() dto: CreatePromotionListDto) {
     return this.promotionListService.createPromotionList(dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post('/promotion-lists/:id/books')
+  addBookToPromoList(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBookToPromoListDto,
+  ) {
+    return this.promotionListService.addBookToPromoList(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -385,7 +398,7 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @Get('/books')
   @Render('books/list')
-  async getBooksPage(@Query() dto: BookPageOptionsDto) {
+  async getBooksPage(@Query() dto: FindAllBooksInput) {
     dto.page = dto.page || 1;
     dto.take = dto.take || DEFAULT_PAGE_SIZE;
 
@@ -453,7 +466,7 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @Post('/books')
   @UseInterceptors(FileInterceptor('image'))
-  async createBook(
+  createBook(
     @Body() dto: CreateBookInput,
     @UploadedFile(
       new ParseFilePipeBuilder()

@@ -26,11 +26,16 @@ block content
                         label(for="updatedAt" class="modal-label") Updated At
                         input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
-        - var wrapperTitle = `Books`
-        include ../partials/wrapper
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Books
+                button(id="add-book-btn" class="primary-btn" onclick="openModal()")
+                    i.lni.lni-plus
+                    span Add Book
+
             block content
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Discount Percentage', 'Created At', 'Updated At']
                 include ../partials/head-table
 
                 - var rows = books
@@ -42,5 +47,68 @@ block content
                                 td(class="py-4 px-6 flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= book.name
+                                td(class="py-4 px-6")= `${book.discountPercentage}%`
                                 td(class="py-4 px-6")= book.createdAt
                                 td(class="py-4 px-6")= book.updatedAt
+
+
+    - var modalTitle = 'Add Book To Promotion List'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-book-form" onsubmit="addBook(event)")
+                div(class="mb-4")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Book
+                    div(id="book-select")
+
+                div(class="mb-8")
+                    label(for="discountPercentage" class="block text-gray-700 text-sm font-medium mb-2") Discount Percentage
+                    input(id="discountPercentage" type="text" name="discountPercentage" class="modal-input" autocomplete="off")
+
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const nonPromotionalBooks = !{JSON.stringify(nonPromotionalBooks)};
+            VirtualSelect.init({
+                ele: '#book-select',
+                options: nonPromotionalBooks.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+            });
+        });
+
+        async function addBook(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('id').value;
+            const bookId = document.getElementById('book-select').value;
+            const discountPercentage = document.getElementById('discountPercentage').value;
+
+            const data = {
+                bookId: Number(bookId),
+                discountPercentage: Number(discountPercentage)
+            }
+
+            try {
+                const response = await fetch(`/promotion-lists/${id}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added book to promotion list successfully');
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book to promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to add book to promotion list');
+            }
+        }

@@ -205,6 +205,14 @@ export class BookService {
     };
   }
 
+  async getNonPromotionalBooks() {
+    return await this.prismaService.book.findMany({
+      where: {
+        promotionListId: null,
+      },
+    });
+  }
+
   async getBookById(id: number, reviewsDto: RatingReviewsPageOptionsDto) {
     const book = await this.prismaService.book.findUnique({
       where: { id },
