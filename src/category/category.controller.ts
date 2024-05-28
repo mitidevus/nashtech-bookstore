@@ -65,4 +65,17 @@ export class CategoryController {
   ) {
     return await this.categoryService.addBooksToCategory(id, dto);
   }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':categoryId/books/:bookId')
+  async removeBookFromCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.categoryService.removeBookFromCategory(
+      categoryId,
+      bookId,
+    );
+  }
 }

@@ -290,4 +290,51 @@ export class CategoryService {
 
     return books;
   }
+
+  async removeBookFromCategory(categoryId: number, bookId: number) {
+    const category = await this.prismaService.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
+
+    if (!category) {
+      throw new BadRequestException({
+        message: 'Category not found',
+      });
+    }
+
+    const bookCategory = await this.prismaService.bookCategory.findFirst({
+      where: {
+        categoryId,
+        bookId,
+      },
+    });
+
+    if (!bookCategory) {
+      throw new BadRequestException({
+        message: 'Book not found in this category',
+      });
+    }
+
+    try {
+      await this.prismaService.bookCategory.delete({
+        where: {
+          bookId_categoryId: {
+            bookId,
+            categoryId,
+          },
+        },
+      });
+
+      return {
+        message: 'Removed book from category successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to remove book from category',
+      });
+    }
+  }
 }
