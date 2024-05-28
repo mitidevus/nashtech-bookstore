@@ -9,22 +9,28 @@ block content
         include ../partials/wrapper
             block content
             div(class="pt-4 pb-6 px-6")
-                div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
-                    div
-                        label(for="id" class="modal-label") ID
-                        input(id="id" type="text" class="modal-input" value=id readonly) 
+                div(class="grid gap-4")
+                    div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+                        div
+                            label(for="id" class="modal-label") ID
+                            input(id="id" type="text" class="modal-input" value=id readonly) 
 
-                    div
-                        label(for="slug" class="modal-label") Slug
-                        input(id="slug" type="text" class="modal-input" value=slug readonly)
+                        div
+                            label(for="slug" class="modal-label") Slug
+                            input(id="slug" type="text" class="modal-input" value=slug readonly)
 
-                    div
-                        label(for="createdAt" class="modal-label") Created At
-                        input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+                        div
+                            label(for="discountPercentage" class="modal-label") Discount Percentage
+                            input(id="discountPercentage" type="text" class="modal-input" value=`${discountPercentage}%` readonly)
 
-                    div
-                        label(for="updatedAt" class="modal-label") Updated At
-                        input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+                    div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+                        div
+                            label(for="createdAt" class="modal-label") Created At
+                            input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+
+                        div
+                            label(for="updatedAt" class="modal-label") Updated At
+                            input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
         div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
@@ -35,7 +41,7 @@ block content
 
             block content
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Discount Percentage', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Created At', 'Updated At']
                 include ../partials/head-table
 
                 - var rows = books
@@ -47,7 +53,6 @@ block content
                                 td(class="py-4 px-6 flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= book.name
-                                td(class="py-4 px-6")= `${book.discountPercentage}%`
                                 td(class="py-4 px-6")= book.createdAt
                                 td(class="py-4 px-6")= book.updatedAt
 
@@ -56,14 +61,9 @@ block content
     include ../partials/modal
         block modalFormContent
             form(id="add-book-form" onsubmit="addBook(event)")
-                div(class="mb-4")
+                div(class="mb-8")
                     label(class="block text-gray-700 text-sm font-medium mb-2") Book
                     div(id="book-select")
-
-                div(class="mb-8")
-                    label(for="discountPercentage" class="block text-gray-700 text-sm font-medium mb-2") Discount Percentage
-                    input(id="discountPercentage" type="text" name="discountPercentage" class="modal-input" autocomplete="off")
-
 
                 div(class="flex gap-2 justify-end")
                     button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
@@ -83,17 +83,15 @@ block content
         async function addBook(event) {
             event.preventDefault();
 
-            const id = document.getElementById('id').value;
+            const promotionListId = document.getElementById('id').value;
             const bookId = document.getElementById('book-select').value;
-            const discountPercentage = document.getElementById('discountPercentage').value;
 
             const data = {
                 bookId: Number(bookId),
-                discountPercentage: Number(discountPercentage)
             }
 
             try {
-                const response = await fetch(`/promotion-lists/${id}/books`, {
+                const response = await fetch(`/promotion-lists/${promotionListId}/books`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

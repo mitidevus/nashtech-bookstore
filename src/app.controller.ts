@@ -440,6 +440,16 @@ export class AppController {
   ) {
     const book = await this.bookService.getBookById(id, reviewsDto);
 
+    let promos = [];
+    if (!book.promotionListId) {
+      promos = (await this.promotionListService.getAllPromotionLists()).map(
+        (promo) => ({
+          id: promo.id,
+          name: promo.name + ' - ' + promo.discountPercentage + '%',
+        }),
+      );
+    }
+
     return {
       ...book,
       createdAt: toTimeDate(book.createdAt),
@@ -460,6 +470,7 @@ export class AppController {
         }),
         currentPage: reviewsDto.page || 1,
       },
+      promos,
     };
   }
 

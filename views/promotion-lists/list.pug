@@ -13,7 +13,7 @@ block content
                     span Add List
 
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Slug', 'Discount', 'Created At', 'Updated At']
                 include ../partials/head-table
 
                 - var rows = data
@@ -21,8 +21,11 @@ block content
                     block items
                         each promotionList in data
                             tr(key=promotionList.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
-                                each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
-                                    td(class="py-4 px-6")= promotionList[prop]
+                                each prop in ['id', 'name', 'slug', 'discountPercentage', 'createdAt', 'updatedAt']
+                                    if prop === 'discountPercentage'
+                                        td(class="py-4 px-6")= promotionList[prop] + '%'
+                                    else
+                                        td(class="py-4 px-6")= promotionList[prop]
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug

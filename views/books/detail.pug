@@ -120,7 +120,7 @@ block content
 
                                     div(class="md:col-span-1")
                                         label(for="discountPercentage" class="modal-label") Percentage
-                                        input(id="discountPercentage" type="text" class="modal-input" value=`${discountPercentage}%` readonly)
+                                        input(id="discountPercentage" type="text" class="modal-input" value=`${promotionList.discountPercentage}%` readonly)
 
                                     div(class="md:col-span-1")
                                         label(for="discountPrice" class="modal-label") Discount Price
@@ -131,6 +131,60 @@ block content
                                         input(id="discountDate" type="text" class="modal-input" value=discountDate readonly)
                                 else
                                     div(class="md:col-span-3 flex items-center justify-center")
-                                        button(class="primary-btn")
+                                        button(class="primary-btn" onclick="openModal()")
                                             i.lni.lni-plus
                                             span Add Discount
+
+    - var modalTitle = 'Add Discount To Book'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-promotion-list-form" onsubmit="addPromotionList(event)")
+                div(class="mb-8")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Promotion List
+                    div(id="promotion-list-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const promos = !{JSON.stringify(promos)};
+            VirtualSelect.init({
+                ele: '#promotion-list-select',
+                options: promos.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+            });
+        });
+
+        async function addPromotionList(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('id').value;
+            const promotionListId = document.getElementById('promotion-list-select').value;
+
+            const data = {
+                bookId: Number(bookId),
+            }
+
+            try {
+                const response = await fetch(`/promotion-lists/${promotionListId}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added book to promotion list successfully');
+                    closeModal();
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book to promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to add book to promotion list');
+            }
+        }
