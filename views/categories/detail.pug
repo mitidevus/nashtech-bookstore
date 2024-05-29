@@ -83,7 +83,7 @@ block content
             const bookIds = document.getElementById('books-select').value;
 
             const data = {
-                bookIds: bookIds.map(id => Number(id)),
+                bookIds: bookIds.map(id => parseInt(id)),
             }
 
             try {
