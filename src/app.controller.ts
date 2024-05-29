@@ -253,6 +253,12 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Delete('/categories/:id')
+  async deleteCategory(@Param('id', ParseIntPipe) id: number) {
+    return await this.categoryService.deleteCategory(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/promotion-lists')
   @Render('promotion-lists/list')
   async getPromotionListsPage(@Query() dto: PromotionListPageOptionsDto) {

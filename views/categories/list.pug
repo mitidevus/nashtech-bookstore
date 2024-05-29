@@ -13,16 +13,19 @@ block content
                     span Add Category
 
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At', '']
                 include ../partials/head-table
 
                 - var rows = data
                 include ../partials/body-table
                     block items
                         each category in data
-                            tr(key=category.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/categories/${category.id}'`) 
+                            tr(key=category.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/categories/${category.id}'`) 
                                 each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
                                     td(class="py-5 px-6")= category[prop]
+                                td(class="py-4 px-10 relative")
+                                    button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeCategory(event, ${category.id})`)
+                                        i(class="lni lni-trash-can")
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
@@ -67,3 +70,25 @@ block content
             }
         }
 
+        async function removeCategory(event, id) {
+            event.stopPropagation();
+
+            if (!confirm('Are you sure you want to delete this category?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/categories/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    console.log('Deleted category successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to delete category');
+                }
+            } catch (error) {
+                console.error('Failed to delete category');
+            }
+        }
