@@ -100,7 +100,7 @@ block content
                                         tr(key=author.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
                                             td(class="py-4 px-6")= author.id
                                             td(class="py-4 px-6")= author.name
-                                            td(class="py-4 px-10 relative")
+                                            td(class="py-4 px-6 relative")
                                                 button(class="delete-btn p-1 hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeAuthor(event, ${author.id})`)
                                                     i(class="lni lni-circle-minus")
 
@@ -108,16 +108,19 @@ block content
                     include ../partials/wrapper
                         block content
                         table(class="min-w-full divide-y divide-gray-200")
-                            - var columns = ['ID', 'Name']
+                            - var columns = ['ID', 'Name', '']
                             include ../partials/head-table
 
                             - var rows = categories
                             include ../partials/body-table
                                 block items
                                     each category in categories
-                                        tr(key=category.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/categories/${category.id}'`) 
+                                        tr(key=category.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/categories/${category.id}'`) 
                                             td(class="py-4 px-6")= category.id
                                             td(class="py-4 px-6")= category.name
+                                            td(class="py-4 px-6 relative")
+                                                button(class="delete-btn p-1 hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeCategory(event, ${category.id})`)
+                                                    i(class="lni lni-circle-minus")
 
                     - var wrapperTitle = 'Discount'
                     include ../partials/wrapper
@@ -257,5 +260,29 @@ block content
                 }
             } catch (error) {
                 console.error('Failed to remove author from book');
+            }
+        }
+
+        async function removeCategory(event, categoryId) {
+            event.stopPropagation();
+
+            const bookId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/categories/${categoryId}/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Removed category from book successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove category from book');
+                }
+            } catch (error) {
+                console.error('Failed to remove category from book');
             }
         }
