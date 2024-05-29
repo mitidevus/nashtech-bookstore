@@ -14,14 +14,14 @@ block content
 
 
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Price', 'Sold', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Price', 'Sold', 'Created At', 'Updated At', '']
                 include ../partials/head-table
 
                 - var rows = data
                 include ../partials/body-table
                     block items
                         each book in data
-                            tr(key=book.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${book.id}'`)  
+                            tr(key=book.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/books/${book.id}'`)  
                                 td(class="py-4 px-6")= book.id
                                 td(class="py-4 px-6 max-w-[300px] flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
@@ -35,6 +35,9 @@ block content
                                 td(class="py-4 px-6")= book.soldQuantity
                                 td(class="py-4 px-6")= book.createdAt
                                 td(class="py-4 px-6")= book.updatedAt
+                                td(class="py-4 px-10 relative")
+                                    button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeBook(event, ${book.id})`)
+                                        i(class="lni lni-trash-can")
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
@@ -105,5 +108,28 @@ block content
                 }
             } catch (error) {
                 console.error('Failed to add book');
+            }
+        }
+
+        async function removeBook(event, id) {
+            event.stopPropagation();
+
+            if (!confirm('Are you sure you want to delete this book?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/books/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    console.log('Deleted book successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to delete book');
+                }
+            } catch (error) {
+                console.error('Failed to delete book');
             }
         }

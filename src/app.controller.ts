@@ -574,6 +574,12 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Delete('/books/:id')
+  async deleteBook(@Param('id', ParseIntPipe) id: number) {
+    return await this.bookService.deleteBook(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/logout')
   logout(@Request() req, @Res() res: Response): void {
     req.logout((error) => {
