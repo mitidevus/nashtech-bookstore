@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseFilePipeBuilder,
@@ -67,6 +68,13 @@ export class BookController {
   @Get('slug/:slug')
   async getBookBySlug(@Param('slug') slug: string) {
     return this.bookService.getBookBySlug(slug);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':id')
+  async deleteBook(@Param('id', ParseIntPipe) id: number) {
+    return await this.bookService.deleteBook(id);
   }
 
   @UseGuards(JwtGuard)
