@@ -52,7 +52,6 @@ block content
                                     span(class="block")= book.name
                                 td(class="py-4 px-6")= book.addedAt
                                 td(class="py-4 px-10 relative")
-                                    - var modalName = 'remove-book-modal'
                                     button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeBook(event, ${book.id})`)
                                         i(class="lni lni-trash-can")
 

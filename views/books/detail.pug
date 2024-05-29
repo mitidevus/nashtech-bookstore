@@ -90,16 +90,19 @@ block content
                         block content
 
                         table(class="min-w-full divide-y divide-gray-200")
-                            - var columns = ['ID', 'Name']
+                            - var columns = ['ID', 'Name', '']
                             include ../partials/head-table
 
                             - var rows = authors
                             include ../partials/body-table
                                 block items
                                     each author in authors
-                                        tr(key=author.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
+                                        tr(key=author.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
                                             td(class="py-4 px-6")= author.id
                                             td(class="py-4 px-6")= author.name
+                                            td(class="py-4 px-10 relative")
+                                                button(class="delete-btn p-1 hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeAuthor(event, ${author.id})`)
+                                                    i(class="lni lni-circle-minus")
 
                     - var wrapperTitle = 'Categories'
                     include ../partials/wrapper
@@ -230,5 +233,29 @@ block content
                 }
             } catch (error) {
                 console.error('Failed to remove book from promotion list');
+            }
+        }
+
+        async function removeAuthor(event, authorId) {
+            event.stopPropagation();
+
+            const bookId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/authors/${authorId}/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Removed author from book successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove author from book');
+                }
+            } catch (error) {
+                console.error('Failed to remove author from book');
             }
         }
