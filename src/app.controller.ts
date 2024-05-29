@@ -171,6 +171,12 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Delete('/authors/:id')
+  async deleteAuthor(@Param('id', ParseIntPipe) id: number) {
+    return await this.authorService.deleteAuthor(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/categories')
   @Render('categories/list')
   async getCategoryListPage(@Query() dto: CategoryPageOptionsDto) {

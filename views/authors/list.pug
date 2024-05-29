@@ -13,16 +13,19 @@ block content
                     span Add Author
 
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Slug', 'Created At', 'Updated At', '']
                 include ../partials/head-table
 
                 - var rows = data
                 include ../partials/body-table
                     block items
                         each author in data
-                            tr(key=author.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
+                            tr(key=author.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
                                 each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
                                     td(class="py-4 px-6")= author[prop]
+                                td(class="py-4 px-6 relative")
+                                    button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeAuthor(event, ${author.id})`)
+                                        i(class="lni lni-trash-can")
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
@@ -63,5 +66,26 @@ block content
                 }
             } catch (error) {
                 console.error('Failed to add author');
+            }
+        }
+
+        async function removeAuthor(event, id) {
+            event.stopPropagation();
+
+            if (confirm('Are you sure you want to delete this author?')) {
+                try {
+                    const response = await fetch(`/authors/${id}`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response.ok) {
+                        console.log('Deleted author successfully');
+                        window.location.reload();
+                    } else {
+                        console.error('Failed to delete author');
+                    }
+                } catch (error) {
+                    console.error('Failed to delete author');
+                }
             }
         }
