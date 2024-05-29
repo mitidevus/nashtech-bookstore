@@ -13,19 +13,22 @@ block content
                     span Add List
 
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Slug', 'Discount', 'Created At', 'Updated At']
+                - var columns = ['ID', 'Name', 'Slug', 'Discount', 'Created At', 'Updated At', '']
                 include ../partials/head-table
 
                 - var rows = data
                 include ../partials/body-table
                     block items
                         each promotionList in data
-                            tr(key=promotionList.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+                            tr(key=promotionList.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
                                 each prop in ['id', 'name', 'slug', 'discountPercentage', 'createdAt', 'updatedAt']
                                     if prop === 'discountPercentage'
                                         td(class="py-4 px-6")= promotionList[prop] + '%'
                                     else
                                         td(class="py-4 px-6")= promotionList[prop]
+                                td(class="py-4 px-10 relative")
+                                    button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removePromotionList(event, ${promotionList.id})`)
+                                        i(class="lni lni-trash-can")
 
             div(class="py-4 px-6")
                 include ../partials/pagination.pug
@@ -34,9 +37,13 @@ block content
     include ../partials/modal
         block modalFormContent
             form(id="add-promotion-list-form" onsubmit="addPromotionList(event)")
-                div(class="mb-8")
+                div(class="mb-4")
                     label(for="name" class="block text-gray-700 text-sm font-medium mb-2") Name
                     input(id="name" type="text" name="name" class="modal-input" autocomplete="off")
+
+                div(class="mb-8")
+                    label(for="discountPercentage" class="block text-gray-700 text-sm font-medium mb-2") Discount Percentage
+                    input(id="discountPercentage" type="number" min="1" max="99" discountPercentage="discountPercentage" class="modal-input" autocomplete="off")
 
                 div(class="flex gap-2 justify-end")
                     button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
@@ -47,8 +54,13 @@ block content
             event.preventDefault();
 
             const name = document.getElementById('name').value;
+            const discountPercentage = document.getElementById('discountPercentage').value;
 
-            const data = { name }; 
+            const data = { 
+                name, 
+                discountPercentage: parseInt(discountPercentage)
+            };
+
             try {
                 const response = await fetch('/promotion-lists', {
                     method: 'POST',
@@ -70,3 +82,25 @@ block content
             }
         }
 
+        async function removePromotionList(event, id) {
+            event.stopPropagation();
+
+            if (!confirm('Are you sure you want to delete this promotion list?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/promotion-lists/${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    console.log('Deleted promotion list successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to delete promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to delete promotion list');
+            }
+        }

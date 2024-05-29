@@ -20,3 +20,10 @@ export function toTimeDate(date: Date): string {
     targetFormat: DateFormat.TIME_DATE,
   });
 }
+
+export function toDateTime(date: Date): string {
+  return formatDate({
+    date,
+    targetFormat: DateFormat.DATE_TIME,
+  });
+}
