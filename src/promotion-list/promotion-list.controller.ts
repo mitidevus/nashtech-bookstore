@@ -93,4 +93,17 @@ export class PromotionListController {
       bookId,
     );
   }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':promotionListId/books/:bookId')
+  async removeBookFromPromotionList(
+    @Param('promotionListId', ParseIntPipe) promotionListId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.promotionListService.removeBookFromPromotionList(
+      promotionListId,
+      bookId,
+    );
+  }
 }

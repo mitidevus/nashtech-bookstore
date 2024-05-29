@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseFilePipeBuilder,
@@ -161,6 +162,15 @@ export class AppController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @Delete('/authors/:authorId/books/:bookId')
+  async removeBookFromAuthor(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.authorService.removeBookFromAuthor(authorId, bookId);
+  }
+
+  @UseGuards(AuthenticatedGuard)
   @Get('/categories')
   @Render('categories/list')
   async getCategoryListPage(@Query() dto: CategoryPageOptionsDto) {
@@ -222,6 +232,18 @@ export class AppController {
     @Body() dto: AddBooksToCategoryDto,
   ) {
     return await this.categoryService.addBooksToCategory(id, dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Delete('/categories/:categoryId/books/:bookId')
+  async removeBookFromCategory(
+    @Param('categoryId', ParseIntPipe) categoryId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.categoryService.removeBookFromCategory(
+      categoryId,
+      bookId,
+    );
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -287,6 +309,18 @@ export class AppController {
     @Body() dto: AddBookToPromoListDto,
   ) {
     return this.promotionListService.addBookToPromoList(id, dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Delete('/promotion-lists/:promotionListId/books/:bookId')
+  async removeBookFromPromotionList(
+    @Param('promotionListId', ParseIntPipe) promotionListId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.promotionListService.removeBookFromPromotionList(
+      promotionListId,
+      bookId,
+    );
   }
 
   @UseGuards(AuthenticatedGuard)

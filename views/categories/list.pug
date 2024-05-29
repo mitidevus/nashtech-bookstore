@@ -8,7 +8,7 @@ block content
         div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
                 h1(class="text-lg font-semibold text-gray-800") Categories
-                button(class="primary-btn" onclick="openModal()")
+                button(class="primary-btn" onclick="openModal('modal')")
                     i.lni.lni-plus
                     span Add Category
 
@@ -36,7 +36,7 @@ block content
                     input(id="name" type="text" name="name" class="modal-input" autocomplete="off")
 
                 div(class="flex gap-2 justify-end")
-                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal()") Cancel
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
                     button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
 
     script.
@@ -57,7 +57,7 @@ block content
 
                 if (response.ok) {
                     console.log('Added category successfully');
-                    closeModal();
+                    closeModal('modal');
                     window.location.reload();
                 } else {
                     console.error('Failed to add category');

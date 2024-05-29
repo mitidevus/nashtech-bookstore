@@ -87,4 +87,14 @@ export class AuthorController {
   ) {
     return await this.authorService.addBooksToAuthor(id, dto);
   }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Delete(':authorId/books/:bookId')
+  async removeBookFromAuthor(
+    @Param('authorId', ParseIntPipe) authorId: number,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.authorService.removeBookFromAuthor(authorId, bookId);
+  }
 }
