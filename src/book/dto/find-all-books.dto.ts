@@ -1,11 +1,15 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { MAX_ITEMS_PER_PAGE, Order } from 'constants/app';
+import { MAX_ITEMS_PER_PAGE, Order, SortBy } from 'constants/app';
 
 export class BooksPageOptionsDto {
   @IsEnum(Order)
   @IsOptional()
   order?: Order = Order.DESC;
+
+  @IsEnum(SortBy)
+  @IsOptional()
+  sort?: SortBy;
 
   @Type(() => Number)
   @IsInt()

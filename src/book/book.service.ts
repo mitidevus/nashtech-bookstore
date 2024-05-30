@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DEFAULT_BOOK_IMAGE_URL } from 'constants/app';
+import { DEFAULT_BOOK_IMAGE_URL, sortMapping } from 'constants/app';
 import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -146,12 +146,10 @@ export class BookService {
   }
 
   async getBooks(dto: FindAllBooksInput) {
+    const sortOrder = sortMapping[dto.sort];
+
     const conditions = {
-      orderBy: [
-        {
-          createdAt: dto.order,
-        },
-      ],
+      orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
     };
 
     const pageOption =
@@ -167,6 +165,7 @@ export class BookService {
         ...conditions,
         ...pageOption,
         include: {
+          promotionList: true,
           authors: {
             select: {
               author: {
