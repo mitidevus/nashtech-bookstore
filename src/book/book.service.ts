@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DEFAULT_BOOK_IMAGE_URL, sortMapping } from 'constants/app';
 import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
@@ -9,6 +13,7 @@ import { uploadFilesFromFirebase } from 'src/services/files/upload';
 import { calculateDiscountedPrice } from 'src/utils';
 import {
   AddRatingReviewToBookDto,
+  BooksPageOptionsDto,
   CreateBookInput,
   FindAllBooksInput,
   RatingReviewInBookPageOptionsDto,
@@ -560,6 +565,87 @@ export class BookService {
       data: ratingReviews,
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
+    };
+  }
+
+  async getBooksByCategorySlug(slug: string, dto: BooksPageOptionsDto) {
+    const category = await this.prismaService.category.findFirst({
+      where: {
+        slug,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException({
+        message: 'Category not found',
+      });
+    }
+
+    const sortOrder = sortMapping[dto.sort];
+
+    const conditions = {
+      where: {
+        categories: {
+          some: {
+            categoryId: category.id,
+          },
+        },
+      },
+      orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        include: {
+          promotionList: true,
+          authors: {
+            select: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      ...category,
+      books: {
+        data: books.map((book) => ({
+          ...book,
+          authors: book.authors.map((item) => item.author),
+          categories: book.categories.map((item) => item.category),
+        })),
+        totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+        totalCount,
+      },
     };
   }
 }
