@@ -11,10 +11,12 @@ export enum SortBy {
 }
 
 export const sortMapping = {
-  [SortBy.ON_SALE]: { discountPrice: Order.DESC },
-  [SortBy.POPULAR]: { avgStars: Order.DESC },
-  [SortBy.ASC_PRICE]: { price: Order.ASC },
-  [SortBy.DESC_PRICE]: { price: Order.DESC },
+  [SortBy.ON_SALE]: {
+    discountPercentage: Order.DESC,
+  },
+  [SortBy.POPULAR]: { soldQuantity: Order.DESC },
+  [SortBy.ASC_PRICE]: { finalPrice: Order.ASC },
+  [SortBy.DESC_PRICE]: { finalPrice: Order.DESC },
 };
 
 // PAGINATION

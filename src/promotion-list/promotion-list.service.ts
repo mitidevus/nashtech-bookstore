@@ -182,17 +182,27 @@ export class PromotionListService {
     }
 
     try {
-      await this.prismaService.$transaction([
-        this.prismaService.book.updateMany({
+      const booksToUpdate = await this.prismaService.book.findMany({
+        where: {
+          promotionListId: id,
+        },
+      });
+
+      const updateBookPromises = booksToUpdate.map((book) => {
+        return this.prismaService.book.update({
           where: {
-            promotionListId: id,
+            id: book.id,
           },
           data: {
             promotionListId: null,
-            discountPrice: 0,
+            finalPrice: book.price,
             discountDate: null,
           },
-        }),
+        });
+      });
+
+      await this.prismaService.$transaction([
+        ...updateBookPromises,
         this.prismaService.promotionList.delete({
           where: {
             id,
@@ -249,10 +259,11 @@ export class PromotionListService {
         },
         data: {
           promotionListId: id,
-          discountPrice: calculateDiscountedPrice(
+          finalPrice: calculateDiscountedPrice(
             book.price,
             promotionList.discountPercentage,
           ),
+          discountPercentage: promotionList.discountPercentage,
           discountDate: new Date(),
         },
       });
@@ -345,6 +356,12 @@ export class PromotionListService {
       });
     }
 
+    if (!book.promotionListId) {
+      throw new BadRequestException({
+        message: 'Book not in any promotion list',
+      });
+    }
+
     if (book.promotionListId !== promoId) {
       throw new BadRequestException({
         message: 'Book not in promotion list',
@@ -358,67 +375,8 @@ export class PromotionListService {
         },
         data: {
           promotionListId: null,
-          discountPrice: 0,
-          discountDate: null,
-        },
-      });
-
-      return {
-        message: 'Removed book from promotion list successfully',
-      };
-    } catch (error) {
-      console.log('Error:', error.message);
-      throw new BadRequestException({
-        message: 'Failed to remove book from promotion list',
-      });
-    }
-  }
-
-  async removeBookFromPromotionList(promotionListId: number, bookId: number) {
-    const promotionList = await this.prismaService.promotionList.findUnique({
-      where: {
-        id: promotionListId,
-      },
-    });
-
-    if (!promotionList) {
-      throw new BadRequestException({
-        message: 'Promotion list not found',
-      });
-    }
-
-    const book = await this.prismaService.book.findUnique({
-      where: {
-        id: bookId,
-      },
-    });
-
-    if (!book) {
-      throw new BadRequestException({
-        message: 'Book not found',
-      });
-    }
-
-    if (!book.promotionListId) {
-      throw new BadRequestException({
-        message: 'Book not in any promotion list',
-      });
-    }
-
-    if (book.promotionListId !== promotionListId) {
-      throw new BadRequestException({
-        message: 'Book not in this promotion list',
-      });
-    }
-
-    try {
-      await this.prismaService.book.update({
-        where: {
-          id: bookId,
-        },
-        data: {
-          promotionListId: null,
-          discountPrice: 0,
+          finalPrice: book.price,
+          discountPercentage: 0,
           discountDate: null,
         },
       });

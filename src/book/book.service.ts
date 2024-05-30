@@ -6,6 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
+import { calculateDiscountedPrice } from 'src/utils';
 import {
   AddRatingReviewToBookDto,
   CreateBookInput,
@@ -54,6 +55,7 @@ export class BookService {
         throw new BadRequestException('Invalid author');
       }
     }
+
     const price = Number(dto.price);
     if (isNaN(price)) {
       throw new BadRequestException('Price must be a number!');
@@ -82,6 +84,7 @@ export class BookService {
             description: dto.description,
             image: imageUrls.length ? imageUrls[0] : DEFAULT_BOOK_IMAGE_URL,
             price: price,
+            finalPrice: price,
           },
         });
 
@@ -317,6 +320,9 @@ export class BookService {
   async updateBook(id: number, dto: UpdateBookInput) {
     const book = await this.prismaService.book.findUnique({
       where: { id },
+      include: {
+        promotionList: true,
+      },
     });
 
     if (!book) {
@@ -372,6 +378,14 @@ export class BookService {
           });
         }
 
+        let finalPrice;
+        if (book.promotionListId) {
+          finalPrice = calculateDiscountedPrice(
+            dto.price,
+            book.promotionList.discountPercentage,
+          );
+        }
+
         const updatedBook = await tx.book.update({
           where: { id },
           data: {
@@ -379,6 +393,7 @@ export class BookService {
             description: dto.description,
             image: dto.image,
             price: dto.price,
+            finalPrice,
             slug: slugify(dto.name, { lower: true, locale: 'vi' }),
           },
           include: {

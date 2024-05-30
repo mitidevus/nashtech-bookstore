@@ -104,11 +104,11 @@ export class PromotionListViewController {
 
   @UseGuards(AuthenticatedGuard)
   @Delete(':promotionListId/books/:bookId')
-  async removeBookFromPromotionList(
+  async removeBookFromPromoList(
     @Param('promotionListId', ParseIntPipe) promotionListId: number,
     @Param('bookId', ParseIntPipe) bookId: number,
   ) {
-    return await this.promotionListService.removeBookFromPromotionList(
+    return await this.promotionListService.removeBookFromPromoList(
       promotionListId,
       bookId,
     );

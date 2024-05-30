@@ -28,8 +28,7 @@ type Book {
   description: String!
   image: String!
   price: Float!
-  discountPrice: Float!
-  discountPercentage: Float!
+  finalPrice: Float!
   avgStars: Float!
   totalReviews: Int!
   soldQuantity: Int!

@@ -31,7 +31,7 @@ export class OrderService {
         book.id,
         {
           price: book.price,
-          discountPrice: book.discountPrice,
+          finalPrice: book.finalPrice,
         },
       ]),
     );
@@ -45,17 +45,17 @@ export class OrderService {
             phone: dto.phone,
           },
         });
+
         const orderItems = dto.items.map((item) => {
-          const { price, discountPrice } = bookPriceMap.get(item.bookId);
-          const purchasePrice = discountPrice || price;
-          const totalPrice = purchasePrice * item.quantity;
+          const { price, finalPrice } = bookPriceMap.get(item.bookId);
+          const totalPrice = finalPrice * item.quantity;
 
           return {
             orderId: order.id,
             bookId: item.bookId,
             quantity: item.quantity,
             price,
-            discountPrice,
+            finalPrice,
             totalPrice,
           };
         });
@@ -88,7 +88,7 @@ export class OrderService {
                   },
                 },
                 price: true,
-                discountPrice: true,
+                finalPrice: true,
                 totalPrice: true,
                 quantity: true,
               },
@@ -165,7 +165,7 @@ export class OrderService {
               },
             },
             price: true,
-            discountPrice: true,
+            finalPrice: true,
             totalPrice: true,
             quantity: true,
           },
