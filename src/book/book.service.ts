@@ -729,4 +729,53 @@ export class BookService {
       },
     };
   }
+
+  async getBooksByPromoListSlug(slug: string, dto: BooksPageOptionsDto) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        slug,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const conditions = {
+      where: {
+        promotionListId: promotionList.id,
+      },
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: books,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
+  }
 }

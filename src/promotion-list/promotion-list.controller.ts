@@ -13,18 +13,22 @@ import {
 import { UserRole } from '@prisma/client';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { BookService } from 'src/book/book.service';
+import { BooksPageOptionsDto } from 'src/book/dto';
 import {
   AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
 } from './dto';
-import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
 import { PromotionListService } from './promotion-list.service';
 
 @Controller('/api/promotion-lists')
 export class PromotionListController {
-  constructor(private readonly promotionListService: PromotionListService) {}
+  constructor(
+    private readonly promotionListService: PromotionListService,
+    private readonly bookService: BookService,
+  ) {}
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
@@ -73,12 +77,9 @@ export class PromotionListController {
   @Get(':slug/books')
   async getBooksFromPromoListBySlug(
     @Param('slug') slug: string,
-    @Query() dto: BookInPromoListPageOptionsDto,
+    @Query() dto: BooksPageOptionsDto,
   ) {
-    return await this.promotionListService.getBooksFromPromoListBySlug(
-      slug,
-      dto,
-    );
+    return await this.bookService.getBooksByPromoListSlug(slug, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

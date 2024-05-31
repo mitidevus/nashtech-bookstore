@@ -8,7 +8,6 @@ import {
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
 } from './dto';
-import { BookInPromoListPageOptionsDto } from './dto/find-all-books.dto';
 
 @Injectable()
 export class PromotionListService {
@@ -277,58 +276,6 @@ export class PromotionListService {
         message: 'Failed to add book to promotion list',
       });
     }
-  }
-
-  async getBooksFromPromoListBySlug(
-    slug: string,
-    dto: BookInPromoListPageOptionsDto,
-  ) {
-    const promotionList = await this.prismaService.promotionList.findUnique({
-      where: {
-        slug,
-      },
-    });
-
-    if (!promotionList) {
-      throw new BadRequestException({
-        message: 'Promotion list not found',
-      });
-    }
-
-    const conditions = {
-      where: {
-        promotionListId: promotionList.id,
-      },
-      orderBy: [
-        {
-          createdAt: dto.order,
-        },
-      ],
-    };
-
-    const pageOption =
-      dto.page && dto.take
-        ? {
-            skip: dto.skip,
-            take: dto.take,
-          }
-        : undefined;
-
-    const [books, totalCount] = await Promise.all([
-      this.prismaService.book.findMany({
-        ...conditions,
-        ...pageOption,
-      }),
-      this.prismaService.book.count({
-        ...conditions,
-      }),
-    ]);
-
-    return {
-      data: books,
-      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
-      totalCount,
-    };
   }
 
   async removeBookFromPromoList(promoId: number, bookId: number) {
