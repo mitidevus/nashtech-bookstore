@@ -1,13 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { DEFAULT_BOOK_IMAGE_URL } from 'constants/app';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { DEFAULT_BOOK_IMAGE_URL, sortMapping } from 'constants/app';
 import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
+import { calculateDiscountedPrice } from 'src/utils';
 import {
   AddRatingReviewToBookDto,
+  BooksPageOptionsDto,
   CreateBookInput,
   FindAllBooksInput,
   RatingReviewInBookPageOptionsDto,
@@ -54,6 +60,7 @@ export class BookService {
         throw new BadRequestException('Invalid author');
       }
     }
+
     const price = Number(dto.price);
     if (isNaN(price)) {
       throw new BadRequestException('Price must be a number!');
@@ -82,6 +89,7 @@ export class BookService {
             description: dto.description,
             image: imageUrls.length ? imageUrls[0] : DEFAULT_BOOK_IMAGE_URL,
             price: price,
+            finalPrice: price,
           },
         });
 
@@ -146,12 +154,10 @@ export class BookService {
   }
 
   async getBooks(dto: FindAllBooksInput) {
+    const sortOrder = sortMapping[dto.sort];
+
     const conditions = {
-      orderBy: [
-        {
-          createdAt: dto.order,
-        },
-      ],
+      orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
     };
 
     const pageOption =
@@ -167,6 +173,7 @@ export class BookService {
         ...conditions,
         ...pageOption,
         include: {
+          promotionList: true,
           authors: {
             select: {
               author: {
@@ -318,6 +325,9 @@ export class BookService {
   async updateBook(id: number, dto: UpdateBookInput) {
     const book = await this.prismaService.book.findUnique({
       where: { id },
+      include: {
+        promotionList: true,
+      },
     });
 
     if (!book) {
@@ -373,6 +383,14 @@ export class BookService {
           });
         }
 
+        let finalPrice;
+        if (book.promotionListId) {
+          finalPrice = calculateDiscountedPrice(
+            dto.price,
+            book.promotionList.discountPercentage,
+          );
+        }
+
         const updatedBook = await tx.book.update({
           where: { id },
           data: {
@@ -380,6 +398,7 @@ export class BookService {
             description: dto.description,
             image: dto.image,
             price: dto.price,
+            finalPrice,
             slug: slugify(dto.name, { lower: true, locale: 'vi' }),
           },
           include: {
@@ -544,6 +563,217 @@ export class BookService {
 
     return {
       data: ratingReviews,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
+  }
+
+  async getBooksByCategorySlug(slug: string, dto: BooksPageOptionsDto) {
+    const category = await this.prismaService.category.findFirst({
+      where: {
+        slug,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException({
+        message: 'Category not found',
+      });
+    }
+
+    const sortOrder = sortMapping[dto.sort];
+
+    const conditions = {
+      where: {
+        categories: {
+          some: {
+            categoryId: category.id,
+          },
+        },
+      },
+      orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        include: {
+          promotionList: true,
+          authors: {
+            select: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      ...category,
+      books: {
+        data: books.map((book) => ({
+          ...book,
+          authors: book.authors.map((item) => item.author),
+          categories: book.categories.map((item) => item.category),
+        })),
+        totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+        totalCount,
+      },
+    };
+  }
+
+  async getBooksByAuthorSlug(slug: string, dto: BooksPageOptionsDto) {
+    const author = await this.prismaService.author.findFirst({
+      where: {
+        slug,
+      },
+    });
+
+    if (!author) {
+      throw new NotFoundException({
+        message: 'Author not found',
+      });
+    }
+
+    const sortOrder = sortMapping[dto.sort];
+
+    const conditions = {
+      where: {
+        authors: {
+          some: {
+            authorId: author.id,
+          },
+        },
+      },
+      orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        include: {
+          promotionList: true,
+          authors: {
+            select: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      ...author,
+      books: {
+        data: books.map((book) => ({
+          ...book,
+          authors: book.authors.map((item) => item.author),
+          categories: book.categories.map((item) => item.category),
+        })),
+        totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+        totalCount,
+      },
+    };
+  }
+
+  async getBooksByPromoListSlug(slug: string, dto: BooksPageOptionsDto) {
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        slug,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    const conditions = {
+      where: {
+        promotionListId: promotionList.id,
+      },
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: books,
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };

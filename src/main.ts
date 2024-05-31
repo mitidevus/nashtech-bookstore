@@ -13,6 +13,10 @@ import InitFirebase from './services/firebase';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  app.enableCors({
+    origin: '*',
+  });
+
   app.useStaticAssets(resolve('./public'));
   app.setBaseViewsDir(resolve('./views'));
   app.setViewEngine('pug');

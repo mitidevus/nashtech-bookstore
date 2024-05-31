@@ -28,8 +28,7 @@ type Book {
   description: String!
   image: String!
   price: Float!
-  discountPrice: Float!
-  discountPercentage: Float!
+  finalPrice: Float!
   avgStars: Float!
   totalReviews: Int!
   soldQuantity: Int!
@@ -52,6 +51,7 @@ type Query {
 
 input FindAllBooksInput {
   order: Order = DESC
+  sort: SortBy
   page: Int
   take: Int
 }
@@ -59,6 +59,13 @@ input FindAllBooksInput {
 enum Order {
   ASC
   DESC
+}
+
+enum SortBy {
+  ON_SALE
+  POPULAR
+  ASC_PRICE
+  DESC_PRICE
 }
 
 type Mutation {

@@ -3,6 +3,22 @@ export enum Order {
   DESC = 'desc',
 }
 
+export enum SortBy {
+  ON_SALE = 'on_sale',
+  POPULAR = 'popular',
+  ASC_PRICE = 'price_asc',
+  DESC_PRICE = 'price_desc',
+}
+
+export const sortMapping = {
+  [SortBy.ON_SALE]: {
+    discountPercentage: Order.DESC,
+  },
+  [SortBy.POPULAR]: { soldQuantity: Order.DESC },
+  [SortBy.ASC_PRICE]: { finalPrice: Order.ASC },
+  [SortBy.DESC_PRICE]: { finalPrice: Order.DESC },
+};
+
 // PAGINATION
 export const MAX_ITEMS_PER_PAGE = 20;
 export const MAX_PAGINATION_PAGES = 5;

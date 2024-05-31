@@ -61,10 +61,7 @@ export class OrderViewController {
         return {
           ...item,
           price: formatCurrency(item.price * 1000),
-          discountPrice:
-            item.discountPrice > 0
-              ? formatCurrency(item.discountPrice * 1000)
-              : null,
+          finalPrice: formatCurrency(item.finalPrice * 1000),
           totalPrice: formatCurrency(item.totalPrice * 1000),
         };
       }),

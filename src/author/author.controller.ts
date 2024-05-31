@@ -19,6 +19,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FILE_TYPES_REGEX } from 'constants/image';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { BookService } from 'src/book/book.service';
+import { BooksPageOptionsDto } from 'src/book/dto';
 import { AuthorService } from './author.service';
 import {
   AddBooksToAuthorDto,
@@ -29,7 +31,10 @@ import {
 
 @Controller('/api/authors')
 export class AuthorController {
-  constructor(private readonly authorService: AuthorService) {}
+  constructor(
+    private readonly authorService: AuthorService,
+    private readonly bookService: BookService,
+  ) {}
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
@@ -86,6 +91,14 @@ export class AuthorController {
     @Body() dto: AddBooksToAuthorDto,
   ) {
     return await this.authorService.addBooksToAuthor(id, dto);
+  }
+
+  @Get(':slug/books')
+  async getBooksByAuthorSlug(
+    @Param('slug') slug: string,
+    @Query() dto: BooksPageOptionsDto,
+  ) {
+    return this.bookService.getBooksByAuthorSlug(slug, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

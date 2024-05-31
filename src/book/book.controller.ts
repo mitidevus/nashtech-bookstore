@@ -21,8 +21,8 @@ import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { BookService } from './book.service';
 import {
   AddRatingReviewToBookDto,
+  BooksPageOptionsDto,
   CreateBookInput,
-  FindAllBooksInput,
   RatingReviewInBookPageOptionsDto,
 } from './dto';
 
@@ -51,7 +51,7 @@ export class BookController {
   }
 
   @Get()
-  async getBooks(@Query() dto: FindAllBooksInput) {
+  async getBooks(@Query() dto: BooksPageOptionsDto) {
     return this.bookService.getBooks(dto);
   }
 

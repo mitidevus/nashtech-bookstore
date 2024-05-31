@@ -23,10 +23,7 @@ export class Book {
   price: number;
 
   @Field(() => Float)
-  discountPrice: number;
-
-  @Field(() => Float)
-  discountPercentage: number;
+  finalPrice: number;
 
   @Field(() => Float)
   avgStars: number;

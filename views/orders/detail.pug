@@ -65,9 +65,9 @@ block content
                                     img(src=`${item.book.image}` alt=item.book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= item.book.name
                                 td(class="py-4 px-6")
-                                    if item.discountPrice
+                                    if item.finalPrice != item.price
+                                        span(class="block")= item.finalPrice
                                         span(class="block text-gray-400 line-through")= item.price
-                                        span(class="block")= item.discountPrice
                                     else
                                         span(class="block")= item.price
                                 td(class="py-4 px-6")= item.quantity

@@ -13,6 +13,8 @@ import {
 import { UserRole } from '@prisma/client';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { BookService } from 'src/book/book.service';
+import { BooksPageOptionsDto } from 'src/book/dto';
 import { CategoryService } from './category.service';
 import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
 import { AddBooksToCategoryDto } from './dto/add-books.dto';
@@ -20,7 +22,10 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('/api/categories')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  constructor(
+    private readonly categoryService: CategoryService,
+    private readonly bookService: BookService,
+  ) {}
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
@@ -64,6 +69,14 @@ export class CategoryController {
     @Body() dto: AddBooksToCategoryDto,
   ) {
     return await this.categoryService.addBooksToCategory(id, dto);
+  }
+
+  @Get(':slug/books')
+  async getBooksByCategorySlug(
+    @Param('slug') slug: string,
+    @Query() dto: BooksPageOptionsDto,
+  ) {
+    return this.bookService.getBooksByCategorySlug(slug, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
