@@ -44,14 +44,6 @@ export class CategoryController {
     return this.categoryService.getCategoryById(id);
   }
 
-  @Get(':slug/books')
-  async getBooksByCategorySlug(
-    @Param('slug') slug: string,
-    @Query() dto: BooksPageOptionsDto,
-  ) {
-    return this.bookService.getBooksByCategorySlug(slug, dto);
-  }
-
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Patch(':id')
@@ -77,6 +69,14 @@ export class CategoryController {
     @Body() dto: AddBooksToCategoryDto,
   ) {
     return await this.categoryService.addBooksToCategory(id, dto);
+  }
+
+  @Get(':slug/books')
+  async getBooksByCategorySlug(
+    @Param('slug') slug: string,
+    @Query() dto: BooksPageOptionsDto,
+  ) {
+    return this.bookService.getBooksByCategorySlug(slug, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

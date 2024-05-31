@@ -648,4 +648,85 @@ export class BookService {
       },
     };
   }
+
+  async getBooksByAuthorSlug(slug: string, dto: BooksPageOptionsDto) {
+    const author = await this.prismaService.author.findFirst({
+      where: {
+        slug,
+      },
+    });
+
+    if (!author) {
+      throw new NotFoundException({
+        message: 'Author not found',
+      });
+    }
+
+    const sortOrder = sortMapping[dto.sort];
+
+    const conditions = {
+      where: {
+        authors: {
+          some: {
+            authorId: author.id,
+          },
+        },
+      },
+      orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        include: {
+          promotionList: true,
+          authors: {
+            select: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          categories: {
+            select: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+        ...pageOption,
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      ...author,
+      books: {
+        data: books.map((book) => ({
+          ...book,
+          authors: book.authors.map((item) => item.author),
+          categories: book.categories.map((item) => item.category),
+        })),
+        totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+        totalCount,
+      },
+    };
+  }
 }
