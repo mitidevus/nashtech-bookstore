@@ -75,17 +75,43 @@ export class CartService {
           in: cart.map((item) => item.bookId),
         },
       },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        image: true,
+        price: true,
+        finalPrice: true,
+        discountPercentage: true,
+      },
     });
 
-    return cart.map((item) => {
-      const book = books.find((book) => book.id === item.bookId);
+    const bookMap = new Map(books.map((book) => [book.id, book]));
+
+    // return totalPrice of item, totalPrice of cart, totalQuantity of cart
+    const cartDetail = cart.map((item) => {
+      const book = bookMap.get(item.bookId);
 
       return {
-        book,
+        bookId: item.bookId,
         quantity: item.quantity,
-        totalPrice: (item.quantity * book.finalPrice).toFixed(2),
+        book,
+        totalPrice: book.finalPrice * item.quantity,
       };
     });
+
+    const totalPrice = parseFloat(
+      cartDetail.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2),
+    );
+
+    return {
+      items: cartDetail.map((item) => ({
+        ...item,
+        totalPrice: parseFloat(item.totalPrice.toFixed(2)),
+      })),
+      totalPrice,
+      totalQuantity: cart.length,
+    };
   }
 
   async updateCartItem(userId: string, dto: UpdateCartItemDto) {
@@ -165,7 +191,11 @@ export class CartService {
 
       await this.redis.del(cartKey);
 
-      return [];
+      return {
+        items: [],
+        totalPrice: 0,
+        totalQuantity: 0,
+      };
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
