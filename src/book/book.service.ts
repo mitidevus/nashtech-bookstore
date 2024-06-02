@@ -298,14 +298,27 @@ export class BookService {
     const book = await this.prismaService.book.findUnique({
       where: { slug },
       include: {
+        promotionList: true,
         authors: {
           select: {
-            author: true,
+            author: {
+              select: {
+                id: true,
+                slug: true,
+                name: true,
+              },
+            },
           },
         },
         categories: {
           select: {
-            category: true,
+            category: {
+              select: {
+                id: true,
+                slug: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -527,6 +540,7 @@ export class BookService {
     const conditions = {
       where: {
         bookId: book.id,
+        ...(dto.star ? { star: dto.star } : {}),
       },
       orderBy: [
         {
@@ -552,6 +566,7 @@ export class BookService {
             select: {
               name: true,
               email: true,
+              image: true,
             },
           },
         },
@@ -561,10 +576,30 @@ export class BookService {
       }),
     ]);
 
+    const ratingCount = await this.prismaService.ratingReview.groupBy({
+      by: ['star'],
+      where: {
+        bookId: book.id,
+      },
+      _count: true,
+    });
+
+    const ratingCountMap = ratingCount.reduce((acc, curr) => {
+      acc[curr.star] = curr._count;
+      return acc;
+    }, {});
+
     return {
       data: ratingReviews,
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
+      ratingCount: {
+        oneStar: ratingCountMap[1] || 0,
+        twoStar: ratingCountMap[2] || 0,
+        threeStar: ratingCountMap[3] || 0,
+        fourStar: ratingCountMap[4] || 0,
+        fiveStar: ratingCountMap[5] || 0,
+      },
     };
   }
 
