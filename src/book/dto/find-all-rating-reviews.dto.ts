@@ -20,6 +20,13 @@ export class RatingReviewInBookPageOptionsDto {
   @IsOptional()
   take?: number;
 
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  @IsOptional()
+  star?: number;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }
