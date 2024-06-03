@@ -5,13 +5,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Redis } from 'ioredis';
+import { OrderService } from 'src/order/order.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AddToCartDto, UpdateCartItemDto } from './dto';
+import { AddToCartDto, CheckoutDto, UpdateCartItemDto } from './dto';
 
 @Injectable()
 export class CartService {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly orderService: OrderService,
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
@@ -46,7 +48,13 @@ export class CartService {
         newQuantity.toString(),
       );
 
-      return await this.getCart(userId);
+      const cart = await this.getCart(userId);
+      const totalQuantity = await this.redis.hlen(cartKey);
+
+      return {
+        items: cart,
+        totalQuantity,
+      };
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
@@ -82,13 +90,16 @@ export class CartService {
         image: true,
         price: true,
         finalPrice: true,
-        discountPercentage: true,
+        promotionList: {
+          select: {
+            discountPercentage: true,
+          },
+        },
       },
     });
 
     const bookMap = new Map(books.map((book) => [book.id, book]));
 
-    // return totalPrice of item, totalPrice of cart, totalQuantity of cart
     const cartDetail = cart.map((item) => {
       const book = bookMap.get(item.bookId);
 
@@ -101,8 +112,16 @@ export class CartService {
     });
 
     const totalPrice = parseFloat(
+      cartDetail
+        .reduce((sum, item) => sum + item.book.price * item.quantity, 0)
+        .toFixed(2),
+    );
+
+    const finalPrice = parseFloat(
       cartDetail.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2),
     );
+
+    const discount = parseFloat((totalPrice - finalPrice).toFixed(2));
 
     return {
       items: cartDetail.map((item) => ({
@@ -110,6 +129,8 @@ export class CartService {
         totalPrice: parseFloat(item.totalPrice.toFixed(2)),
       })),
       totalPrice,
+      finalPrice,
+      discount,
       totalQuantity: cart.length,
     };
   }
@@ -200,6 +221,31 @@ export class CartService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to clear cart',
+      });
+    }
+  }
+
+  async checkout(userId: string, dto: CheckoutDto) {
+    const cart = await this.getCart(userId);
+
+    if (cart.length === 0) {
+      throw new BadRequestException({
+        message: 'Cart is empty',
+      });
+    }
+    try {
+      const order = await this.orderService.createOrder(userId, {
+        ...dto,
+        items: cart,
+      });
+
+      await this.clearCart(userId);
+
+      return order;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to checkout',
       });
     }
   }
