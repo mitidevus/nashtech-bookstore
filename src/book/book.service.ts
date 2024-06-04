@@ -162,6 +162,9 @@ export class BookService {
     const sortOrder = sortMapping[dto.sort];
 
     const conditions = {
+      where: {
+        ...(dto.rating ? { avgStars: { gte: dto.rating } } : {}),
+      },
       orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
     };
 
