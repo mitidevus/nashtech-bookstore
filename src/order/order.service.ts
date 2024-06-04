@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateOrderDto,
@@ -108,6 +112,43 @@ export class OrderService {
     }
   }
 
+  async getUserOrders(userId: string, dto: OrderPageOptionsDto) {
+    const conditions = {
+      where: {
+        userId,
+      },
+      orderBy: [
+        {
+          createdAt: dto.order,
+        },
+      ],
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [orders, totalCount] = await Promise.all([
+      this.prismaService.order.findMany({
+        ...conditions,
+        ...pageOption,
+      }),
+      this.prismaService.order.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: orders,
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
+  }
+
   async getOrders(dto: OrderPageOptionsDto) {
     const conditions = {
       orderBy: [
@@ -148,6 +189,53 @@ export class OrderService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async getUserOrderById(userId: string, orderId: string) {
+    const order = await this.prismaService.order.findUnique({
+      where: {
+        id: orderId,
+      },
+      include: {
+        items: {
+          select: {
+            book: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                image: true,
+              },
+            },
+            price: true,
+            finalPrice: true,
+            totalPrice: true,
+            quantity: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new BadRequestException({
+        message: 'Order not found',
+      });
+    }
+
+    if (order.userId !== userId) {
+      throw new ForbiddenException({
+        message: 'You do not have permission to view this order',
+      });
+    }
+
+    return order;
   }
 
   async getOrderById(id: string) {
