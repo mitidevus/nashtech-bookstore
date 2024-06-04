@@ -351,4 +351,32 @@ export class AuthorService {
       });
     }
   }
+
+  async getAuthorsNotInBook(bookId: number) {
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    const authors = await this.prismaService.author.findMany({
+      where: {
+        NOT: {
+          books: {
+            some: {
+              bookId,
+            },
+          },
+        },
+      },
+    });
+
+    return authors;
+  }
 }

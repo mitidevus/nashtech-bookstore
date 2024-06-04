@@ -85,9 +85,12 @@ block content
 
             div(class="xl:col-span-1")
                 div(class="flex flex-col gap-8")
-                    - var wrapperTitle = 'Authors'
-                    include ../partials/wrapper
-                        block content
+                    div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                        div(class="flex items-center justify-between py-4 px-6")
+                            h1(class="text-lg font-semibold text-gray-800") Authors
+                            if authorsNotInBook.length > 0
+                                button(id="add-book-btn" class="primary-btn" onclick="openModal('add-authors-modal')")
+                                    i.lni.lni-plus
 
                         table(class="min-w-full divide-y divide-gray-200")
                             - var columns = ['ID', 'Name', '']
@@ -104,9 +107,13 @@ block content
                                                 button(class="delete-btn p-1 hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeAuthor(event, ${author.id})`)
                                                     i(class="lni lni-circle-minus")
 
-                    - var wrapperTitle = 'Categories'
-                    include ../partials/wrapper
-                        block content
+                    div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                        div(class="flex items-center justify-between py-4 px-6")
+                            h1(class="text-lg font-semibold text-gray-800") Categories
+                            if categoriesNotInBook.length > 0
+                                button(id="add-book-btn" class="primary-btn" onclick="openModal('add-categories-modal')")
+                                    i.lni.lni-plus
+
                         table(class="min-w-full divide-y divide-gray-200")
                             - var columns = ['ID', 'Name', '']
                             include ../partials/head-table
@@ -159,7 +166,6 @@ block content
                                     i.lni.lni-trash-can
                                     span Remove
 
-
     - var modalTitle = 'Add Discount To Book'
     include ../partials/modal
         block modalFormContent
@@ -172,14 +178,56 @@ block content
                     button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
                     button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
 
+    - var modalTitle = 'Add Author To Book'
+    - var modalName = 'add-authors-modal'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-authors-form" onsubmit="addAuthors(event)")
+                div(class="mb-8")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Authors
+                    div(id="authors-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick=`closeModal('${modalName}')`) Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    - var modalTitle = 'Add Category To Book'
+    - var modalName = 'add-categories-modal'
+        include ../partials/modal
+            block modalFormContent
+                form(id="add-categories-form" onsubmit="addCategories(event)")
+                    div(class="mb-8")
+                        label(class="block text-gray-700 text-sm font-medium mb-2") Categories
+                        div(id="categories-select")
+
+                    div(class="flex gap-2 justify-end")
+                        button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick=`closeModal('${modalName}')`) Cancel
+                        button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
     script.
         document.addEventListener('DOMContentLoaded', function() {
             const promos = !{JSON.stringify(promos)};
+            const authorsNotInBook = !{JSON.stringify(authorsNotInBook)};
+            const categoriesNotInBook = !{JSON.stringify(categoriesNotInBook)};
             VirtualSelect.init({
                 ele: '#promotion-list-select',
                 options: promos.map(book => ({ label: book.name, value: book.id })),
                 maxWidth: '100%',
                 search: true,
+            });
+            VirtualSelect.init({
+                ele: '#authors-select',
+                options: authorsNotInBook.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+            VirtualSelect.init({
+                ele: '#categories-select',
+                options: categoriesNotInBook.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
             });
         });
 
@@ -286,3 +334,66 @@ block content
                 console.error('Failed to remove category from book');
             }
         }
+
+        async function addAuthors(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('id').value;
+            const authorIds = document.getElementById('authors-select').value;
+
+            const data = {
+                authorIds: authorIds.map(id => parseInt(id)),
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}/authors`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added author to book successfully');
+                    closeModal('add-authors-modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add author to book');
+                }
+            } catch (error) {
+                console.error('Failed to add author to book');
+            }
+        }
+
+        async function addCategories(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('id').value;
+            const categoryIds = document.getElementById('categories-select').value;
+
+            const data = {
+                categoryIds: categoryIds.map(id => parseInt(id)),
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}/categories`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added category to book successfully');
+                    closeModal('add-categories-modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add category to book');
+                }
+            } catch (error) {
+                console.error('Failed to add category to book');
+            }
+        }
+
