@@ -1,7 +1,7 @@
-import { ArrayMinSize, IsNotEmpty, IsNumber } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNotEmpty } from 'class-validator';
 
 export class AddBooksToPromoListDto {
-  @IsNumber()
+  @IsArray()
   @IsNotEmpty()
   @ArrayMinSize(1)
   bookIds: number[];
