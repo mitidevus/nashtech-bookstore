@@ -217,14 +217,14 @@ block content
             });
             VirtualSelect.init({
                 ele: '#authors-select',
-                options: authorsNotInBook.map(book => ({ label: book.name, value: book.id })),
+                options: authorsNotInBook.map(author => ({ label: author.name, value: author.id })),
                 maxWidth: '100%',
                 search: true,
                 multiple: true,
             });
             VirtualSelect.init({
                 ele: '#categories-select',
-                options: categoriesNotInBook.map(book => ({ label: book.name, value: book.id })),
+                options: categoriesNotInBook.map(category => ({ label: category.name, value: category.id })),
                 maxWidth: '100%',
                 search: true,
                 multiple: true,
