@@ -33,6 +33,12 @@ export class FindAllBooksInput {
   @IsOptional()
   take?: number;
 
+  @Field(() => Int, { nullable: true })
+  @Min(1)
+  @Max(5)
+  @IsOptional()
+  rating?: number;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }

@@ -54,6 +54,7 @@ input FindAllBooksInput {
   sort: SortBy
   page: Int
   take: Int
+  rating: Int
 }
 
 enum Order {
