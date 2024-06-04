@@ -17,6 +17,7 @@ import { uploadFilesFromFirebase } from 'src/services/files/upload';
 import { calculateDiscountedPrice } from 'src/utils';
 import {
   AddAuthorsToBookDto,
+  AddCategoriesToBookDto,
   AddRatingReviewToBookDto,
   BooksPageOptionsDto,
   CreateBookInput,
@@ -942,6 +943,57 @@ export class BookService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to add authors to book',
+      });
+    }
+  }
+
+  async addCategoriesToBook(bookId: number, dto: AddCategoriesToBookDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id: bookId },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    const categories = await this.prismaService.category.findMany({
+      where: { id: { in: dto.categoryIds } },
+    });
+
+    if (categories.length !== dto.categoryIds.length) {
+      throw new BadRequestException('Invalid category');
+    }
+
+    const bookCategory = await this.prismaService.bookCategory.findMany({
+      where: {
+        bookId,
+        categoryId: {
+          in: dto.categoryIds,
+        },
+      },
+    });
+
+    if (bookCategory.length) {
+      throw new BadRequestException({
+        message: 'There are some categories already in the book',
+      });
+    }
+
+    try {
+      await this.prismaService.bookCategory.createMany({
+        data: dto.categoryIds.map((categoryId) => ({
+          bookId,
+          categoryId,
+        })),
+      });
+
+      return {
+        message: 'Added categories to book successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add categories to book',
       });
     }
   }
