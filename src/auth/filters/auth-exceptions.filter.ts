@@ -24,6 +24,7 @@ export class AuthExceptionFilter implements ExceptionFilter {
     } else if (exception.getStatus() === 302) {
       response.redirect('/');
     } else {
+      console.log(exception);
       response.redirect('/error');
     }
   }

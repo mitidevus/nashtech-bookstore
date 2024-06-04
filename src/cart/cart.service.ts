@@ -111,23 +111,19 @@ export class CartService {
       };
     });
 
-    const totalPrice = parseFloat(
-      cartDetail
-        .reduce((sum, item) => sum + item.book.price * item.quantity, 0)
-        .toFixed(2),
+    const totalPrice = cartDetail.reduce(
+      (sum, item) => sum + item.book.price * item.quantity,
+      0,
     );
 
-    const finalPrice = parseFloat(
-      cartDetail.reduce((sum, item) => sum + item.totalPrice, 0).toFixed(2),
+    const finalPrice = cartDetail.reduce(
+      (sum, item) => sum + item.totalPrice,
+      0,
     );
-
-    const discount = parseFloat((totalPrice - finalPrice).toFixed(2));
+    const discount = totalPrice - finalPrice;
 
     return {
-      items: cartDetail.map((item) => ({
-        ...item,
-        totalPrice: parseFloat(item.totalPrice.toFixed(2)),
-      })),
+      items: cartDetail,
       totalPrice,
       finalPrice,
       discount,
