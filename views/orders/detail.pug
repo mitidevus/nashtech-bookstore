@@ -5,48 +5,61 @@ block content
     include ../partials/breadcrumbs
 
     div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
-        div(class="w-full grid grid-cols-1 xl:grid-cols-2 gap-8")
-            - var wrapperTitle = 'Order details'
-            include ../partials/wrapper
-                block content
-                div(class="pt-4 pb-6 px-6")
-                    div(class="grid grid-cols-1 md:grid-cols-4 gap-4")
-                        div(class="md:col-span-3")
-                            label(for="id" class="modal-label") ID
-                            input(id="id" type="text" class="modal-input" value=id readonly) 
+        div(class="w-full grid grid-cols-1 xl:grid-cols-12 gap-8")
+            div(class="xl:col-span-7")
+                - var wrapperTitle = 'Order details'
+                include ../partials/wrapper
+                    block content
+                    div(class="pt-4 pb-6 px-6")
+                        div(class="grid grid-cols-1 md:grid-cols-6 gap-4")
+                            div(class="md:col-span-4")
+                                label(for="id" class="modal-label") ID
+                                input(id="id" type="text" class="modal-input" value=id readonly) 
 
-                        div(class="md:col-span-1")
-                            label(for="status" class="modal-label") Status
-                            input(id="status" type="text" class="modal-input capitalize" value=status readonly)
+                            div(class="md:col-span-2")
+                                label(for="status" class="modal-label") Status
+                                input(id="status" type="text" class="modal-input capitalize" value=status readonly)
 
-                        div(class="md:col-span-2")
-                            label(for="createdAt" class="modal-label") Created At
-                            input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+                            div(class="md:col-span-2")
+                                label(for="paymentMethod" class="modal-label") Payment Method
+                                case paymentMethod
+                                    when 'momo'
+                                        input(id="paymentMethod" type="text" class="modal-input" value="Momo" readonly) 
+                                    when 'zalo_pay'
+                                        input(id="paymentMethod" type="text" class="modal-input" value="ZaloPay" readonly) 
+                                    when 'vn_pay'
+                                        input(id="paymentMethod" type="text" class="modal-input" value="VNPAY" readonly) 
+                                    default 
+                                        input(id="paymentMethod" type="text" class="modal-input" value="Cash on delivery" readonly)
+                            div(class="md:col-span-2")
+                                label(for="createdAt" class="modal-label") Created At
+                                input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
 
-                        div(class="md:col-span-2")
-                            label(for="updatedAt" class="modal-label") Updated At
-                            input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+                            div(class="md:col-span-2")
+                                label(for="updatedAt" class="modal-label") Updated At
+                                input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
-            - var wrapperTitle = `Customer`
-            include ../partials/wrapper
-                block content
-                div(class="pt-4 pb-6 px-6")
-                    div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
-                        div(class="md:col-span-1")
-                            label(class="modal-label") Name
-                            input(id="name" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=user.name readonly onclick=`window.location='/customers/${user.id}'`) 
+            div(class="xl:col-span-5")
+                - var wrapperTitle = `Customer`
+                include ../partials/wrapper
+                    block content
+                    div(class="pt-4 pb-6 px-6")
+                        div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+                            div(class="md:col-span-1")
+                                label(class="modal-label") Name
+                                input(id="name" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=user.name readonly onclick=`window.location='/customers/${user.id}'`) 
 
-                        div(class="md:col-span-1")
-                            label(for="email" class="modal-label") Email
-                            input(id="email" type="text" class="modal-input" value=user.email readonly)
+                            div(class="md:col-span-1")
+                                label(for="email" class="modal-label") Email
+                                input(id="email" type="text" class="modal-input" value=user.email readonly)
 
-                        div(class="md:col-span-1")
-                            label(for="phone" class="modal-label") Phone
-                            input(id="phone" type="text" class="modal-input" value=phone readonly) 
+                            div(class="md:col-span-1")
+                                label(for="phone" class="modal-label") Phone
+                                input(id="phone" type="text" class="modal-input" value=phone readonly) 
 
-                        div(class="md:col-span-3")
-                            label(for="shippingAddress" class="modal-label") Shipping Address
-                            input(id="shippingAddress" type="text" class="modal-input" value=shippingAddress readonly)
+                            div(class="md:col-span-3")
+                                label(for="shippingAddress" class="modal-label") Shipping Address
+                                input(id="shippingAddress" type="text" class="modal-input" value=shippingAddress readonly)
 
         - var wrapperTitle = `Items`
         include ../partials/wrapper
