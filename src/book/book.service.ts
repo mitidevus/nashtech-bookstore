@@ -16,6 +16,7 @@ import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
 import { calculateDiscountedPrice } from 'src/utils';
 import {
+  AddAuthorsToBookDto,
   AddRatingReviewToBookDto,
   BooksPageOptionsDto,
   CreateBookInput,
@@ -892,5 +893,56 @@ export class BookService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async addAuthorsToBook(id: number, dto: AddAuthorsToBookDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    const authors = await this.prismaService.author.findMany({
+      where: { id: { in: dto.authorIds } },
+    });
+
+    if (authors.length !== dto.authorIds.length) {
+      throw new BadRequestException('Invalid author');
+    }
+
+    const bookAuthor = await this.prismaService.bookAuthor.findMany({
+      where: {
+        bookId: id,
+        authorId: {
+          in: dto.authorIds,
+        },
+      },
+    });
+
+    if (bookAuthor.length) {
+      throw new BadRequestException({
+        message: 'There are some authors already in the book',
+      });
+    }
+
+    try {
+      await this.prismaService.bookAuthor.createMany({
+        data: dto.authorIds.map((authorId) => ({
+          authorId,
+          bookId: id,
+        })),
+      });
+
+      return {
+        message: 'Added authors to book successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add authors to book',
+      });
+    }
   }
 }
