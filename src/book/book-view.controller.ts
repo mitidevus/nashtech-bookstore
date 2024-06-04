@@ -25,7 +25,7 @@ import { PromotionListService } from 'src/promotion-list/promotion-list.service'
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { formatCurrency, toDateTime } from 'src/utils';
 import { BookService } from './book.service';
-import { CreateBookInput, FindAllBooksInput } from './dto';
+import { BooksPageOptionsDto, CreateBookInput } from './dto';
 
 @Controller('/books')
 @UseFilters(AuthExceptionFilter)
@@ -59,7 +59,7 @@ export class BookViewController {
   @UseGuards(AuthenticatedGuard)
   @Get()
   @Render('books/list')
-  async getBooksPage(@Query() dto: FindAllBooksInput) {
+  async getBooksPage(@Query() dto: BooksPageOptionsDto) {
     dto.page = dto.page || 1;
     dto.take = dto.take || DEFAULT_BOOK_PAGE_SIZE;
 

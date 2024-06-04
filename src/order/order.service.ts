@@ -41,8 +41,10 @@ export class OrderService {
         const order = await tx.order.create({
           data: {
             userId,
-            shippingAddress: dto.shippingAddress,
+            fullName: dto.fullName,
             phone: dto.phone,
+            shippingAddress: dto.shippingAddress,
+            paymentMethod: dto.paymentMethod,
           },
         });
 

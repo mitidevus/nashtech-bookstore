@@ -24,6 +24,7 @@ import {
   BooksPageOptionsDto,
   CreateBookInput,
   RatingReviewInBookPageOptionsDto,
+  SpecialBooksPageOptionsDto,
 } from './dto';
 
 @Controller('/api/books')
@@ -53,6 +54,11 @@ export class BookController {
   @Get()
   async getBooks(@Query() dto: BooksPageOptionsDto) {
     return this.bookService.getBooks(dto);
+  }
+
+  @Get('special')
+  async getOnSaleBooks(@Query() dto: SpecialBooksPageOptionsDto) {
+    return this.bookService.getSpecialBooks(dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

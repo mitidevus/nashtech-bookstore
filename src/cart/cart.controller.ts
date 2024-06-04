@@ -12,7 +12,7 @@ import {
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { CartService } from './cart.service';
-import { AddToCartDto, UpdateCartItemDto } from './dto';
+import { AddToCartDto, CheckoutDto, UpdateCartItemDto } from './dto';
 
 @Controller('/api/cart')
 export class CartController {
@@ -52,5 +52,11 @@ export class CartController {
   @Delete()
   async clearCart(@GetUser('sub') userId: string) {
     return await this.cartService.clearCart(userId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('/checkout')
+  async checkout(@GetUser('sub') userId: string, @Body() dto: CheckoutDto) {
+    return await this.cartService.checkout(userId, dto);
   }
 }

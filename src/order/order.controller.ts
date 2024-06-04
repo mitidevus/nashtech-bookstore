@@ -32,18 +32,22 @@ export class OrderController {
     return this.orderService.createOrder(userId, dto);
   }
 
-  @UseGuards(JwtGuard, RolesGuard)
-  @Roles(UserRole.admin)
+  @UseGuards(JwtGuard)
   @Get()
-  async getOrders(@Query() dto: OrderPageOptionsDto) {
-    return this.orderService.getOrders(dto);
+  async getOrders(
+    @GetUser('sub') userId: string,
+    @Query() dto: OrderPageOptionsDto,
+  ) {
+    return this.orderService.getUserOrders(userId, dto);
   }
 
-  @UseGuards(JwtGuard, RolesGuard)
-  @Roles(UserRole.admin)
+  @UseGuards(JwtGuard)
   @Get(':id')
-  async getOrderById(@Param('id') id: string) {
-    return this.orderService.getOrderById(id);
+  async getOrderById(
+    @GetUser('sub') userId: string,
+    @Param('id') orderId: string,
+  ) {
+    return this.orderService.getUserOrderById(userId, orderId);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

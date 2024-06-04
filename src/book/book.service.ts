@@ -3,7 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DEFAULT_BOOK_IMAGE_URL, sortMapping } from 'constants/app';
+import {
+  DEFAULT_BOOK_IMAGE_URL,
+  SpecialBook,
+  sortMapping,
+} from 'constants/app';
 import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -17,6 +21,7 @@ import {
   CreateBookInput,
   FindAllBooksInput,
   RatingReviewInBookPageOptionsDto,
+  SpecialBooksPageOptionsDto,
   UpdateBookInput,
 } from './dto';
 
@@ -207,6 +212,78 @@ export class BookService {
         authors: book.authors.map((item) => item.author),
         categories: book.categories.map((item) => item.category),
       })),
+      totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
+      totalCount,
+    };
+  }
+
+  async getSpecialBooks(dto: SpecialBooksPageOptionsDto) {
+    let whereCondition;
+    let orderByCondition;
+
+    switch (dto.type) {
+      case SpecialBook.ON_SALE:
+        whereCondition = {
+          promotionListId: {
+            not: null,
+          },
+        };
+        orderByCondition = {
+          discountPercentage: 'desc',
+        };
+        break;
+      case SpecialBook.RECOMMENDED:
+        whereCondition = {
+          avgStars: {
+            gte: 4,
+          },
+        };
+        orderByCondition = {
+          avgStars: 'desc',
+        };
+        break;
+      case SpecialBook.POPULAR:
+        whereCondition = {
+          soldQuantity: {
+            gt: 0,
+          },
+        };
+        orderByCondition = {
+          soldQuantity: 'desc',
+        };
+        break;
+      default:
+        throw new BadRequestException('Invalid special book type');
+    }
+
+    const conditions = {
+      where: whereCondition,
+      orderBy: orderByCondition,
+    };
+
+    const pageOption =
+      dto.page && dto.take
+        ? {
+            skip: dto.skip,
+            take: dto.take,
+          }
+        : undefined;
+
+    const [books, totalCount] = await Promise.all([
+      this.prismaService.book.findMany({
+        ...conditions,
+        ...pageOption,
+        include: {
+          promotionList: true,
+        },
+      }),
+      this.prismaService.book.count({
+        ...conditions,
+      }),
+    ]);
+
+    return {
+      data: books,
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };

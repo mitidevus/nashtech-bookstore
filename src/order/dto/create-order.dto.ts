@@ -1,7 +1,9 @@
+import { PaymentMethod } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -33,9 +35,17 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
-  shippingAddress: string;
+  fullName: string;
 
   @IsString()
   @IsNotEmpty()
   phone: string;
+
+  @IsString()
+  @IsNotEmpty()
+  shippingAddress: string;
+
+  @IsEnum(PaymentMethod)
+  @IsNotEmpty()
+  paymentMethod: PaymentMethod;
 }

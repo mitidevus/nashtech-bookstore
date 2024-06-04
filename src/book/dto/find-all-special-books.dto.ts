@@ -1,15 +1,18 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { MAX_ITEMS_PER_PAGE, Order, SortBy, SpecialBook } from 'constants/app';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  Max,
+  Min,
+} from 'class-validator';
+import { MAX_ITEMS_PER_PAGE, Order, SpecialBook } from 'constants/app';
 
-export class BooksPageOptionsDto {
+export class SpecialBooksPageOptionsDto {
   @IsEnum(Order)
   @IsOptional()
   order?: Order = Order.DESC;
-
-  @IsEnum(SortBy)
-  @IsOptional()
-  sort?: SortBy;
 
   @Type(() => Number)
   @IsInt()
@@ -25,8 +28,8 @@ export class BooksPageOptionsDto {
   take?: number;
 
   @IsEnum(SpecialBook)
-  @IsOptional()
-  type?: SpecialBook;
+  @IsNotEmpty()
+  type: SpecialBook;
 
   get skip(): number {
     return (this.page - 1) * this.take;
