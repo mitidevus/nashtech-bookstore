@@ -16,11 +16,7 @@ import { AuthExceptionFilter } from 'src/auth/filters';
 import { AuthenticatedGuard } from 'src/auth/guard';
 import { BookService } from 'src/book/book.service';
 import { toDateTime } from 'src/utils';
-import {
-  AddBookToPromoListDto,
-  CreatePromotionListDto,
-  PromotionListPageOptionsDto,
-} from './dto';
+import { CreatePromotionListDto, PromotionListPageOptionsDto } from './dto';
 import { PromotionListService } from './promotion-list.service';
 
 @Controller('/promotion-lists')
@@ -93,14 +89,14 @@ export class PromotionListViewController {
     return await this.promotionListService.deletePromotionList(id);
   }
 
-  @UseGuards(AuthenticatedGuard)
-  @Post(':id/books')
-  async addBookToPromoList(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AddBookToPromoListDto,
-  ) {
-    return this.promotionListService.addBookToPromoList(id, dto);
-  }
+  // @UseGuards(AuthenticatedGuard)
+  // @Post(':id/books')
+  // async addBookToPromoList(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() dto: AddBookToPromoListDto,
+  // ) {
+  //   return this.promotionListService.addBookToPromoList(id, dto);
+  // }
 
   @UseGuards(AuthenticatedGuard)
   @Delete(':promotionListId/books/:bookId')

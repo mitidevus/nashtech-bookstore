@@ -238,11 +238,11 @@ block content
             const promotionListId = document.getElementById('promotion-list-select').value;
 
             const data = {
-                bookId: parseInt(bookId),
+                promotionListId: parseInt(promotionListId),
             }
 
             try {
-                const response = await fetch(`/promotion-lists/${promotionListId}/books`, {
+                const response = await fetch(`/books/${bookId}/promotion-lists`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -16,7 +16,6 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { BookService } from 'src/book/book.service';
 import { BooksPageOptionsDto } from 'src/book/dto';
 import {
-  AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
@@ -64,15 +63,15 @@ export class PromotionListController {
     return await this.promotionListService.deletePromotionList(id);
   }
 
-  @UseGuards(JwtGuard, RolesGuard)
-  @Roles(UserRole.admin)
-  @Post(':id/books')
-  async addBookToPromoList(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AddBookToPromoListDto,
-  ) {
-    return await this.promotionListService.addBookToPromoList(id, dto);
-  }
+  // @UseGuards(JwtGuard, RolesGuard)
+  // @Roles(UserRole.admin)
+  // @Post(':id/books')
+  // async addBookToPromoList(
+  //   @Param('id', ParseIntPipe) id: number,
+  //   @Body() dto: AddBookToPromoListDto,
+  // ) {
+  //   return await this.promotionListService.addBookToPromoList(id, dto);
+  // }
 
   @Get(':slug/books')
   async getBooksFromPromoListBySlug(

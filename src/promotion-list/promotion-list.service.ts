@@ -1,9 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { calculateDiscountedPrice } from 'src/utils/calculation';
 import {
-  AddBookToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
@@ -216,64 +214,6 @@ export class PromotionListService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to delete promotion list',
-      });
-    }
-  }
-
-  async addBookToPromoList(id: number, dto: AddBookToPromoListDto) {
-    const promotionList = await this.prismaService.promotionList.findUnique({
-      where: {
-        id,
-      },
-    });
-
-    if (!promotionList) {
-      throw new BadRequestException({
-        message: 'Promotion list not found',
-      });
-    }
-
-    const book = await this.prismaService.book.findUnique({
-      where: {
-        id: dto.bookId,
-      },
-    });
-
-    if (!book) {
-      throw new BadRequestException({
-        message: 'Book not found',
-      });
-    }
-
-    if (book.promotionListId) {
-      throw new BadRequestException({
-        message: 'Book already in promotion list',
-      });
-    }
-
-    try {
-      await this.prismaService.book.update({
-        where: {
-          id: dto.bookId,
-        },
-        data: {
-          promotionListId: id,
-          finalPrice: calculateDiscountedPrice(
-            book.price,
-            promotionList.discountPercentage,
-          ),
-          discountPercentage: promotionList.discountPercentage,
-          discountDate: new Date(),
-        },
-      });
-
-      return {
-        message: 'Added book to promotion list successfully',
-      };
-    } catch (error) {
-      console.log('Error:', error.message);
-      throw new BadRequestException({
-        message: 'Failed to add book to promotion list',
       });
     }
   }

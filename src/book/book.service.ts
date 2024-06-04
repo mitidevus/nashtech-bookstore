@@ -18,6 +18,7 @@ import { calculateDiscountedPrice } from 'src/utils';
 import {
   AddAuthorsToBookDto,
   AddCategoriesToBookDto,
+  AddPromoListToBookDto,
   AddRatingReviewToBookDto,
   BooksPageOptionsDto,
   CreateBookInput,
@@ -994,6 +995,64 @@ export class BookService {
       console.log('Error:', error.message);
       throw new BadRequestException({
         message: 'Failed to add categories to book',
+      });
+    }
+  }
+
+  async addPromoListToBook(id: number, dto: AddPromoListToBookDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id: dto.promotionListId,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    if (book.promotionListId) {
+      throw new BadRequestException({
+        message: 'Book already in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id,
+        },
+        data: {
+          promotionListId: promotionList.id,
+          finalPrice: calculateDiscountedPrice(
+            book.price,
+            promotionList.discountPercentage,
+          ),
+          discountPercentage: promotionList.discountPercentage,
+          discountDate: new Date(),
+        },
+      });
+
+      return {
+        message: 'Added promotion list to book successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add promotion list to book',
       });
     }
   }

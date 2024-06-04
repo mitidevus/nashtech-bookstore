@@ -28,6 +28,7 @@ import { BookService } from './book.service';
 import {
   AddAuthorsToBookDto,
   AddCategoriesToBookDto,
+  AddPromoListToBookDto,
   BooksPageOptionsDto,
   CreateBookInput,
 } from './dto';
@@ -163,5 +164,14 @@ export class BookViewController {
     @Body() dto: AddCategoriesToBookDto,
   ) {
     return await this.bookService.addCategoriesToBook(id, dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post(':id/promotion-lists')
+  async addPromoListToBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddPromoListToBookDto,
+  ) {
+    return this.bookService.addPromoListToBook(id, dto);
   }
 }
