@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
+import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateOrderDto,
@@ -292,14 +293,52 @@ export class OrderService {
       });
     }
 
-    return await this.prismaService.order.update({
-      where: {
-        id,
-      },
-      data: {
-        status: dto.status,
-      },
-    });
+    try {
+      const order = await this.prismaService.$transaction(async (tx) => {
+        const order = await tx.order.update({
+          where: {
+            id,
+          },
+          data: {
+            status: dto.status,
+          },
+        });
+
+        if (order.status === OrderStatus.completed) {
+          const orderItems = await tx.orderItem.findMany({
+            where: {
+              orderId: order.id,
+            },
+            select: {
+              bookId: true,
+              quantity: true,
+            },
+          });
+
+          for (const item of orderItems) {
+            await tx.book.update({
+              where: {
+                id: item.bookId,
+              },
+              data: {
+                soldQuantity: {
+                  increment: item.quantity,
+                },
+              },
+            });
+          }
+        }
+
+        return order;
+      });
+
+      return order;
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to update order status',
+      });
+    }
   }
 
   async deleteOrder(id: string) {
