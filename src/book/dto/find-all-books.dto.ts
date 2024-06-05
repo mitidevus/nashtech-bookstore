@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { MAX_ITEMS_PER_PAGE, Order, SortBy, SpecialBook } from 'constants/app';
 
 export class BooksPageOptionsDto {
@@ -34,6 +34,10 @@ export class BooksPageOptionsDto {
   @Max(5)
   @IsOptional()
   rating?: number;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
 
   get skip(): number {
     return (this.page - 1) * this.take;

@@ -167,6 +167,47 @@ export class BookService {
     const conditions = {
       where: {
         ...(dto.rating ? { avgStars: { gte: dto.rating } } : {}),
+        ...(dto.search &&
+          dto.search.length > 0 && {
+            OR: [
+              {
+                name: {
+                  contains: dto.search,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                description: {
+                  contains: dto.search,
+                  mode: 'insensitive' as const,
+                },
+              },
+              {
+                authors: {
+                  some: {
+                    author: {
+                      name: {
+                        contains: dto.search,
+                        mode: 'insensitive' as const,
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                categories: {
+                  some: {
+                    category: {
+                      name: {
+                        contains: dto.search,
+                        mode: 'insensitive' as const,
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          }),
       },
       orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
     };
