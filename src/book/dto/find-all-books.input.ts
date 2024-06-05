@@ -39,6 +39,10 @@ export class FindAllBooksInput {
   @IsOptional()
   rating?: number;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  search?: string;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }

@@ -55,6 +55,7 @@ input FindAllBooksInput {
   page: Int
   take: Int
   rating: Int
+  search: String
 }
 
 enum Order {
