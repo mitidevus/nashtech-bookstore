@@ -1,0 +1,26 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'About Us']
+    include ../partials/breadcrumbs
+
+    div(class="w-full flex flex-col items-center mt-4")
+        div(class="w-full h-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") About Us
+                button(class="primary-btn" onClick="window.location='/about/edit'")
+                    i.lni.lni-pencil-alt
+                    span Edit
+
+    div(class="mt-6")
+        textarea(id="content" name="content") !{content}
+
+    script.
+        tinymce.init({
+            selector: 'textarea',
+            readonly: true,
+            menubar: false,
+            toolbar: false,
+            min_height: 550,
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant"))
+        });
