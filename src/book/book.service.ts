@@ -16,6 +16,9 @@ import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
 import { calculateDiscountedPrice } from 'src/utils';
 import {
+  AddAuthorsToBookDto,
+  AddCategoriesToBookDto,
+  AddPromoListToBookDto,
   AddRatingReviewToBookDto,
   BooksPageOptionsDto,
   CreateBookInput,
@@ -892,5 +895,165 @@ export class BookService {
       totalPages: dto.take ? Math.ceil(totalCount / dto.take) : 1,
       totalCount,
     };
+  }
+
+  async addAuthorsToBook(id: number, dto: AddAuthorsToBookDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    const authors = await this.prismaService.author.findMany({
+      where: { id: { in: dto.authorIds } },
+    });
+
+    if (authors.length !== dto.authorIds.length) {
+      throw new BadRequestException('Invalid author');
+    }
+
+    const bookAuthor = await this.prismaService.bookAuthor.findMany({
+      where: {
+        bookId: id,
+        authorId: {
+          in: dto.authorIds,
+        },
+      },
+    });
+
+    if (bookAuthor.length) {
+      throw new BadRequestException({
+        message: 'There are some authors already in the book',
+      });
+    }
+
+    try {
+      await this.prismaService.bookAuthor.createMany({
+        data: dto.authorIds.map((authorId) => ({
+          authorId,
+          bookId: id,
+        })),
+      });
+
+      return {
+        message: 'Added authors to book successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add authors to book',
+      });
+    }
+  }
+
+  async addCategoriesToBook(bookId: number, dto: AddCategoriesToBookDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: { id: bookId },
+    });
+
+    if (!book) {
+      throw new BadRequestException('Book not found');
+    }
+
+    const categories = await this.prismaService.category.findMany({
+      where: { id: { in: dto.categoryIds } },
+    });
+
+    if (categories.length !== dto.categoryIds.length) {
+      throw new BadRequestException('Invalid category');
+    }
+
+    const bookCategory = await this.prismaService.bookCategory.findMany({
+      where: {
+        bookId,
+        categoryId: {
+          in: dto.categoryIds,
+        },
+      },
+    });
+
+    if (bookCategory.length) {
+      throw new BadRequestException({
+        message: 'There are some categories already in the book',
+      });
+    }
+
+    try {
+      await this.prismaService.bookCategory.createMany({
+        data: dto.categoryIds.map((categoryId) => ({
+          bookId,
+          categoryId,
+        })),
+      });
+
+      return {
+        message: 'Added categories to book successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add categories to book',
+      });
+    }
+  }
+
+  async addPromoListToBook(id: number, dto: AddPromoListToBookDto) {
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    const promotionList = await this.prismaService.promotionList.findUnique({
+      where: {
+        id: dto.promotionListId,
+      },
+    });
+
+    if (!promotionList) {
+      throw new BadRequestException({
+        message: 'Promotion list not found',
+      });
+    }
+
+    if (book.promotionListId) {
+      throw new BadRequestException({
+        message: 'Book already in promotion list',
+      });
+    }
+
+    try {
+      await this.prismaService.book.update({
+        where: {
+          id,
+        },
+        data: {
+          promotionListId: promotionList.id,
+          finalPrice: calculateDiscountedPrice(
+            book.price,
+            promotionList.discountPercentage,
+          ),
+          discountPercentage: promotionList.discountPercentage,
+          discountDate: new Date(),
+        },
+      });
+
+      return {
+        message: 'Added promotion list to book successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to add promotion list to book',
+      });
+    }
   }
 }

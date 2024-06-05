@@ -176,3 +176,8 @@ enum PaymentMethod {
   zalo_pay
   vn_pay
 }
+
+model About {
+  id      Int    @id @default(autoincrement())
+  content String
+}

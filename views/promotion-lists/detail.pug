@@ -35,13 +35,14 @@ block content
         div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
                 h1(class="text-lg font-semibold text-gray-800") Books
-                button(id="add-book-btn" class="primary-btn" onclick="openModal('modal')")
-                    i.lni.lni-plus
-                    span Add Book
+                if nonPromotionalBooks.length > 0
+                    button(id="add-book-btn" class="primary-btn" onclick="openModal('modal')")
+                        i.lni.lni-plus
+                        span Add Book
 
             block content
             table(class="min-w-full divide-y divide-gray-200")
-                - var columns = ['ID', 'Name', 'Created At', 'Updated At', '']
+                - var columns = ['ID', 'Name', 'Added At', '']
                 include ../partials/head-table
 
                 - var rows = books
@@ -53,8 +54,7 @@ block content
                                 td(class="py-4 px-6 flex items-center gap-4")
                                     img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
                                     span(class="block")= book.name
-                                td(class="py-4 px-6")= book.createdAt
-                                td(class="py-4 px-6")= book.updatedAt
+                                td(class="py-4 px-6")= book.discountDate
                                 td(class="py-4 px-10 relative")
                                     button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeBook(event, ${book.id})`)
                                         i(class="lni lni-trash-can")
@@ -64,7 +64,7 @@ block content
     include ../partials/modal
         block modalFormContent
             form(id="add-book-form" onsubmit="addBook(event)")
-                div(class="mb-8")
+                div(class="mb-8 max-w-[400px]")
                     label(class="block text-gray-700 text-sm font-medium mb-2") Book
                     div(id="book-select")
 
@@ -80,6 +80,7 @@ block content
                 options: nonPromotionalBooks.map(book => ({ label: book.name, value: book.id })),
                 maxWidth: '100%',
                 search: true,
+                multiple: true,
             });
         });
 
@@ -87,10 +88,10 @@ block content
             event.preventDefault();
 
             const promotionListId = document.getElementById('id').value;
-            const bookId = document.getElementById('book-select').value;
+            const bookIds = document.getElementById('book-select').value;
 
             const data = {
-                bookId: parseInt(bookId)
+                bookIds: bookIds.map(id => parseInt(id))
             }
 
             try {

@@ -1,0 +1,62 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'About Us', href: '/about' }, 'Edit']
+    include ../partials/breadcrumbs
+
+    div(class="w-full flex flex-col items-center mt-4")
+        div(class="w-full h-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Edit About Us
+                button(id="saveButton" class="primary-btn")
+                    i.lni.lni-save
+                    span Save
+
+    form(class="mt-6")
+        textarea(id="content" name="content") !{content}
+
+    script.
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount checklist mediaembed casechange export formatpainter pageembed linkchecker a11ychecker tinymcespellchecker permanentpen powerpaste advtable advcode editimage advtemplate ai mentions tinycomments tableofcontents footnotes mergetags autocorrect typography inlinecss markdown',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            tinycomments_mode: 'embedded',
+            tinycomments_author: 'Author name',
+            mergetags_list: [
+                { value: 'First.Name', title: 'First Name' },
+                { value: 'Email', title: 'Email' }
+            ],
+            min_height: 550,
+            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject("See docs to implement AI Assistant"))
+        });
+
+        document.getElementById('saveButton').addEventListener('click', editAbout);
+
+        async function editAbout(event) {
+            event.preventDefault();
+
+            const content = tinymce.get('content').getContent();
+            console.log(content);
+            const data = {
+                content
+            }
+
+            try {
+                const response = await fetch(`/about`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Edited about us successfully');
+                    window.location = '/about';
+                } else {
+                    console.error('Failed to edit about us');
+                }
+            } catch (error) {
+                console.error('Failed to edit about us');
+            }
+        }

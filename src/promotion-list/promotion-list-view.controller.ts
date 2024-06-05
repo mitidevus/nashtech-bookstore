@@ -17,7 +17,7 @@ import { AuthenticatedGuard } from 'src/auth/guard';
 import { BookService } from 'src/book/book.service';
 import { toDateTime } from 'src/utils';
 import {
-  AddBookToPromoListDto,
+  AddBooksToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
 } from './dto';
@@ -79,8 +79,7 @@ export class PromotionListViewController {
       books: promotionList.books.map((book) => {
         return {
           ...book,
-          createdAt: toDateTime(book.createdAt),
-          updatedAt: toDateTime(book.updatedAt),
+          discountDate: toDateTime(book.discountDate),
         };
       }),
       nonPromotionalBooks,
@@ -95,11 +94,11 @@ export class PromotionListViewController {
 
   @UseGuards(AuthenticatedGuard)
   @Post(':id/books')
-  async addBookToPromoList(
+  async addBooksToPromoList(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AddBookToPromoListDto,
+    @Body() dto: AddBooksToPromoListDto,
   ) {
-    return this.promotionListService.addBookToPromoList(id, dto);
+    return this.promotionListService.addBooksToPromoList(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)

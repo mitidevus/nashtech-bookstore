@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { calculateDiscountedPrice } from 'src/utils/calculation';
 import {
-  AddBookToPromoListDto,
+  AddBooksToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
@@ -101,7 +100,14 @@ export class PromotionListService {
         id,
       },
       include: {
-        books: true,
+        books: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            discountDate: true,
+          },
+        },
       },
     });
 
@@ -220,10 +226,10 @@ export class PromotionListService {
     }
   }
 
-  async addBookToPromoList(id: number, dto: AddBookToPromoListDto) {
+  async addBooksToPromoList(promoId: number, dto: AddBooksToPromoListDto) {
     const promotionList = await this.prismaService.promotionList.findUnique({
       where: {
-        id,
+        id: promoId,
       },
     });
 
@@ -233,47 +239,52 @@ export class PromotionListService {
       });
     }
 
-    const book = await this.prismaService.book.findUnique({
+    const books = await this.prismaService.book.findMany({
       where: {
-        id: dto.bookId,
+        id: {
+          in: dto.bookIds,
+        },
       },
     });
 
-    if (!book) {
-      throw new BadRequestException({
-        message: 'Book not found',
-      });
+    if (books.length !== dto.bookIds.length) {
+      throw new BadRequestException('Invalid book');
     }
 
-    if (book.promotionListId) {
+    const bookInPromoList = books.find((book) => book.promotionListId);
+
+    if (bookInPromoList) {
       throw new BadRequestException({
-        message: 'Book already in promotion list',
+        message: 'There are some books already in promotion list',
       });
     }
 
     try {
-      await this.prismaService.book.update({
-        where: {
-          id: dto.bookId,
-        },
-        data: {
-          promotionListId: id,
-          finalPrice: calculateDiscountedPrice(
-            book.price,
-            promotionList.discountPercentage,
-          ),
-          discountPercentage: promotionList.discountPercentage,
-          discountDate: new Date(),
-        },
+      const updateBookPromises = books.map((book) => {
+        return this.prismaService.book.update({
+          where: {
+            id: book.id,
+          },
+          data: {
+            promotionListId: promoId,
+            finalPrice:
+              book.price -
+              (book.price * promotionList.discountPercentage) / 100,
+            discountPercentage: promotionList.discountPercentage,
+            discountDate: new Date(),
+          },
+        });
       });
 
+      await this.prismaService.$transaction(updateBookPromises);
+
       return {
-        message: 'Added book to promotion list successfully',
+        message: 'Added books to promotion list successfully',
       };
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({
-        message: 'Failed to add book to promotion list',
+        message: 'Failed to add books to promotion list',
       });
     }
   }

@@ -30,6 +30,7 @@ export const MAX_ITEMS_PER_PAGE = 20;
 export const MAX_PAGINATION_PAGES = 5;
 export const DEFAULT_PAGE_SIZE = 8;
 export const DEFAULT_BOOK_PAGE_SIZE = 5;
+export const DEFAULT_ORDER_PAGE_SIZE = 5;
 
 // IMAGE
 export const DEFAULT_IMAGE_URL =

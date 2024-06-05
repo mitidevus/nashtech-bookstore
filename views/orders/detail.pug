@@ -5,48 +5,65 @@ block content
     include ../partials/breadcrumbs
 
     div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
-        div(class="w-full grid grid-cols-1 xl:grid-cols-2 gap-8")
-            - var wrapperTitle = 'Order details'
-            include ../partials/wrapper
-                block content
-                div(class="pt-4 pb-6 px-6")
-                    div(class="grid grid-cols-1 md:grid-cols-4 gap-4")
-                        div(class="md:col-span-3")
-                            label(for="id" class="modal-label") ID
-                            input(id="id" type="text" class="modal-input" value=id readonly) 
+        div(class="w-full grid grid-cols-1 xl:grid-cols-12 gap-8")
+            div(class="xl:col-span-7")
+                div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                    div(class="flex items-center justify-between py-4 px-6")
+                        h1(class="text-lg font-semibold text-gray-800") Order Details
+                        if status !== "completed" && status !== "cancelled"
+                            button(id="add-book-btn" class="primary-btn" onclick="openModal('modal')")
+                                i.lni.lni-pencil-alt
 
-                        div(class="md:col-span-1")
-                            label(for="status" class="modal-label") Status
-                            input(id="status" type="text" class="modal-input capitalize" value=status readonly)
+                    div(class="pt-4 pb-6 px-6")
+                        div(class="grid grid-cols-1 md:grid-cols-6 gap-4")
+                            div(class="md:col-span-4")
+                                label(for="id" class="modal-label") ID
+                                input(id="id" type="text" class="modal-input" value=id readonly) 
 
-                        div(class="md:col-span-2")
-                            label(for="createdAt" class="modal-label") Created At
-                            input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+                            div(class="md:col-span-2")
+                                label(for="status" class="modal-label") Status
+                                input(id="status" type="text" class="modal-input capitalize" value=status readonly)
 
-                        div(class="md:col-span-2")
-                            label(for="updatedAt" class="modal-label") Updated At
-                            input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+                            div(class="md:col-span-2")
+                                label(for="paymentMethod" class="modal-label") Payment Method
+                                case paymentMethod
+                                    when 'momo'
+                                        input(id="paymentMethod" type="text" class="modal-input" value="Momo" readonly) 
+                                    when 'zalo_pay'
+                                        input(id="paymentMethod" type="text" class="modal-input" value="ZaloPay" readonly) 
+                                    when 'vn_pay'
+                                        input(id="paymentMethod" type="text" class="modal-input" value="VNPAY" readonly) 
+                                    default 
+                                        input(id="paymentMethod" type="text" class="modal-input" value="Cash on delivery" readonly)
+                            div(class="md:col-span-2")
+                                label(for="createdAt" class="modal-label") Created At
+                                input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
 
-            - var wrapperTitle = `Customer`
-            include ../partials/wrapper
-                block content
-                div(class="pt-4 pb-6 px-6")
-                    div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
-                        div(class="md:col-span-1")
-                            label(class="modal-label") Name
-                            input(id="name" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=user.name readonly onclick=`window.location='/customers/${user.id}'`) 
+                            div(class="md:col-span-2")
+                                label(for="updatedAt" class="modal-label") Updated At
+                                input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
 
-                        div(class="md:col-span-1")
-                            label(for="email" class="modal-label") Email
-                            input(id="email" type="text" class="modal-input" value=user.email readonly)
+            div(class="xl:col-span-5")
+                - var wrapperTitle = `Customer`
+                include ../partials/wrapper
+                    block content
+                    div(class="pt-4 pb-6 px-6")
+                        div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+                            div(class="md:col-span-1")
+                                label(class="modal-label") Name
+                                input(id="name" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=user.name readonly onclick=`window.location='/customers/${user.id}'`) 
 
-                        div(class="md:col-span-1")
-                            label(for="phone" class="modal-label") Phone
-                            input(id="phone" type="text" class="modal-input" value=phone readonly) 
+                            div(class="md:col-span-1")
+                                label(for="email" class="modal-label") Email
+                                input(id="email" type="text" class="modal-input" value=user.email readonly)
 
-                        div(class="md:col-span-3")
-                            label(for="shippingAddress" class="modal-label") Shipping Address
-                            input(id="shippingAddress" type="text" class="modal-input" value=shippingAddress readonly)
+                            div(class="md:col-span-1")
+                                label(for="phone" class="modal-label") Phone
+                                input(id="phone" type="text" class="modal-input" value=phone readonly) 
+
+                            div(class="md:col-span-3")
+                                label(for="shippingAddress" class="modal-label") Shipping Address
+                                input(id="shippingAddress" type="text" class="modal-input" value=shippingAddress readonly)
 
         - var wrapperTitle = `Items`
         include ../partials/wrapper
@@ -77,3 +94,59 @@ block content
                             td(class="py-4 px-6 text-gray-800") Total:
                             td(class="py-4 px-6 text-gray-800 font-semibold")= totalPrice
 
+    - var modalTitle = 'Update Order Status'
+    include ../partials/modal
+        block modalFormContent
+            form(id="update-order-status-form" onsubmit="updateOrderStatus(event)")
+                div(class="mb-8")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Status
+                    div(id="status-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const nextStatuses = JSON.parse(`!{JSON.stringify(nextStatuses)}`);
+            VirtualSelect.init({
+                ele: '#status-select',
+                options: nextStatuses.map(status => ({ label: status.label, value: status.value })),
+                maxWidth: '100%',
+                search: true,
+            });
+        });
+
+        async function updateOrderStatus(event) {
+            event.preventDefault();
+
+            const orderId = document.getElementById('id').value;
+            const status = document.getElementById('status-select').value;
+
+            const data = {
+                status
+            }
+
+            console.log(data);
+            console.log(orderId);
+
+            try {
+                const response = await fetch(`/orders/${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Updated order status successfully');
+                    closeModal('modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to update order status');
+                }
+            } catch (error) {
+                console.error('Failed to update order status', error);
+            }
+        }

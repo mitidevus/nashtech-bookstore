@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 
-export class AddBookToPromoListDto {
+export class AddPromoListToBookDto {
   @IsNumber()
   @IsNotEmpty()
-  bookId: number;
+  promotionListId: number;
 }

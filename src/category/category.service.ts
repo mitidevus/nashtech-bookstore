@@ -337,4 +337,32 @@ export class CategoryService {
       });
     }
   }
+
+  async getCategoriesNotInBook(bookId: number) {
+    const book = await this.prismaService.book.findUnique({
+      where: {
+        id: bookId,
+      },
+    });
+
+    if (!book) {
+      throw new BadRequestException({
+        message: 'Book not found',
+      });
+    }
+
+    const categories = await this.prismaService.category.findMany({
+      where: {
+        NOT: {
+          books: {
+            some: {
+              bookId,
+            },
+          },
+        },
+      },
+    });
+
+    return categories;
+  }
 }

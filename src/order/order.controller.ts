@@ -53,11 +53,11 @@ export class OrderController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Patch(':id')
-  async updateOrder(
+  async updateOrderStatus(
     @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrder(id, dto);
+    return this.orderService.updateOrderStatus(id, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

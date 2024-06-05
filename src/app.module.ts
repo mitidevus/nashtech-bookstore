@@ -14,6 +14,7 @@ import { PromotionListModule } from './promotion-list/promotion-list.module';
 import { RatingReviewModule } from './rating-review/rating-review.module';
 import { RedisModule } from './services/redis/redis.module';
 import { UserModule } from './user/user.module';
+import { AboutModule } from './about/about.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     CartModule,
     RedisModule,
+    AboutModule,
   ],
   controllers: [AppController],
 })

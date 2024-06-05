@@ -25,7 +25,13 @@ import { PromotionListService } from 'src/promotion-list/promotion-list.service'
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { formatCurrency, toDateTime } from 'src/utils';
 import { BookService } from './book.service';
-import { BooksPageOptionsDto, CreateBookInput } from './dto';
+import {
+  AddAuthorsToBookDto,
+  AddCategoriesToBookDto,
+  AddPromoListToBookDto,
+  BooksPageOptionsDto,
+  CreateBookInput,
+} from './dto';
 
 @Controller('/books')
 @UseFilters(AuthExceptionFilter)
@@ -108,6 +114,11 @@ export class BookViewController {
       );
     }
 
+    const authorsNotInBook = await this.authorService.getAuthorsNotInBook(id);
+
+    const categoriesNotInBook =
+      await this.categoryService.getCategoriesNotInBook(id);
+
     return {
       ...book,
       createdAt: toDateTime(book.createdAt),
@@ -126,6 +137,8 @@ export class BookViewController {
         currentPage: reviewsDto.page || 1,
       },
       promos,
+      authorsNotInBook,
+      categoriesNotInBook,
     };
   }
 
@@ -133,5 +146,32 @@ export class BookViewController {
   @Delete(':id')
   async deleteBook(@Param('id', ParseIntPipe) id: number) {
     return await this.bookService.deleteBook(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post(':id/authors')
+  async addAuthorsToBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddAuthorsToBookDto,
+  ) {
+    return await this.bookService.addAuthorsToBook(id, dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post(':id/categories')
+  async addCategoriesToBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddCategoriesToBookDto,
+  ) {
+    return await this.bookService.addCategoriesToBook(id, dto);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Post(':id/promotion-lists')
+  async addPromoListToBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddPromoListToBookDto,
+  ) {
+    return this.bookService.addPromoListToBook(id, dto);
   }
 }

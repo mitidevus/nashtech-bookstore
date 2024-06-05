@@ -12,6 +12,7 @@ import { DEFAULT_PAGE_SIZE } from 'constants/app';
 import { AuthExceptionFilter } from 'src/auth/filters';
 import { AuthenticatedGuard } from 'src/auth/guard';
 import { formatCurrency, toDateTime } from 'src/utils';
+import { capitalizeString } from 'src/utils/string';
 import { UserPageOptionsDto } from './dto';
 import { UserService } from './user.service';
 
@@ -37,7 +38,7 @@ export class UserViewController {
           ...user,
           createdAt: toDateTime(user.createdAt),
           updatedAt: toDateTime(user.updatedAt),
-          role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
+          role: capitalizeString(user.role),
         };
       }),
     };

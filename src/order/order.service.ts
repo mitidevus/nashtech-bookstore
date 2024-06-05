@@ -279,7 +279,7 @@ export class OrderService {
     return order;
   }
 
-  async updateOrder(id: string, dto: UpdateOrderStatusDto) {
+  async updateOrderStatus(id: string, dto: UpdateOrderStatusDto) {
     const order = await this.prismaService.order.findUnique({
       where: {
         id,
