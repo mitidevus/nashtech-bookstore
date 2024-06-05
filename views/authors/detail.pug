@@ -5,8 +5,13 @@ block content
     include ../partials/breadcrumbs
 
     div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
-        - var wrapperTitle = name
-        include ../partials/wrapper
+        div(class="w-full h-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800")= name
+                button(class="primary-btn" onclick=`window.location='/authors/${id}/edit'`)
+                    i.lni.lni-pencil-alt
+                    span Edit
+
             block content
             div(class="pt-4 pb-6 px-6")
                 div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
