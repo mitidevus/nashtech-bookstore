@@ -106,13 +106,7 @@ export class AuthorViewController {
   @Get(':id/edit')
   @Render('authors/edit')
   async getEditAuthorDetailPage(@Param('id', ParseIntPipe) id: number) {
-    const author = await this.authorService.getAuthorById(id);
-
-    return {
-      ...author,
-      createdAt: toDateTime(author.createdAt),
-      updatedAt: toDateTime(author.updatedAt),
-    };
+    return await this.authorService.getAuthorById(id);
   }
 
   @UseGuards(AuthenticatedGuard)

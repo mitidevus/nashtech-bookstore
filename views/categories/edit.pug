@@ -1,13 +1,13 @@
 extends ../partials/dashboard-layout
 
 block content
-    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Authors', href: '/authors' }, { text: `${name}`, href: `/authors/${id}` }, "Edit"]
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Categories', href: '/categories' }, { text: `${name}`, href: `/categories/${id}` }, "Edit"]
     include ../partials/breadcrumbs
 
     div(class="w-full flex flex-col items-center gap-8 mt-4")
         div(class="w-full h-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
             div(class="flex items-center justify-between py-4 px-6")
-                h1(class="text-lg font-semibold text-gray-800") Edit Author
+                h1(class="text-lg font-semibold text-gray-800") Edit Category
                 button(id="saveButton" class="primary-btn")
                     i.lni.lni-save
                     span Save 
@@ -22,34 +22,35 @@ block content
                     label(for="name" class="modal-label") Name
                     input(id="name" type="text" class="modal-input" value=name name="name" autocomplete="off")
 
-                div 
-                    - var imageUrl = image 
-                    include ../partials/image-input
-
     script.
-        document.getElementById('saveButton').addEventListener('click', editAuthor);
+        document.getElementById('saveButton').addEventListener('click', editCategory);
 
-        async function editAuthor(event) {
+        async function editCategory(event) {
             event.preventDefault()
 
-            const authorId = document.getElementById('id').value;
+            const categoryId = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
 
-            const form = document.querySelector('form');
-            const formData = new FormData(form);
+            console.log(categoryId, name)
+
+            const data = { name }; 
 
             try {
-                const response = await fetch(`/authors/${authorId}`, {
+                const response = await fetch(`/categories/${categoryId}`, {
                     method: 'PATCH',
-                    body: formData
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
                 });
 
                 if (response.ok) {
-                    console.log('Edited author successfully');
-                    window.location = `/authors/${id}`;
+                    console.log('Edited category successfully');
+                    window.location = `/categories/${categoryId}`;
                 } else {
-                    console.error('Failed to edit author');
+                    console.error('Failed to edit category');
                 }
             } catch (error) {
-                console.error('Failed to edit author');
+                console.error('Failed to edit category');
             }
         }
