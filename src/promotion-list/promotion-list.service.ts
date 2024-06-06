@@ -125,6 +125,14 @@ export class PromotionListService {
       where: {
         id,
       },
+      include: {
+        books: {
+          select: {
+            id: true,
+            price: true,
+          },
+        },
+      },
     });
 
     if (!promotionList) {
@@ -141,30 +149,49 @@ export class PromotionListService {
       },
     );
 
-    if (promotionListExist) {
+    if (promotionListExist && promotionListExist.id !== id) {
       throw new BadRequestException({
         message: 'Promotion list already exists',
       });
     }
 
     try {
-      const promotionList = await this.prismaService.promotionList.update({
-        where: {
-          id,
-        },
-        data: {
-          ...dto,
-          slug: slugify(dto.name, {
-            lower: true,
-            locale: 'vi',
-          }),
-        },
-        include: {
-          books: true,
-        },
-      });
+      let updateBookPromises = [];
+      if (
+        dto.discountPercentage &&
+        dto.discountPercentage !== promotionList.discountPercentage
+      ) {
+        updateBookPromises = promotionList.books.map((book) => {
+          return this.prismaService.book.update({
+            where: {
+              id: book.id,
+            },
+            data: {
+              finalPrice:
+                book.price - (book.price * dto.discountPercentage) / 100,
+              discountPercentage: dto.discountPercentage,
+            },
+          });
+        });
+      }
 
-      return promotionList;
+      const updatedPromotionList = await this.prismaService.$transaction([
+        ...updateBookPromises,
+        this.prismaService.promotionList.update({
+          where: {
+            id,
+          },
+          data: {
+            ...dto,
+            slug: slugify(dto.name, {
+              lower: true,
+              locale: 'vi',
+            }),
+          },
+        }),
+      ]);
+
+      return updatedPromotionList;
     } catch (error) {
       console.log('Error:', error.message);
       throw new BadRequestException({

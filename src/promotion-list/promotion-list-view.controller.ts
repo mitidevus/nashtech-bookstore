@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Render,
@@ -20,6 +21,7 @@ import {
   AddBooksToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
+  UpdatePromotionListDto,
 } from './dto';
 import { PromotionListService } from './promotion-list.service';
 
@@ -84,6 +86,22 @@ export class PromotionListViewController {
       }),
       nonPromotionalBooks,
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get(':id/edit')
+  @Render('promotion-lists/edit')
+  async getEditPromotionListDetailPage(@Param('id', ParseIntPipe) id: number) {
+    return await this.promotionListService.getPromotionListById(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Patch(':id')
+  async updatePromotionList(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdatePromotionListDto,
+  ) {
+    return await this.promotionListService.updatePromotionList(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)

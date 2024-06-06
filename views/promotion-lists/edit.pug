@@ -1,0 +1,59 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Promotion Lists', href: '/promotion-lists' }, { text: `${name}`, href: `/promotion-lists/${id}` }, "Edit"]
+    include ../partials/breadcrumbs
+
+    div(class="w-full flex flex-col items-center gap-8 mt-4")
+        div(class="w-full h-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Edit Promotion List
+                button(id="saveButton" class="primary-btn")
+                    i.lni.lni-save
+                    span Save 
+
+            block content
+            form(class="px-6 py-4 grid grid-cols-1 md:grid-cols-3 gap-4")
+                div
+                    label(for="id" class="modal-label") ID
+                    input(id="id" type="text" class="modal-input" value=id disabled) 
+
+                div
+                    label(for="name" class="modal-label") Name
+                    input(id="name" type="text" class="modal-input" value=name name="name" autocomplete="off")
+
+                div
+                    label(for="discountPercentage" class="modal-label") Discount Percentage
+                    input(id="discountPercentage" type="text" class="modal-input" value=discountPercentage name="discountPercentage" autocomplete="off")
+
+    script.
+        document.getElementById('saveButton').addEventListener('click', editPromotionList);
+
+        async function editPromotionList(event) {
+            event.preventDefault()
+
+            const promotionListId = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
+            const discountPercentage = document.getElementById('discountPercentage').value;
+
+            const data = { name, discountPercentage: parseInt(discountPercentage) };
+
+            try {
+                const response = await fetch(`/promotion-lists/${promotionListId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Edited promotion list successfully');
+                    window.location = `/promotion-lists/${promotionListId}`;
+                } else {
+                    console.error('Failed to edit promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to edit promotion list');
+            }
+        }

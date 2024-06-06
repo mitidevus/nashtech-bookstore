@@ -24,7 +24,7 @@ block content
                                 each prop in ['id', 'name', 'slug', 'createdAt', 'updatedAt']
                                     td(class="py-5 px-6")= category[prop]
                                 td(class="py-4 px-10 relative")
-                                    button(class="delete-btn bg-[#7f56d9] border-[#7f56d9] hover:bg-[#926fdf] hidden group-hover:inline-flex absolute top-1/2 left-0                                                                                                                             transform -translate-x-1/2 -translate-y-1/2" onclick=`event.stopPropagation(); window.location='/categories/${category.id}/edit'`)
+                                    button(class="delete-btn bg-[#7f56d9] border-[#7f56d9] hover:bg-[#926fdf] hidden group-hover:inline-flex absolute top-1/2 left-0 transform -translate-x-1/2 -translate-y-1/2" onclick=`event.stopPropagation(); window.location='/categories/${category.id}/edit'`)
                                         i(class="lni lni-pencil-alt")
                                     button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeCategory(event, ${category.id})`)
                                         i(class="lni lni-trash-can")
