@@ -30,18 +30,20 @@ export class CategoryController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Post()
-  createCategory(@Body() dto: CreateCategoryDto) {
-    return this.categoryService.createCategory(dto);
+  async createCategory(@Body() dto: CreateCategoryDto) {
+    return await this.categoryService.createCategory(dto);
   }
 
   @Get()
-  getCategories(@Query() dto: CategoryPageOptionsDto) {
-    return this.categoryService.getCategories(dto);
+  async getCategories(@Query() dto: CategoryPageOptionsDto) {
+    return await this.categoryService.getCategories(dto);
   }
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
   @Get(':id')
-  getCategoryById(@Param('id', ParseIntPipe) id: number) {
-    return this.categoryService.getCategoryById(id);
+  async getCategoryById(@Param('id', ParseIntPipe) id: number) {
+    return await this.categoryService.getCategoryById(id);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -76,7 +78,7 @@ export class CategoryController {
     @Param('slug') slug: string,
     @Query() dto: BooksPageOptionsDto,
   ) {
-    return this.bookService.getBooksByCategorySlug(slug, dto);
+    return await this.bookService.getBooksByCategorySlug(slug, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

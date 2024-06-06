@@ -31,7 +31,7 @@ import {
   AddCategoriesToBookDto,
   AddPromoListToBookDto,
   BooksPageOptionsDto,
-  CreateBookInput,
+  CreateBookDto,
   UpdateBookDto,
 } from './dto';
 
@@ -49,7 +49,7 @@ export class BookViewController {
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   async createBook(
-    @Body() dto: CreateBookInput,
+    @Body() dto: CreateBookDto,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -201,6 +201,6 @@ export class BookViewController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: AddPromoListToBookDto,
   ) {
-    return this.bookService.addPromoListToBook(id, dto);
+    return await this.bookService.addPromoListToBook(id, dto);
   }
 }

@@ -13,14 +13,14 @@ export class BookResolver {
 
   @Query(() => BookList)
   async books(@Args('input') dto: FindAllBooksInput) {
-    return this.bookService.getBooks(dto);
+    return await this.bookService.getBooks(dto);
   }
 
   @UseGuards(JwtGqlGuard, RolesGqlGuard)
   @Roles(UserRole.admin)
   @Mutation(() => Book)
   async createBook(@Args('input') dto: CreateBookInput) {
-    return this.bookService.createBook(dto);
+    return await this.bookService.createBook(dto);
   }
 
   @UseGuards(JwtGqlGuard, RolesGqlGuard)
@@ -33,7 +33,7 @@ export class BookResolver {
     id: number,
     @Args('input') dto: UpdateBookInput,
   ) {
-    return this.bookService.updateBook(id, dto);
+    return await this.bookService.updateBook(id, dto);
   }
 
   @UseGuards(JwtGqlGuard, RolesGqlGuard)
@@ -45,6 +45,6 @@ export class BookResolver {
     })
     id: number,
   ) {
-    return this.bookService.deleteBook(id);
+    return await this.bookService.deleteBook(id);
   }
 }

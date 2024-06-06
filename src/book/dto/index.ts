@@ -3,6 +3,7 @@ export * from './add-categories.dto';
 export * from './add-promotion-list.dto';
 export * from './add-rating-review.dto';
 export * from './create-book.dto';
+export * from './create-book.input';
 export * from './find-all-books.dto';
 export * from './find-all-books.input';
 export * from './find-all-rating-reviews.dto';

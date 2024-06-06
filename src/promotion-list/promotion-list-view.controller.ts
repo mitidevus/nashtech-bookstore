@@ -36,7 +36,7 @@ export class PromotionListViewController {
   @UseGuards(AuthenticatedGuard)
   @Post()
   async createPromotionList(@Body() dto: CreatePromotionListDto) {
-    return this.promotionListService.createPromotionList(dto);
+    return await this.promotionListService.createPromotionList(dto);
   }
 
   @UseGuards(AuthenticatedGuard)
@@ -116,7 +116,7 @@ export class PromotionListViewController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: AddBooksToPromoListDto,
   ) {
-    return this.promotionListService.addBooksToPromoList(id, dto);
+    return await this.promotionListService.addBooksToPromoList(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)

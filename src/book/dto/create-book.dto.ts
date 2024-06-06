@@ -1,26 +1,22 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-@InputType()
-export class CreateBookInput {
-  @Field()
+export class CreateBookDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
 
-  @Field()
   @IsString()
+  @IsNotEmpty()
   description: string;
 
-  @Field()
   @IsString()
+  @IsNotEmpty()
   price: string;
 
-  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   categoryIds?: string;
 
-  @Field({ nullable: true })
   @IsOptional()
   @IsString()
   authorIds?: string;

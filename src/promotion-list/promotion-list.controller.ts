@@ -16,6 +16,7 @@ import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { BookService } from 'src/book/book.service';
 import { BooksPageOptionsDto } from 'src/book/dto';
 import {
+  AddBooksToPromoListDto,
   CreatePromotionListDto,
   PromotionListPageOptionsDto,
   UpdatePromotionListDto,
@@ -32,18 +33,22 @@ export class PromotionListController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Post()
-  createPromotionList(@Body() dto: CreatePromotionListDto) {
-    return this.promotionListService.createPromotionList(dto);
+  async createPromotionList(@Body() dto: CreatePromotionListDto) {
+    return await this.promotionListService.createPromotionList(dto);
   }
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
   @Get()
-  getPromotionLists(@Query() dto: PromotionListPageOptionsDto) {
-    return this.promotionListService.getPromotionLists(dto);
+  async getPromotionLists(@Query() dto: PromotionListPageOptionsDto) {
+    return await this.promotionListService.getPromotionLists(dto);
   }
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
   @Get(':id')
-  getPromotionListById(@Param('id', ParseIntPipe) id: number) {
-    return this.promotionListService.getPromotionListById(id);
+  async getPromotionListById(@Param('id', ParseIntPipe) id: number) {
+    return await this.promotionListService.getPromotionListById(id);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -63,22 +68,22 @@ export class PromotionListController {
     return await this.promotionListService.deletePromotionList(id);
   }
 
-  // @UseGuards(JwtGuard, RolesGuard)
-  // @Roles(UserRole.admin)
-  // @Post(':id/books')
-  // async addBookToPromoList(
-  //   @Param('id', ParseIntPipe) id: number,
-  //   @Body() dto: AddBookToPromoListDto,
-  // ) {
-  //   return await this.promotionListService.addBookToPromoList(id, dto);
-  // }
-
   @Get(':slug/books')
   async getBooksFromPromoListBySlug(
     @Param('slug') slug: string,
     @Query() dto: BooksPageOptionsDto,
   ) {
     return await this.bookService.getBooksByPromoListSlug(slug, dto);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Post(':id/books')
+  async addBookToPromoList(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: AddBooksToPromoListDto,
+  ) {
+    return await this.promotionListService.addBooksToPromoList(id, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

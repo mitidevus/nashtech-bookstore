@@ -91,7 +91,7 @@ export class PromotionListService {
   }
 
   async getAllPromotionLists() {
-    return this.prismaService.promotionList.findMany();
+    return await this.prismaService.promotionList.findMany();
   }
 
   async getPromotionListById(id: number) {

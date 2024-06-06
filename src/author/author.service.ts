@@ -95,7 +95,7 @@ export class AuthorService {
   }
 
   async getAllAuthors() {
-    return this.prismaService.author.findMany();
+    return await this.prismaService.author.findMany();
   }
 
   async getAuthorById(id: number) {

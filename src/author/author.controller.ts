@@ -40,7 +40,7 @@ export class AuthorController {
   @Roles(UserRole.admin)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
-  createAuthor(
+  async createAuthor(
     @Body() dto: CreateAuthorDto,
     @UploadedFile(
       new ParseFilePipeBuilder()
@@ -53,17 +53,19 @@ export class AuthorController {
     )
     image?: Express.Multer.File,
   ) {
-    return this.authorService.createAuthor(dto, image);
+    return await this.authorService.createAuthor(dto, image);
   }
 
   @Get()
-  getAuthors(@Query() dto: AuthorPageOptionsDto) {
-    return this.authorService.getAuthors(dto);
+  async getAuthors(@Query() dto: AuthorPageOptionsDto) {
+    return await this.authorService.getAuthors(dto);
   }
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
   @Get(':id')
-  getAuthorById(@Param('id', ParseIntPipe) id: number) {
-    return this.authorService.getAuthorById(id);
+  async getAuthorById(@Param('id', ParseIntPipe) id: number) {
+    return await this.authorService.getAuthorById(id);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -109,7 +111,7 @@ export class AuthorController {
     @Param('slug') slug: string,
     @Query() dto: BooksPageOptionsDto,
   ) {
-    return this.bookService.getBooksByAuthorSlug(slug, dto);
+    return await this.bookService.getBooksByAuthorSlug(slug, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

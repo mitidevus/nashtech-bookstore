@@ -23,13 +23,14 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(JwtGuard)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
   @Post()
   async createOrder(
     @GetUser('sub') userId: string,
     @Body() dto: CreateOrderDto,
   ) {
-    return this.orderService.createOrder(userId, dto);
+    return await this.orderService.createOrder(userId, dto);
   }
 
   @UseGuards(JwtGuard)
@@ -38,7 +39,7 @@ export class OrderController {
     @GetUser('sub') userId: string,
     @Query() dto: OrderPageOptionsDto,
   ) {
-    return this.orderService.getUserOrders(userId, dto);
+    return await this.orderService.getUserOrders(userId, dto);
   }
 
   @UseGuards(JwtGuard)
@@ -47,7 +48,7 @@ export class OrderController {
     @GetUser('sub') userId: string,
     @Param('id') orderId: string,
   ) {
-    return this.orderService.getUserOrderById(userId, orderId);
+    return await this.orderService.getUserOrderById(userId, orderId);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -57,13 +58,13 @@ export class OrderController {
     @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(id, dto);
+    return await this.orderService.updateOrderStatus(id, dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Delete(':id')
   async deleteOrder(@Param('id') id: string) {
-    return this.orderService.deleteOrder(id);
+    return await this.orderService.deleteOrder(id);
   }
 }

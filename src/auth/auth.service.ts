@@ -103,7 +103,7 @@ export class AuthService {
     };
   }
 
-  async generateJwtToken(
+  private async generateJwtToken(
     tokenType: TokenType,
     sub: string,
     email: string,
