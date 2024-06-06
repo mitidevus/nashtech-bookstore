@@ -56,7 +56,7 @@ block content
                                 td(class="py-5 px-6")= order.id
                                 td(class="py-5 px-6")= order.totalPrice
                                 td(class="text-center")    
-                                    - var statusColor = order.status === 'pending' ? '#5925DC' : order.status === 'processing' ? '#B54708' : order.status === 'completed' ? '#067647' : order.status === 'cancelled' ? '#C11574' : 'gray'
+                                    - var statusColor = order.status === 'pending' ? '#5925DC' : order.status === 'confirmed' ? '#7F56D9' : order.status === 'delivering' ? '#B54708' : order.status === 'completed' ? '#067647' : order.status === 'cancelled' ? '#C11574' : 'gray'
                                     span(class=`block w-full py-1.5 px-4 bg-[${statusColor}] bg-opacity-10 border border-[${statusColor}] border-opacity-20 rounded-full text-[${statusColor}] text-sm capitalize`)= order.status
                                 td(class="py-5 px-6")= order.createdAt
                                 td(class="py-5 px-6")= order.updatedAt   

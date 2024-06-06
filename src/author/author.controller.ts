@@ -69,11 +69,22 @@ export class AuthorController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
   async updateAuthor(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateAuthorDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
   ) {
-    return await this.authorService.updateAuthor(id, dto);
+    return await this.authorService.updateAuthor(id, dto, image);
   }
 
   @UseGuards(JwtGuard, RolesGuard)

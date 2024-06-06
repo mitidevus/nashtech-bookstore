@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Render,
@@ -16,7 +17,11 @@ import { AuthExceptionFilter } from 'src/auth/filters';
 import { AuthenticatedGuard } from 'src/auth/guard';
 import { toDateTime } from 'src/utils';
 import { CategoryService } from './category.service';
-import { CategoryPageOptionsDto, CreateCategoryDto } from './dto';
+import {
+  CategoryPageOptionsDto,
+  CreateCategoryDto,
+  UpdateCategoryDto,
+} from './dto';
 import { AddBooksToCategoryDto } from './dto/add-books.dto';
 
 @Controller('/categories')
@@ -77,6 +82,22 @@ export class CategoryViewController {
       }),
       booksNotInCategory,
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get(':id/edit')
+  @Render('categories/edit')
+  async getEditCategoryDetailPage(@Param('id', ParseIntPipe) id: number) {
+    return await this.categoryService.getCategoryById(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Patch(':id')
+  async updateCategory(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateCategoryDto,
+  ) {
+    return await this.categoryService.updateCategory(id, dto);
   }
 
   @UseGuards(AuthenticatedGuard)

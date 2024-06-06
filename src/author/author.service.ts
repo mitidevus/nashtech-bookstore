@@ -137,7 +137,11 @@ export class AuthorService {
     };
   }
 
-  async updateAuthor(id: number, dto: UpdateAuthorDto) {
+  async updateAuthor(
+    id: number,
+    dto: UpdateAuthorDto,
+    image: Express.Multer.File,
+  ) {
     if (!Object.keys(dto).length) {
       throw new BadRequestException({
         message: 'No data provided',
@@ -162,13 +166,28 @@ export class AuthorService {
       },
     });
 
-    if (authorExists) {
+    if (authorExists && authorExists.id !== id) {
       throw new BadRequestException({
         message: 'Author already exists',
       });
     }
 
+    let imageUrls = [];
+
     try {
+      if (image && image.buffer.byteLength > 0) {
+        const uploadImagesData = await uploadFilesFromFirebase(
+          [image],
+          EUploadFolder.author,
+        );
+
+        if (!uploadImagesData.success) {
+          throw new Error('Failed to upload images!');
+        }
+
+        imageUrls = uploadImagesData.urls;
+      }
+
       const updatedAuthor = await this.prismaService.author.update({
         where: {
           id,
@@ -179,12 +198,16 @@ export class AuthorService {
             lower: true,
             locale: 'vi',
           }),
+          image: image ? imageUrls[0] : author.image,
         },
       });
 
       return updatedAuthor;
     } catch (error) {
       console.log('Error:', error.message);
+
+      if (image && !imageUrls.length) await deleteFilesFromFirebase(imageUrls);
+
       throw new BadRequestException({
         message: 'Failed to update author',
       });

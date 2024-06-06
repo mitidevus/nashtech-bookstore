@@ -31,14 +31,13 @@ export class AppController {
   @UseGuards(LoginGuard)
   @Post('/login')
   login(@Res() res: Response): void {
-    res.redirect('/');
+    res.redirect('/books');
   }
 
   @UseGuards(AuthenticatedGuard)
   @Get()
-  @Render('index')
-  root(@Request() req) {
-    return { user: req.user };
+  root(@Res() res: Response) {
+    res.redirect('/books');
   }
 
   @UseGuards(AuthenticatedGuard)

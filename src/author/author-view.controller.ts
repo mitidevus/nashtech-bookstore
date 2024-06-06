@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Render,
@@ -26,6 +27,7 @@ import {
   AddBooksToAuthorDto,
   AuthorPageOptionsDto,
   CreateAuthorDto,
+  UpdateAuthorDto,
 } from './dto';
 
 @Controller('/authors')
@@ -98,6 +100,33 @@ export class AuthorViewController {
       }),
       booksNotInAuthor,
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get(':id/edit')
+  @Render('authors/edit')
+  async getEditAuthorDetailPage(@Param('id', ParseIntPipe) id: number) {
+    return await this.authorService.getAuthorById(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateAuthor(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateAuthorDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return await this.authorService.updateAuthor(id, dto, image);
   }
 
   @UseGuards(AuthenticatedGuard)

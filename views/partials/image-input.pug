@@ -1,11 +1,15 @@
+
 div(class="mb-4")
     label(for="image" class="block text-gray-700 text-sm font-medium mb-2") Upload Image
     div(class="relative")
         input(id="image" type="file" name="image" class="modal-input" onchange="previewImage(event)")
         button(type="button" id="cancel-image-btn" onclick="cancelImage()" class="absolute py-0.5 px-2 bg-gray-200 text-gray-700 rounded-md right-4 -translate-y-1/2 top-1/2 hidden") x
 
-div(class="mb-8")
+if (imageUrl)
+    img(id="image-preview" src=imageUrl alt="Image Preview" class="w-32 h-32 object-cover border rounded-md")
+else
     img(id="image-preview" src="#" alt="Image Preview" class="hidden w-32 h-32 object-cover border rounded-md")
+
 
 script.
     function previewImage(event) {
