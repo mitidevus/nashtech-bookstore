@@ -10,8 +10,12 @@ block content
             div(class="xl:col-span-2")
                 div(class="flex flex-col gap-8")
 
-                    - var wrapperTitle = name
-                    include ../partials/wrapper
+                    div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                        div(class="flex items-center justify-between py-4 px-6")
+                            h1(class="text-lg font-semibold text-gray-800")= name
+                            button(class="primary-btn" onclick=`window.location='/books/${id}/edit'`)
+                                i.lni.lni-pencil-alt
+
                         block content
                         div(class="pt-4 pb-6 px-6")
                             div(class="grid gap-4")
@@ -157,11 +161,7 @@ block content
                                             i.lni.lni-plus
                                             span Add Discount
                         if isPromotion
-                            div(class="flex justify-between py-4 px-6")
-                                button(class="primary-btn bg-[#fdb022] border-[#fdb022] hover:bg-[#fdbc43]")
-                                    i.lni.lni-spinner-arrow
-                                    span Change Discount
-
+                            div(class="flex justify-end py-4 px-6")
                                 button(class="primary-btn bg-[#ea4c89] border-[#ea4c89] hover:bg-[#ed679b]" onclick="removePromotionList(event)")
                                     i.lni.lni-trash-can
                                     span Remove

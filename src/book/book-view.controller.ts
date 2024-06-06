@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Render,
@@ -31,6 +32,7 @@ import {
   AddPromoListToBookDto,
   BooksPageOptionsDto,
   CreateBookInput,
+  UpdateBookDto,
 } from './dto';
 
 @Controller('/books')
@@ -140,6 +142,33 @@ export class BookViewController {
       authorsNotInBook,
       categoriesNotInBook,
     };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get(':id/edit')
+  @Render('books/edit')
+  async getEditBookDetailPage(@Param('id', ParseIntPipe) id: number) {
+    return await this.bookService.getBookByIdForAdmin(id);
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateBookDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return await this.bookService.updateBook(id, dto, image);
   }
 
   @UseGuards(AuthenticatedGuard)

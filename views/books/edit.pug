@@ -1,0 +1,64 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Books', href: '/books' }, { text: `${name}`, href: `/books/${id}` }, "Edit"]
+    include ../partials/breadcrumbs
+
+    div(class="w-full flex flex-col items-center gap-8 mt-4")
+        div(class="w-full h-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Edit Book
+                button(id="saveButton" class="primary-btn")
+                    i.lni.lni-save
+                    span Save 
+
+            block content
+            form(class="px-6 py-4 grid grid-cols-1 md:grid-cols-3 gap-4")
+                div
+                    label(for="id" class="modal-label") ID
+                    input(id="id" type="text" class="modal-input" value=id disabled) 
+
+                div
+                    label(for="name" class="modal-label") Name
+                    input(id="name" type="text" class="modal-input" value=name name="name" autocomplete="off")
+
+                div
+                    label(for="price" class="modal-label") Price
+                    input(id="price" type="text" class="modal-input" value=price name="price" autocomplete="off")
+
+                div(class="col-span-3")
+                    label(for="description" class="block text-gray-700 text-sm font-medium mb-2") Description
+                    textarea(id="description" type="text" class="modal-input" name="description" autocomplete="off" rows="4")
+                        = description
+
+                div 
+                    - var imageUrl = image 
+                    include ../partials/image-input
+
+    script.
+        document.getElementById('saveButton').addEventListener('click', editBook);
+
+        async function editBook(event) {
+            event.preventDefault()
+
+            const bookId = document.getElementById('id').value;
+
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch(`/books/${bookId}`, {
+                    method: 'PATCH',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    console.log('Edited book successfully');
+                    window.location = `/books/${bookId}`;
+                } else {
+                    console.error('Failed to edit book');
+                }
+            } catch (error) {
+                console.error('Failed to edit book');
+            }
+        }

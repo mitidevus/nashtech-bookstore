@@ -87,8 +87,5 @@ input CreateBookInput {
 input UpdateBookInput {
   name: String
   description: String
-  image: String
-  price: Float
-  categoryIds: [Int!]
-  authorIds: [Int!]
+  price: String
 }
