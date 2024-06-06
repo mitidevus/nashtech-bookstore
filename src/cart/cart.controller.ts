@@ -31,21 +31,21 @@ export class CartController {
   }
 
   @UseGuards(JwtGuard)
-  @Delete(':bookId')
-  async removeFromCart(
-    @GetUser('sub') userId: string,
-    @Param('bookId', ParseIntPipe) bookId: number,
-  ) {
-    return await this.cartService.removeFromCart(userId, bookId);
-  }
-
-  @UseGuards(JwtGuard)
   @Patch()
   async updateCartItem(
     @GetUser('sub') userId: string,
     @Body() dto: UpdateCartItemDto,
   ) {
     return await this.cartService.updateCartItem(userId, dto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(':bookId')
+  async removeFromCart(
+    @GetUser('sub') userId: string,
+    @Param('bookId', ParseIntPipe) bookId: number,
+  ) {
+    return await this.cartService.removeFromCart(userId, bookId);
   }
 
   @UseGuards(JwtGuard)

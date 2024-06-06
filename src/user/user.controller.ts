@@ -12,14 +12,14 @@ export class UserController {
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Get()
-  getUsers(@Query() dto: UserPageOptionsDto) {
-    return this.userService.getUsers(dto);
+  async getUsers(@Query() dto: UserPageOptionsDto) {
+    return await this.userService.getUsers(dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
   @Roles(UserRole.admin)
   @Get('/:id')
-  getUserById(@Param('id') id: string) {
-    return this.userService.getUserById(id);
+  async getUserById(@Param('id') id: string) {
+    return await this.userService.getUserById(id);
   }
 }

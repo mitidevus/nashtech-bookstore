@@ -6,6 +6,7 @@ import {
   Param,
   ParseFilePipeBuilder,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UploadedFile,
@@ -22,9 +23,10 @@ import { BookService } from './book.service';
 import {
   AddRatingReviewToBookDto,
   BooksPageOptionsDto,
-  CreateBookInput,
+  CreateBookDto,
   RatingReviewInBookPageOptionsDto,
   SpecialBooksPageOptionsDto,
+  UpdateBookDto,
 } from './dto';
 
 @Controller('/api/books')
@@ -36,7 +38,7 @@ export class BookController {
   @Post()
   @UseInterceptors(FileInterceptor('image'))
   async createBook(
-    @Body() dto: CreateBookInput,
+    @Body() dto: CreateBookDto,
     @UploadedFile(
       new ParseFilePipeBuilder()
         .addFileTypeValidator({
@@ -48,17 +50,17 @@ export class BookController {
     )
     image?: Express.Multer.File,
   ) {
-    return this.bookService.createBook(dto, image);
+    return await this.bookService.createBook(dto, image);
   }
 
   @Get()
   async getBooks(@Query() dto: BooksPageOptionsDto) {
-    return this.bookService.getBooks(dto);
+    return await this.bookService.getBooks(dto);
   }
 
   @Get('special')
-  async getOnSaleBooks(@Query() dto: SpecialBooksPageOptionsDto) {
-    return this.bookService.getSpecialBooks(dto);
+  async getSpectialBooks(@Query() dto: SpecialBooksPageOptionsDto) {
+    return await this.bookService.getSpecialBooks(dto);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -68,12 +70,33 @@ export class BookController {
     @Param('id', ParseIntPipe) id: number,
     @Query() reviewsDto: RatingReviewsPageOptionsDto,
   ) {
-    return this.bookService.getBookById(id, reviewsDto);
+    return await this.bookService.getBookById(id, reviewsDto);
   }
 
   @Get('slug/:slug')
   async getBookBySlug(@Param('slug') slug: string) {
-    return this.bookService.getBookBySlug(slug);
+    return await this.bookService.getBookBySlug(slug);
+  }
+
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles(UserRole.admin)
+  @Patch(':id')
+  @UseInterceptors(FileInterceptor('image'))
+  async updateBook(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateBookDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return await this.bookService.updateBook(id, dto, image);
   }
 
   @UseGuards(JwtGuard, RolesGuard)
@@ -90,7 +113,7 @@ export class BookController {
     @Param('slug') slug: string,
     @Body() dto: AddRatingReviewToBookDto,
   ) {
-    return this.bookService.createRatingReview(userId, slug, dto);
+    return await this.bookService.createRatingReview(userId, slug, dto);
   }
 
   @Get(':slug/rating-reviews')
@@ -98,6 +121,6 @@ export class BookController {
     @Param('slug') slug: string,
     @Query() dto: RatingReviewInBookPageOptionsDto,
   ) {
-    return this.bookService.getRatingReviewsBySlug(slug, dto);
+    return await this.bookService.getRatingReviewsBySlug(slug, dto);
   }
 }

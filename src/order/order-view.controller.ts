@@ -79,6 +79,6 @@ export class OrderViewController {
     @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ) {
-    return this.orderService.updateOrderStatus(id, dto);
+    return await this.orderService.updateOrderStatus(id, dto);
   }
 }

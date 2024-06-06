@@ -81,7 +81,7 @@ export class CategoryService {
   }
 
   async getAllCategories() {
-    return this.prismaService.category.findMany();
+    return await this.prismaService.category.findMany();
   }
 
   async getCategoryById(id: number) {

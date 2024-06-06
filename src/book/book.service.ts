@@ -471,7 +471,7 @@ export class BookService {
     image?: Express.Multer.File,
   ) {
     const price = Number(dto.price);
-    if (isNaN(price)) {
+    if (dto.price && isNaN(price)) {
       throw new BadRequestException('Price must be a number!');
     }
 
@@ -486,14 +486,16 @@ export class BookService {
       throw new BadRequestException('Book not found');
     }
 
-    const bookExists = await this.prismaService.book.findFirst({
-      where: {
-        name: dto.name,
-      },
-    });
+    if (dto.name) {
+      const bookExists = await this.prismaService.book.findFirst({
+        where: {
+          name: dto.name,
+        },
+      });
 
-    if (bookExists && bookExists.id !== id) {
-      throw new BadRequestException('Book already exists');
+      if (bookExists && bookExists.id !== id) {
+        throw new BadRequestException('Book already exists');
+      }
     }
 
     let imageUrls = [];
@@ -520,7 +522,7 @@ export class BookService {
             book.promotionList.discountPercentage,
           );
         } else {
-          finalPrice = price;
+          finalPrice = book.finalPrice;
         }
 
         const updatedBook = await tx.book.update({
@@ -529,9 +531,11 @@ export class BookService {
             name: dto.name,
             description: dto.description,
             image: imageUrls.length ? imageUrls[0] : book.image,
-            price: price,
+            price: dto?.price ? price : book.price,
             finalPrice,
-            slug: slugify(dto.name, { lower: true, locale: 'vi' }),
+            slug: dto?.name
+              ? `${slugify(dto.name, { lower: true, locale: 'vi' })}_${id}`
+              : book.slug,
           },
           include: {
             categories: {
