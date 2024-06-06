@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { MAX_ITEMS_PER_PAGE, Order } from 'constants/app';
+import { MAX_ITEMS_PER_PAGE, Order } from 'src/constants/app';
 
 export class RatingReviewsPageOptionsDto {
   @IsEnum(Order)

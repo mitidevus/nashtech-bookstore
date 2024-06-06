@@ -1,5 +1,5 @@
-import { EUploadFolder } from 'constants/image';
 import { getStorage } from 'firebase-admin/storage';
+import { EUploadFolder } from 'src/constants/image';
 
 /**
  * Hàm dùng để upload files lên Firebase Storage

@@ -1,6 +1,6 @@
 import { Field, InputType, Int, registerEnumType } from '@nestjs/graphql';
 import { IsEnum, IsOptional, Max, Min } from 'class-validator';
-import { MAX_ITEMS_PER_PAGE, Order, SortBy } from 'constants/app';
+import { MAX_ITEMS_PER_PAGE, Order, SortBy } from 'src/constants/app';
 
 registerEnumType(Order, {
   name: 'Order',

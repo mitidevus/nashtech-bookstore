@@ -3,13 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import slugify from 'slugify';
 import {
   DEFAULT_BOOK_IMAGE_URL,
   SpecialBook,
   sortMapping,
-} from 'constants/app';
-import { EUploadFolder } from 'constants/image';
-import slugify from 'slugify';
+} from 'src/constants/app';
+import { EUploadFolder } from 'src/constants/image';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { deleteFilesFromFirebase } from 'src/services/files/delete';

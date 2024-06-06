@@ -16,11 +16,11 @@ import {
 import { UserRole } from '@prisma/client';
 
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FILE_TYPES_REGEX } from 'constants/image';
 import { Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
 import { BookService } from 'src/book/book.service';
 import { BooksPageOptionsDto } from 'src/book/dto';
+import { FILE_TYPES_REGEX } from 'src/constants/image';
 import { AuthorService } from './author.service';
 import {
   AddBooksToAuthorDto,

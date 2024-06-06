@@ -5,7 +5,7 @@ import {
   IsString,
   Max,
 } from 'class-validator';
-import { MAX_DISCOUNT_PERCENTAGE } from 'constants/promotion-list';
+import { MAX_DISCOUNT_PERCENTAGE } from 'src/constants/promotion-list';
 
 export class CreatePromotionListDto {
   @IsString()

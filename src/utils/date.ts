@@ -1,5 +1,5 @@
-import { DateFormat } from 'constants/app';
 import * as moment from 'moment';
+import { DateFormat } from 'src/constants/app';
 
 export const formatDate = ({
   date,

@@ -15,9 +15,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserRole } from '@prisma/client';
-import { FILE_TYPES_REGEX } from 'constants/image';
 import { GetUser, Roles } from 'src/auth/decorator';
 import { JwtGuard, RolesGuard } from 'src/auth/guard';
+import { FILE_TYPES_REGEX } from 'src/constants/image';
 import { RatingReviewsPageOptionsDto } from 'src/rating-review/dto';
 import { BookService } from './book.service';
 import {

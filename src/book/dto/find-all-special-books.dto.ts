@@ -7,7 +7,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { MAX_ITEMS_PER_PAGE, Order, SpecialBook } from 'constants/app';
+import { MAX_ITEMS_PER_PAGE, Order, SpecialBook } from 'src/constants/app';
 
 export class SpecialBooksPageOptionsDto {
   @IsEnum(Order)

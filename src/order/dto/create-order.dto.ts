@@ -11,7 +11,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { MAX_QUANTITY_PER_ITEM } from 'constants/order';
+import { MAX_QUANTITY_PER_ITEM } from 'src/constants/order';
 
 class OrderItemDto {
   @IsNumber()

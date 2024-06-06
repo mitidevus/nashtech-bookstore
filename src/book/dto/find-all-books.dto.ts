@@ -1,6 +1,11 @@
 import { Type } from 'class-transformer';
 import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { MAX_ITEMS_PER_PAGE, Order, SortBy, SpecialBook } from 'constants/app';
+import {
+  MAX_ITEMS_PER_PAGE,
+  Order,
+  SortBy,
+  SpecialBook,
+} from 'src/constants/app';
 
 export class BooksPageOptionsDto {
   @IsEnum(Order)

@@ -3,9 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DEFAULT_IMAGE_URL } from 'constants/app';
-import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
+import { DEFAULT_IMAGE_URL } from 'src/constants/app';
+import { EUploadFolder } from 'src/constants/image';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
