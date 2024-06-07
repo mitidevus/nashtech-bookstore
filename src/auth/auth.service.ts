@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,8 +9,11 @@ import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { DEFAULT_IMAGE_URL } from 'src/constants/app';
 import { TokenType } from 'src/constants/auth';
+import { EUploadFolder } from 'src/constants/image';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginRequestDto, SignUpRequestDto } from './dto';
+import { deleteFilesFromFirebase } from 'src/services/files/delete';
+import { uploadFilesFromFirebase } from 'src/services/files/upload';
+import { EditProfileDto, LoginRequestDto, SignUpRequestDto } from './dto';
 import { ITokenPayload } from './interfaces';
 
 @Injectable()
@@ -186,5 +190,67 @@ export class AuthService {
       phone: user.phone,
       image: user.image,
     };
+  }
+
+  async editProfile(
+    userId: string,
+    dto: EditProfileDto,
+    image?: Express.Multer.File,
+  ) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    let imageUrls = [];
+
+    try {
+      if (image && image.buffer.byteLength > 0) {
+        const uploadImagesData = await uploadFilesFromFirebase(
+          [image],
+          EUploadFolder.user,
+        );
+
+        if (!uploadImagesData.success) {
+          throw new Error('Failed to upload images!');
+        }
+
+        imageUrls = uploadImagesData.urls;
+      }
+
+      const updatedUser = await this.prismaService.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          name: dto.name,
+          phone: dto.phone,
+          address: dto.address,
+          image: imageUrls[0] || user.image,
+        },
+      });
+
+      return {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        address: updatedUser.address,
+        phone: updatedUser.phone,
+        image: updatedUser.image,
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+
+      if (image && !imageUrls.length) await deleteFilesFromFirebase(imageUrls);
+
+      throw new BadRequestException({
+        message: 'Failed to edit profile',
+      });
+    }
   }
 }

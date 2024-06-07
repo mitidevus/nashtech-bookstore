@@ -48,7 +48,7 @@ block content
     include ../partials/modal
         block modalFormContent
             form(id="add-book-form" onsubmit="addBook(event)")
-                div(class="grid grid-cols-2 gap-4")
+                div(class="grid grid-cols-2 gap-4 max-w-[400px]")
                     div(class="col-span-2")
                         label(for="name" class="block text-gray-700 text-sm font-medium mb-2") Name
                         input(id="name" type="text" name="name" class="modal-input" autocomplete="off")
@@ -57,17 +57,13 @@ block content
                         label(for="price" class="block text-gray-700 text-sm font-medium mb-2") Price
                         input(id="price" type="text" name="price" class="modal-input" autocomplete="off")
 
-                    div(class="col-span-2")
+                    div(class="col-span-4")
                         label(for="categories" class="block text-gray-700 text-sm font-medium mb-2") Categories
-                        select(id="categories" name="categories" class="modal-input" multiple size=2.5)
-                            each category in categories
-                                option(value=category.id)= category.name
+                        div(id="categories-select")
 
-                    div(class="col-span-2")
+                    div(class="col-span-4")
                         label(for="authors" class="block text-gray-700 text-sm font-medium mb-2") Authors
-                        select(id="authors" name="authors" class="modal-input" multiple size=2.5)
-                            each author in authors
-                                option(value=author.id)= author.name
+                        div(id="authors-select")
 
                     div(class="col-span-4")
                         label(for="description" class="block text-gray-700 text-sm font-medium mb-2") Description
@@ -81,19 +77,35 @@ block content
                     button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
 
     script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const categories = !{JSON.stringify(categories)};
+            const authors = !{JSON.stringify(authors)};
+            VirtualSelect.init({
+                ele: '#categories-select',
+                options: categories.map(category => ({ label: category.name, value: category.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+            VirtualSelect.init({
+                ele: '#authors-select',
+                options: authors.map(author => ({ label: author.name, value: author.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+        });
+
         async function addBook(event) {
             event.preventDefault();
 
+            const categorySelect = document.getElementById('categories-select').value; 
+            const authorSelect = document.getElementById('authors-select').value;
+
             const form = document.getElementById('add-book-form');
             const formData = new FormData(form);
-
-            const categorySelect = document.getElementById('categories');
-            const selectedCategories = Array.from(categorySelect.selectedOptions).map(option => option.value);
-            formData.set('categoryIds', selectedCategories.join(','));
-
-            const authorSelect = document.getElementById('authors');
-            const selectedAuthors = Array.from(authorSelect.selectedOptions).map(option => option.value);
-            formData.set('authorIds', selectedAuthors.join(','));
+            formData.set('categoryIds', categorySelect.join(','));
+            formData.set('authorIds', authorSelect.join(','));
 
             try {
                 const response = await fetch('/books', {
