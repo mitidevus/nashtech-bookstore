@@ -11,8 +11,6 @@ import { LoginRequestDto, SignUpRequestDto } from './dto';
 describe('AuthService', () => {
   let service: AuthService;
   let prismaService: PrismaService;
-  let configService: ConfigService;
-  let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -46,8 +44,6 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     prismaService = module.get<PrismaService>(PrismaService);
-    configService = module.get<ConfigService>(ConfigService);
-    jwtService = module.get<JwtService>(JwtService);
 
     // Mock argon.hash and argon.verify
     (argon.hash as jest.Mock) = jest.fn().mockResolvedValue('hashed_password');

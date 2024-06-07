@@ -352,13 +352,13 @@ describe('CategoryService', () => {
 
       await expect(
         service.addBooksToCategory(1, { bookIds: [1, 2] }),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw an error when trying to add books with empty book IDs to a category', async () => {
       await expect(
         service.addBooksToCategory(1, { bookIds: [] }),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw an error if some books are not found', async () => {
@@ -426,7 +426,7 @@ describe('CategoryService', () => {
       (prismaService.category.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.getBooksNotInCategory(1)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
@@ -451,7 +451,7 @@ describe('CategoryService', () => {
     it('should throw an error when trying to get books not in a category by invalid ID type', async () => {
       await expect(
         service.getBooksNotInCategory('invalid-id' as any),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should return an empty array when there are no books not in the category', async () => {
@@ -476,7 +476,7 @@ describe('CategoryService', () => {
       (prismaService.category.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.removeBookFromCategory(1, 1)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
     });
 
@@ -523,13 +523,13 @@ describe('CategoryService', () => {
     it('should throw an error when trying to remove a book from a category by invalid ID type', async () => {
       await expect(
         service.removeBookFromCategory('invalid-id' as any, 1),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw an error when trying to remove a book from a category by invalid book ID type', async () => {
       await expect(
         service.removeBookFromCategory(1, 'invalid-id' as any),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });

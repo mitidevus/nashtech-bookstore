@@ -251,7 +251,7 @@ export class AuthorService {
     });
 
     if (!author) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Author not found',
       });
     }
@@ -306,7 +306,7 @@ export class AuthorService {
     });
 
     if (!author) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Author not found',
       });
     }
@@ -334,7 +334,7 @@ export class AuthorService {
     });
 
     if (!author) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Author not found',
       });
     }
@@ -381,7 +381,7 @@ export class AuthorService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }

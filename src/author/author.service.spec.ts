@@ -384,14 +384,14 @@ describe('AuthorService', () => {
       });
     });
 
-    it('should throw BadRequestException if author not found', async () => {
+    it('should throw NotFoundException if author not found', async () => {
       const id = 1;
       const dto: AddBooksToAuthorDto = { bookIds: [1, 2] };
 
       (prismaService.author.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.addBooksToAuthor(id, dto)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
 
       expect(prismaService.author.findUnique).toHaveBeenCalledWith({

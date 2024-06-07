@@ -363,7 +363,7 @@ export class BookService {
     });
 
     if (!book) {
-      throw new BadRequestException('Book not found');
+      throw new NotFoundException('Book not found');
     }
 
     const conditions = {
@@ -607,7 +607,7 @@ export class BookService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }
@@ -658,7 +658,7 @@ export class BookService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }
@@ -899,7 +899,7 @@ export class BookService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }
@@ -1050,7 +1050,7 @@ export class BookService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }
@@ -1062,7 +1062,7 @@ export class BookService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }

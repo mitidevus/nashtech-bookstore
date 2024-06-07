@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Order } from 'src/constants/app';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -199,7 +199,7 @@ describe('PromotionListService', () => {
       );
 
       await expect(service.getPromotionListById(id)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
 
       expect(prismaService.promotionList.findUnique).toHaveBeenCalledWith({
@@ -263,7 +263,7 @@ describe('PromotionListService', () => {
       );
 
       await expect(service.updatePromotionList(id, dto)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
 
       expect(prismaService.promotionList.findUnique).toHaveBeenCalledWith({
@@ -311,7 +311,7 @@ describe('PromotionListService', () => {
       );
 
       await expect(service.deletePromotionList(id)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
 
       expect(prismaService.promotionList.findUnique).toHaveBeenCalledWith({
@@ -360,7 +360,7 @@ describe('PromotionListService', () => {
       );
 
       await expect(service.addBooksToPromoList(promoId, dto)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
 
       expect(prismaService.promotionList.findUnique).toHaveBeenCalledWith({
@@ -416,7 +416,7 @@ describe('PromotionListService', () => {
 
       await expect(
         service.removeBookFromPromoList(promoId, bookId),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(NotFoundException);
 
       expect(prismaService.promotionList.findUnique).toHaveBeenCalledWith({
         where: { id: promoId },
