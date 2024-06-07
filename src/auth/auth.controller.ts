@@ -1,7 +1,19 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  ParseFilePipeBuilder,
+  Patch,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FILE_TYPES_REGEX } from 'src/constants/image';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator';
-import { LoginRequestDto, SignUpRequestDto } from './dto';
+import { EditProfileDto, LoginRequestDto, SignUpRequestDto } from './dto';
 import { JwtGuard } from './guard';
 
 @Controller('/api/auth')
@@ -22,5 +34,25 @@ export class AuthController {
   @UseGuards(JwtGuard)
   async getPofile(@GetUser('sub') userId: string) {
     return await this.authService.getProfile(userId);
+  }
+
+  @Patch('me')
+  @UseGuards(JwtGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async editProfile(
+    @GetUser('sub') userId: string,
+    @Body() dto: EditProfileDto,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: FILE_TYPES_REGEX,
+        })
+        .build({
+          fileIsRequired: false,
+        }),
+    )
+    image?: Express.Multer.File,
+  ) {
+    return await this.authService.editProfile(userId, dto, image);
   }
 }
