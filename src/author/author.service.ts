@@ -140,7 +140,7 @@ export class AuthorService {
   async updateAuthor(
     id: number,
     dto: UpdateAuthorDto,
-    image: Express.Multer.File,
+    image?: Express.Multer.File,
   ) {
     if (!Object.keys(dto).length) {
       throw new BadRequestException({
@@ -204,8 +204,6 @@ export class AuthorService {
 
       return updatedAuthor;
     } catch (error) {
-      console.log('Error:', error.message);
-
       if (image && !imageUrls.length) await deleteFilesFromFirebase(imageUrls);
 
       throw new BadRequestException({
