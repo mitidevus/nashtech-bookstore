@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { OrderStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -26,7 +27,7 @@ export class OrderService {
     });
 
     if (books.length !== dto.items.length) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Some books are not found',
       });
     }
@@ -225,7 +226,7 @@ export class OrderService {
     });
 
     if (!order) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Order not found',
       });
     }
@@ -272,7 +273,7 @@ export class OrderService {
     });
 
     if (!order) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Order not found',
       });
     }
@@ -288,7 +289,7 @@ export class OrderService {
     });
 
     if (!order) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Order not found',
       });
     }
@@ -349,7 +350,7 @@ export class OrderService {
     });
 
     if (!order) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Order not found',
       });
     }

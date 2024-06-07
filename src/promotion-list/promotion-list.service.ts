@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import slugify from 'slugify';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
@@ -112,7 +116,7 @@ export class PromotionListService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }
@@ -136,7 +140,7 @@ export class PromotionListService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }
@@ -208,7 +212,7 @@ export class PromotionListService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }
@@ -261,7 +265,7 @@ export class PromotionListService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }
@@ -324,7 +328,7 @@ export class PromotionListService {
     });
 
     if (!promotionList) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Promotion list not found',
       });
     }
@@ -336,7 +340,7 @@ export class PromotionListService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }

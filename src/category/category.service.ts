@@ -216,7 +216,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Category not found',
       });
     }
@@ -271,7 +271,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Category not found',
       });
     }
@@ -299,7 +299,7 @@ export class CategoryService {
     });
 
     if (!category) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Category not found',
       });
     }
@@ -346,7 +346,7 @@ export class CategoryService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }

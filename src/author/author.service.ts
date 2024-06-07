@@ -3,9 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { DEFAULT_IMAGE_URL } from 'constants/app';
-import { EUploadFolder } from 'constants/image';
 import slugify from 'slugify';
+import { DEFAULT_IMAGE_URL } from 'src/constants/app';
+import { EUploadFolder } from 'src/constants/image';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { deleteFilesFromFirebase } from 'src/services/files/delete';
 import { uploadFilesFromFirebase } from 'src/services/files/upload';
@@ -140,7 +140,7 @@ export class AuthorService {
   async updateAuthor(
     id: number,
     dto: UpdateAuthorDto,
-    image: Express.Multer.File,
+    image?: Express.Multer.File,
   ) {
     if (!Object.keys(dto).length) {
       throw new BadRequestException({
@@ -204,8 +204,6 @@ export class AuthorService {
 
       return updatedAuthor;
     } catch (error) {
-      console.log('Error:', error.message);
-
       if (image && !imageUrls.length) await deleteFilesFromFirebase(imageUrls);
 
       throw new BadRequestException({
@@ -253,7 +251,7 @@ export class AuthorService {
     });
 
     if (!author) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Author not found',
       });
     }
@@ -308,7 +306,7 @@ export class AuthorService {
     });
 
     if (!author) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Author not found',
       });
     }
@@ -336,7 +334,7 @@ export class AuthorService {
     });
 
     if (!author) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Author not found',
       });
     }
@@ -383,7 +381,7 @@ export class AuthorService {
     });
 
     if (!book) {
-      throw new BadRequestException({
+      throw new NotFoundException({
         message: 'Book not found',
       });
     }

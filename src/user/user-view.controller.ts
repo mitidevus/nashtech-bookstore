@@ -8,9 +8,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
-import { DEFAULT_PAGE_SIZE } from 'constants/app';
 import { AuthExceptionFilter } from 'src/auth/filters';
 import { AuthenticatedGuard } from 'src/auth/guard';
+import { DEFAULT_PAGE_SIZE } from 'src/constants/app';
 import { formatCurrency, toDateTime } from 'src/utils';
 import { capitalizeString } from 'src/utils/string';
 import { UserPageOptionsDto } from './dto';

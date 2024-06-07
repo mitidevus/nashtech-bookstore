@@ -9,9 +9,9 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { DEFAULT_ORDER_PAGE_SIZE } from 'constants/app';
 import { AuthExceptionFilter } from 'src/auth/filters';
 import { AuthenticatedGuard } from 'src/auth/guard';
+import { DEFAULT_ORDER_PAGE_SIZE } from 'src/constants/app';
 import { formatCurrency, getNextStatuses, toDateTime } from 'src/utils';
 import { OrderPageOptionsDto, UpdateOrderStatusDto } from './dto';
 import { OrderService } from './order.service';

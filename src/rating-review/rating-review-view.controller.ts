@@ -6,9 +6,9 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { DEFAULT_PAGE_SIZE } from 'constants/app';
 import { AuthExceptionFilter } from 'src/auth/filters';
 import { AuthenticatedGuard } from 'src/auth/guard';
+import { DEFAULT_PAGE_SIZE } from 'src/constants/app';
 import { toDateTime } from 'src/utils';
 import { RatingReviewsPageOptionsDto } from './dto';
 import { RatingReviewService } from './rating-review.service';
