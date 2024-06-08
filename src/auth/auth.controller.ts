@@ -30,6 +30,12 @@ export class AuthController {
     return await this.authService.login(dto);
   }
 
+  @UseGuards(JwtGuard)
+  @Post('logout')
+  async signOut(@GetUser('sub') userId: string) {
+    return await this.authService.logOut(userId);
+  }
+
   @Get('me')
   @UseGuards(JwtGuard)
   async getPofile(@GetUser('sub') userId: string) {
