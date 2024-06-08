@@ -162,6 +162,40 @@ export class BookService {
   }
 
   async getBooks(dto: FindAllBooksInput) {
+    let categorySlugs: string[] = [];
+    if (dto.categorySlugs) {
+      categorySlugs = dto.categorySlugs.split(',');
+
+      const categories = await this.prismaService.category.findMany({
+        where: {
+          slug: {
+            in: categorySlugs,
+          },
+        },
+      });
+
+      if (categories.length !== categorySlugs.length) {
+        throw new BadRequestException('Invalid category');
+      }
+    }
+
+    let authorSlugs: string[] = [];
+    if (dto.authorSlugs) {
+      authorSlugs = dto.authorSlugs.split(',');
+
+      const authors = await this.prismaService.author.findMany({
+        where: {
+          slug: {
+            in: authorSlugs,
+          },
+        },
+      });
+
+      if (authors.length !== authorSlugs.length) {
+        throw new BadRequestException('Invalid author');
+      }
+    }
+
     const sortOrder = sortMapping[dto.sort];
 
     const conditions = {
@@ -208,6 +242,28 @@ export class BookService {
               },
             ],
           }),
+        ...(categorySlugs.length > 0 && {
+          categories: {
+            some: {
+              category: {
+                slug: {
+                  in: categorySlugs,
+                },
+              },
+            },
+          },
+        }),
+        ...(authorSlugs.length > 0 && {
+          authors: {
+            some: {
+              author: {
+                slug: {
+                  in: authorSlugs,
+                },
+              },
+            },
+          },
+        }),
       },
       orderBy: [...(sortOrder ? [sortOrder] : []), { createdAt: dto.order }],
     };

@@ -44,6 +44,14 @@ export class BooksPageOptionsDto {
   @IsOptional()
   search?: string;
 
+  @IsString()
+  @IsOptional()
+  authorSlugs?: string;
+
+  @IsString()
+  @IsOptional()
+  categorySlugs?: string;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }

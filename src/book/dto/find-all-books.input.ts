@@ -43,6 +43,14 @@ export class FindAllBooksInput {
   @IsOptional()
   search?: string;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  authorSlugs?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  categorySlugs?: string;
+
   get skip(): number {
     return (this.page - 1) * this.take;
   }
