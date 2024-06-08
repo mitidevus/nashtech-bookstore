@@ -124,10 +124,6 @@ export class AuthService {
         secret = this.configService.get('JWT_RT_SECRET');
         expiresIn = this.configService.get('JWT_RT_EXPIRES');
         break;
-      case TokenType.VERIFICATION:
-        secret = this.configService.get('JWT_VT_SECRET');
-        expiresIn = this.configService.get('JWT_VT_EXPIRES');
-        break;
       default:
         throw new Error('Invalid token type');
     }
@@ -171,6 +167,70 @@ export class AuthService {
     };
   }
 
+  async logOut(userId: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.refreshToken) {
+      throw new BadRequestException('User already logged out');
+    }
+
+    try {
+      await this.prismaService.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          refreshToken: null,
+        },
+      });
+
+      return {
+        message: 'Successfully logged out',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException('Failed to log out');
+    }
+  }
+
+  async refreshToken(userId: string, refreshToken: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!user.refreshToken) {
+      throw new BadRequestException('User not logged in');
+    }
+
+    const isRefreshTokenValid = await argon.verify(
+      user.refreshToken,
+      refreshToken,
+    );
+
+    if (!isRefreshTokenValid) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    return await this.signTokens({
+      sub: user.id,
+      email: user.email,
+    });
+  }
+
   async getProfile(userId: string) {
     const user = await this.prismaService.user.findUnique({
       where: {
@@ -179,7 +239,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return {
