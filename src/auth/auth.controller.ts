@@ -14,7 +14,7 @@ import { FILE_TYPES_REGEX } from 'src/constants/image';
 import { AuthService } from './auth.service';
 import { GetUser } from './decorator';
 import { EditProfileDto, LoginRequestDto, SignUpRequestDto } from './dto';
-import { JwtGuard } from './guard';
+import { JwtGuard, JwtRefreshGuard } from './guard';
 
 @Controller('/api/auth')
 export class AuthController {
@@ -34,6 +34,15 @@ export class AuthController {
   @Post('logout')
   async signOut(@GetUser('sub') userId: string) {
     return await this.authService.logOut(userId);
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Post('refresh')
+  async refreshToken(
+    @GetUser('sub') userId: string,
+    @GetUser('refreshToken') refreshToken: string,
+  ) {
+    return await this.authService.refreshToken(userId, refreshToken);
   }
 
   @Get('me')
