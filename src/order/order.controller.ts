@@ -67,4 +67,10 @@ export class OrderController {
   async deleteOrder(@Param('id') id: string) {
     return await this.orderService.deleteOrder(id);
   }
+
+  @UseGuards(JwtGuard)
+  @Patch(':id/cancel')
+  async cancelOrder(@GetUser('sub') userId: string, @Param('id') id: string) {
+    return await this.orderService.cancelOrder(userId, id);
+  }
 }

@@ -372,4 +372,50 @@ export class OrderService {
       });
     }
   }
+
+  async cancelOrder(userId: string, id: string) {
+    const order = await this.prismaService.order.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException({
+        message: 'Order not found',
+      });
+    }
+
+    if (order.userId !== userId) {
+      throw new ForbiddenException({
+        message: 'You do not have permission to cancel this order',
+      });
+    }
+
+    if (order.status !== OrderStatus.pending) {
+      throw new BadRequestException({
+        message: 'Order cannot be cancelled',
+      });
+    }
+
+    try {
+      await this.prismaService.order.update({
+        where: {
+          id,
+        },
+        data: {
+          status: OrderStatus.cancelled,
+        },
+      });
+
+      return {
+        message: 'Cancelled order successfully',
+      };
+    } catch (error) {
+      console.log('Error:', error.message);
+      throw new BadRequestException({
+        message: 'Failed to cancel order',
+      });
+    }
+  }
 }
