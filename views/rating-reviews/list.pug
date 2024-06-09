@@ -1,0 +1,41 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'Rating Reviews']
+    include ../partials/breadcrumbs
+
+    div(class="w-full h-full flex flex-col items-center mt-4")
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Rating reviews
+
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Book', 'Reviewer', 'Review', 'Date']
+                include ../partials/head-table
+
+                - var rows = data
+                include ../partials/body-table
+                    each review in data
+                        tr  
+                            td(class="py-5 px-6")= review.id
+                            td(class="py-5 px-6 max-w-[180px]")
+                                a(href=`/books/${review.book.id}` class="flex items-center gap-4 hover:text-[#7F56D9]")
+                                    img(src=`${review.book.image}` alt=review.book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
+                                    span(class="block font-semibold")= review.book.name
+                            td(class="py-5 px-6")
+                                a(href=`/customers/${review.user.id}` class="flex flex-col hover:text-[#7F56D9]")
+                                    span(class="block font-semibold")= review.user.name
+                                    span(class="block text-gray-500")= review.user.email
+                            td(class="py-5 px-6 max-w-[300px]")
+                                div(class="flex items-center gap-1 mb-1")
+                                    each val in [...Array(review.star).keys()]
+                                        i(class="lni lni-star-fill text-yellow-400")
+                                    each val in [...Array(5 - review.star).keys()]
+                                        i(class="lni lni-star-fill text-gray-300")
+
+                                p(class="text-gray-600 text-md font-bold")= review.title 
+                                p= review.content
+                            td(class="py-5 px-6")= review.createdAt
+
+            div(class="py-4 px-6")
+                include ../partials/pagination.pug

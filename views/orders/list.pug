@@ -1,0 +1,38 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, 'Orders']
+    include ../partials/breadcrumbs
+
+    div(class="w-full h-full flex flex-col items-center mt-4")
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Orders
+
+            table(class="min-w-full divide-y divide-gray-200")
+                thead(class="bg-gray-100")
+                    tr(class="  text-xs font-medium text-gray-500")
+                        th(class="py-3 px-6 text-left tracking-wider") ID
+                        th(class="py-3 px-6 text-left tracking-wider") Customer
+                        th(class="py-3 px-6 text-left tracking-wider") Email
+                        th(class="py-3 px-6 text-left tracking-wider") Total
+                        th(class="py-3 px-6 text-left tracking-wider text-center") Status
+                        th(class="py-3 px-6 text-left tracking-wider") Created At
+                        th(class="py-3 px-6 text-left tracking-wider") Updated At
+                - var rows = data
+                include ../partials/body-table
+                    block items
+                        each order in data
+                            tr(key=order.id class="hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/orders/${order.id}'`)   
+                                td(class="py-5 px-6")= order.id
+                                td(class="py-5 px-6")= order.user.name
+                                td(class="py-5 px-6")= order.user.email
+                                td(class="py-5 px-6")= order.totalPrice
+                                td(class="text-center")    
+                                    - var statusColor = order.status === 'pending' ? '#5925DC' : order.status === 'confirmed' ? '#7F56D9' : order.status === 'delivering' ? '#B54708' : order.status === 'completed' ? '#067647' : order.status === 'cancelled' ? '#C11574' : 'gray'
+                                    span(class=`block w-full py-1.5 px-4 bg-[${statusColor}] bg-opacity-10 border border-[${statusColor}] border-opacity-20 rounded-full text-[${statusColor}] text-sm capitalize`)= order.status
+                                td(class="py-5 px-6")= order.createdAt
+                                td(class="py-5 px-6")= order.updatedAt   
+
+            div(class="py-4 px-6")
+                include ../partials/pagination.pug

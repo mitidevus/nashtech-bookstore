@@ -1,0 +1,399 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Books', href: '/books' }, `${name}`]
+    include ../partials/breadcrumbs
+
+    - var isPromotion = promotionListId
+    div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
+        div(class="w-full grid grid-cols-1 xl:grid-cols-3 gap-8")
+            div(class="xl:col-span-2")
+                div(class="flex flex-col gap-8")
+
+                    div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                        div(class="flex items-center justify-between py-4 px-6")
+                            h1(class="text-lg font-semibold text-gray-800")= name
+                            button(class="primary-btn" onclick=`window.location='/books/${id}/edit'`)
+                                i.lni.lni-pencil-alt
+
+                        block content
+                        div(class="pt-4 pb-6 px-6")
+                            div(class="grid gap-4")
+                                div(class=`grid grid-cols-1 ${isPromotion ? "lg:grid-cols-5" : "lg:grid-cols-4"} gap-4`)
+                                    div(class="lg:col-span-1")
+                                        label(for="id" class="modal-label") ID
+                                        input(id="id" type="text" class="modal-input" value=id readonly) 
+
+                                    div(class="lg:col-span-2")
+                                        label(for="slug" class="modal-label") Slug
+                                        input(id="slug" type="text" class="modal-input" value=slug readonly)
+
+                                    div(class="lg:col-span-1")
+                                        label(for="price" class="modal-label") Price
+                                        input(id="price" type="text" class="modal-input" value=price readonly)
+
+                                    if isPromotion
+                                        div(class="lg:col-span-1")
+                                            label(class="modal-label") Discount Price
+                                            input(id="finalPrice" type="text" class="modal-input" value=finalPrice readonly)
+
+                                div(class="grid grid-cols-1 lg:grid-cols-4 gap-4")
+                                    div(class="lg:col-span-2")
+                                        label(for="createdAt" class="modal-label") Created At
+                                        input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+
+                                    div(class="lg:col-span-2")
+                                        label(for="updatedAt" class="modal-label") Updated At
+                                        input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+
+                                    div(class="lg:col-span-4")
+                                        label(for="description" class="modal-label") Description
+                                        textarea(id="description" class="modal-input" rows="5" readonly)= description
+
+                                    div
+                                        label(for="image" class="modal-label") Image
+                                        img(src=image alt=name class="w-48 h-48 object-cover rounded-lg border border-gray-200")
+
+
+                    - var wrapperTitle = 'Rating Reviews'
+                    include ../partials/wrapper
+                        block content
+                            table(class="min-w-full divide-y divide-gray-200")
+                                - var columns = ['Reviewer', 'Review', 'Date']
+                                include ../partials/head-table
+
+                                - var rows = ratingReviews.data
+                                include ../partials/body-table
+                                    block items
+                                        each review in ratingReviews.data
+                                            tr  
+                                                td(class="py-5 px-6")
+                                                    a(href=`/customers/${review.user.id}` class="flex flex-col hover:text-[#7F56D9]")
+                                                        span(class="block font-semibold")= review.user.name
+                                                        span(class="block text-gray-500")= review.user.email
+                                                td(class="py-5 px-6 max-w-[300px]")
+                                                    div(class="flex items-center gap-1 mb-1")
+                                                        each val in [...Array(review.star).keys()]
+                                                            i(class="lni lni-star-fill text-yellow-400")
+                                                        each val in [...Array(5 - review.star).keys()]
+                                                            i(class="lni lni-star-fill text-gray-300")
+
+                                                    p(class="text-gray-600 text-md font-bold")= review.title 
+                                                    p= review.content
+                                                td(class="py-5 px-6")= review.createdAt
+
+                            - var totalPages = ratingReviews.totalPages 
+                            - var currentPage = ratingReviews.currentPage
+                            div(class="py-4 px-6")
+                                include ../partials/pagination.pug
+
+            div(class="xl:col-span-1")
+                div(class="flex flex-col gap-8")
+                    div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                        div(class="flex items-center justify-between py-4 px-6")
+                            h1(class="text-lg font-semibold text-gray-800") Authors
+                            if authorsNotInBook.length > 0
+                                button(id="add-book-btn" class="primary-btn" onclick="openModal('add-authors-modal')")
+                                    i.lni.lni-plus
+
+                        table(class="min-w-full divide-y divide-gray-200")
+                            - var columns = ['ID', 'Name', '']
+                            include ../partials/head-table
+
+                            - var rows = authors
+                            include ../partials/body-table
+                                block items
+                                    each author in authors
+                                        tr(key=author.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/authors/${author.id}'`) 
+                                            td(class="py-4 px-6")= author.id
+                                            td(class="py-4 px-6")= author.name
+                                            td(class="py-4 px-6 relative")
+                                                button(class="delete-btn p-1 hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeAuthor(event, ${author.id})`)
+                                                    i(class="lni lni-circle-minus")
+
+                    div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+                        div(class="flex items-center justify-between py-4 px-6")
+                            h1(class="text-lg font-semibold text-gray-800") Categories
+                            if categoriesNotInBook.length > 0
+                                button(id="add-book-btn" class="primary-btn" onclick="openModal('add-categories-modal')")
+                                    i.lni.lni-plus
+
+                        table(class="min-w-full divide-y divide-gray-200")
+                            - var columns = ['ID', 'Name', '']
+                            include ../partials/head-table
+
+                            - var rows = categories
+                            include ../partials/body-table
+                                block items
+                                    each category in categories
+                                        tr(key=category.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location='/categories/${category.id}'`) 
+                                            td(class="py-4 px-6")= category.id
+                                            td(class="py-4 px-6")= category.name
+                                            td(class="py-4 px-6 relative")
+                                                button(class="delete-btn p-1 hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeCategory(event, ${category.id})`)
+                                                    i(class="lni lni-circle-minus")
+
+                    - var wrapperTitle = 'Discount'
+                    include ../partials/wrapper
+                        block content
+                        div(class="pt-4 pb-6 px-6")
+                            div(class="grid grid-cols-1 lg:grid-cols-4 gap-4")
+                                if isPromotion
+                                    div(class="lg:col-span-1")
+                                        label(for="promotionListId" class="modal-label") ID
+                                        input(id="promotionListId" type="text" class="modal-input" value= promotionList.id readonly)
+
+                                    div(class="lg:col-span-3")
+                                        label(for="discountDate" class="modal-label") Added At
+                                        input(id="discountDate" type="text" class="modal-input" value=discountDate readonly)
+
+                                    div(class="lg:col-span-2")
+                                        label(class="modal-label") Promotion List
+                                        input(id="promotionListName" type="text" class="modal-input hover:text-[#7F56D9] cursor-pointer" value=promotionList.name readonly onclick=`window.location='/promotion-lists/${promotionList.id}'`) 
+
+                                    div(class="lg:col-span-2")
+                                        label(for="discountPercentage" class="modal-label") Percentage
+                                        input(id="discountPercentage" type="text" class="modal-input" value=`${promotionList.discountPercentage}%` readonly)
+
+                                else
+                                    div(class="lg:col-span-4 flex items-center justify-center")
+                                        button(class="primary-btn" onclick="openModal('modal')")
+                                            i.lni.lni-plus
+                                            span Add Discount
+                        if isPromotion
+                            div(class="flex justify-end py-4 px-6")
+                                button(class="primary-btn bg-[#ea4c89] border-[#ea4c89] hover:bg-[#ed679b]" onclick="removePromotionList(event)")
+                                    i.lni.lni-trash-can
+                                    span Remove
+
+    - var modalTitle = 'Add Discount To Book'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-promotion-list-form" onsubmit="addPromotionList(event)")
+                div(class="mb-8")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Promotion List
+                    div(id="promotion-list-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    - var modalTitle = 'Add Authors To Book'
+    - var modalName = 'add-authors-modal'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-authors-form" onsubmit="addAuthors(event)")
+                div(class="mb-8 max-w-[400px]")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Authors
+                    div(id="authors-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick=`closeModal('${modalName}')`) Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    - var modalTitle = 'Add Categories To Book'
+    - var modalName = 'add-categories-modal'
+        include ../partials/modal
+            block modalFormContent
+                form(id="add-categories-form" onsubmit="addCategories(event)")
+                    div(class="mb-8 max-w-[400px]")
+                        label(class="block text-gray-700 text-sm font-medium mb-2") Categories
+                        div(id="categories-select")
+
+                    div(class="flex gap-2 justify-end")
+                        button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick=`closeModal('${modalName}')`) Cancel
+                        button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const promos = !{JSON.stringify(promos)};
+            const authorsNotInBook = !{JSON.stringify(authorsNotInBook)};
+            const categoriesNotInBook = !{JSON.stringify(categoriesNotInBook)};
+            VirtualSelect.init({
+                ele: '#promotion-list-select',
+                options: promos.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+            });
+            VirtualSelect.init({
+                ele: '#authors-select',
+                options: authorsNotInBook.map(author => ({ label: author.name, value: author.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+            VirtualSelect.init({
+                ele: '#categories-select',
+                options: categoriesNotInBook.map(category => ({ label: category.name, value: category.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+        });
+
+        async function addPromotionList(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('id').value;
+            const promotionListId = document.getElementById('promotion-list-select').value;
+
+            const data = {
+                promotionListId: parseInt(promotionListId),
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}/promotion-lists`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added book to promotion list successfully');
+                    closeModal('modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book to promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to add book to promotion list');
+            }
+        }
+
+        async function removePromotionList(event) {
+            event.preventDefault();
+
+            const promotionListId = document.getElementById('promotionListId').value;
+            const bookId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/promotion-lists/${promotionListId}/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Removed book from promotion list successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove book from promotion list');
+                }
+            } catch (error) {
+                console.error('Failed to remove book from promotion list');
+            }
+        }
+
+        async function removeAuthor(event, authorId) {
+            event.stopPropagation();
+
+            const bookId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/authors/${authorId}/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Removed author from book successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove author from book');
+                }
+            } catch (error) {
+                console.error('Failed to remove author from book');
+            }
+        }
+
+        async function removeCategory(event, categoryId) {
+            event.stopPropagation();
+
+            const bookId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/categories/${categoryId}/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Removed category from book successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove category from book');
+                }
+            } catch (error) {
+                console.error('Failed to remove category from book');
+            }
+        }
+
+        async function addAuthors(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('id').value;
+            const authorIds = document.getElementById('authors-select').value;
+
+            const data = {
+                authorIds: authorIds.map(id => parseInt(id)),
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}/authors`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added author to book successfully');
+                    closeModal('add-authors-modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add author to book');
+                }
+            } catch (error) {
+                console.error('Failed to add author to book');
+            }
+        }
+
+        async function addCategories(event) {
+            event.preventDefault();
+
+            const bookId = document.getElementById('id').value;
+            const categoryIds = document.getElementById('categories-select').value;
+
+            const data = {
+                categoryIds: categoryIds.map(id => parseInt(id)),
+            }
+
+            try {
+                const response = await fetch(`/books/${bookId}/categories`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added category to book successfully');
+                    closeModal('add-categories-modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add category to book');
+                }
+            } catch (error) {
+                console.error('Failed to add category to book');
+            }
+        }
+

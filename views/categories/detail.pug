@@ -1,0 +1,135 @@
+extends ../partials/dashboard-layout
+
+block content
+    - var breadcrumbs = [{ text: 'Dashboard', href: '/' }, { text: 'Categories', href: '/categories' }, `${name}`]
+    include ../partials/breadcrumbs
+
+    div(class="w-full h-full flex flex-col items-center gap-8 mt-4")
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800")= name
+                button(class="primary-btn" onclick=`window.location='/categories/${id}/edit'`)
+                    i.lni.lni-pencil-alt
+                    span Edit
+
+            block content
+            div(class="pt-4 pb-6 px-6")
+                div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+                    div
+                        label(for="id" class="modal-label") ID
+                        input(id="id" type="text" class="modal-input" value=id readonly) 
+
+                    div
+                        label(for="slug" class="modal-label") Slug
+                        input(id="slug" type="text" class="modal-input" value=slug readonly)
+
+                    div
+                        label(for="createdAt" class="modal-label") Created At
+                        input(id="createdAt" type="text" class="modal-input" value=createdAt readonly) 
+
+                    div
+                        label(for="updatedAt" class="modal-label") Updated At
+                        input(id="updatedAt" type="text" class="modal-input" value=updatedAt readonly)
+
+        div(class="w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-md")
+            div(class="flex items-center justify-between py-4 px-6")
+                h1(class="text-lg font-semibold text-gray-800") Books
+                if booksNotInCategory.length > 0
+                    button(id="add-book-btn" class="primary-btn" onclick="openModal('modal')")
+                        i.lni.lni-plus
+                        span Add Books
+
+            table(class="min-w-full divide-y divide-gray-200")
+                - var columns = ['ID', 'Name', 'Added At', '']
+                include ../partials/head-table
+
+                - var rows = books
+                include ../partials/body-table
+                    block items
+                        each book in books
+                            tr(key=book.id class="group hover:bg-gray-50 hover:text-[#7F56D9] cursor-pointer" onclick=`window.location.href='/books/${book.id}'`)
+                                td(class="py-4 px-6")= book.id
+                                td(class="py-4 px-6 flex items-center gap-4")
+                                    img(src=`${book.image}` alt=book.name class="w-14 h-14 object-cover rounded-md border border-gray-200")
+                                    span(class="block")= book.name
+                                td(class="py-4 px-6")= book.addedAt
+                                td(class="py-4 px-10 relative")
+                                    button(class="delete-btn hidden group-hover:inline-flex absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" onclick=`removeBook(event, ${book.id})`)
+                                        i(class="lni lni-trash-can")
+
+
+    - var modalTitle = 'Add Books To Category'
+    include ../partials/modal
+        block modalFormContent
+            form(id="add-books-form" onsubmit="addBooks(event)")
+                div(class="mb-8 max-w-[400px]")
+                    label(class="block text-gray-700 text-sm font-medium mb-2") Books
+                    div(id="books-select")
+
+                div(class="flex gap-2 justify-end")
+                    button(type="button" class="py-2 px-4 border rounded-md bg-gray-50 text-gray-500 font-medium hover:bg-gray-100" onclick="closeModal('modal')") Cancel
+                    button(type="submit" class="py-2 px-4 bg-[#7F56D9] text-white font-medium hover:bg-[#926FDF] rounded focus:outline-none focus:shadow-outline") Add
+
+    script.
+        document.addEventListener('DOMContentLoaded', function() {
+            const booksNotInCategory = !{JSON.stringify(booksNotInCategory)};
+            VirtualSelect.init({
+                ele: '#books-select',
+                options: booksNotInCategory.map(book => ({ label: book.name, value: book.id })),
+                maxWidth: '100%',
+                search: true,
+                multiple: true,
+            });
+        });
+
+        async function addBooks(event) {
+            event.preventDefault();
+
+            const categoryId = document.getElementById('id').value;
+            const bookIds = document.getElementById('books-select').value;
+
+            const data = {
+                bookIds: bookIds.map(id => parseInt(id)),
+            }
+
+            try {
+                const response = await fetch(`/categories/${categoryId}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    console.log('Added book to category successfully');
+                    closeModal('modal');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to add book to category');
+                }
+            } catch (error) {
+                console.error('Failed to add book to category');
+            }
+        }
+
+        async function removeBook(event, bookId) {
+            event.stopPropagation();
+
+            const categoryId = document.getElementById('id').value;
+
+            try {
+                const response = await fetch(`/categories/${categoryId}/books/${bookId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    console.log('Removed book from category successfully');
+                    window.location.reload();
+                } else {
+                    console.error('Failed to remove book from category');
+                }
+            } catch (error) {
+                console.error('Failed to remove book from category');
+            }
+        }

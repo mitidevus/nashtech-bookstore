@@ -1,0 +1,25 @@
+extends layout
+
+block body
+    div(class="w-full h-screen flex justify-center items-center bg-white")
+        div(class="bg-gray-100 px-12 py-20 border rounded-md shadow-md w-96")
+            div.text-center
+                h1(class="text-3xl font-bold text-[#101828] mb-2") Nash Bookstore
+                p Login to your account
+
+                if message != ''
+                    div(class="bg-red-100 border border-red-400 px-4 py-3 rounded mt-4")
+                        p(class="text-red-500 text-sm")= message
+
+
+            form(class="mt-4 space-y-6" method="POST" action="/login")
+                div
+                    label(for="email" class="text-gray-700 text-sm font-medium") Email
+                    input(id="name" type="email" name="email" placeholder="Enter your email" class="bg-gray-50 border border-gray-400 text-gray-900 py-2 px-3 rounded-lg w-full mt-1" autocomplete="off")
+
+                div
+                    label(for="password" class="text-gray-700 text-sm font-medium") Password
+                    input(id="password" type="password" name="password" placeholder="Enter your password" class="bg-gray-50 border border-gray-400 text-gray-900 py-2 px-3 rounded-lg w-full mt-1" autocomplete="off")
+
+                button(type="submit" class="w-full text-white bg-[#7F56D9] py-2 rounded-md font-semibold hover:bg-[#926FDF] focus:outline-none focus:shadow-outline") Log in
+
