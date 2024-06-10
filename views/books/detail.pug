@@ -265,6 +265,10 @@ block content
         async function removePromotionList(event) {
             event.preventDefault();
 
+            if(!confirm('Are you sure you want to remove this promotion list from book?')) {
+                return;
+            }
+
             const promotionListId = document.getElementById('promotionListId').value;
             const bookId = document.getElementById('id').value;
 
@@ -290,6 +294,10 @@ block content
         async function removeAuthor(event, authorId) {
             event.stopPropagation();
 
+            if(!confirm('Are you sure you want to remove this author from book?')) {
+                return;
+            }
+
             const bookId = document.getElementById('id').value;
 
             try {
@@ -313,6 +321,10 @@ block content
 
         async function removeCategory(event, categoryId) {
             event.stopPropagation();
+
+            if(!confirm('Are you sure you want to remove this category from book?')) {
+                return;
+            }
 
             const bookId = document.getElementById('id').value;
 

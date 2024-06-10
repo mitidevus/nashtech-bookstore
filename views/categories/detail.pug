@@ -116,6 +116,10 @@ block content
         async function removeBook(event, bookId) {
             event.stopPropagation();
 
+            if (!confirm('Are you sure you want to remove this book from category?')) {
+                return;
+            }
+
             const categoryId = document.getElementById('id').value;
 
             try {

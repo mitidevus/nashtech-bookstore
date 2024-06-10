@@ -104,6 +104,9 @@ export class BookViewController {
     @Param('id', ParseIntPipe) id: number,
     @Query() reviewsDto: RatingReviewsPageOptionsDto,
   ) {
+    reviewsDto.page = reviewsDto.page || 1;
+    reviewsDto.take = reviewsDto.take || DEFAULT_BOOK_PAGE_SIZE;
+
     const book = await this.bookService.getBookById(id, reviewsDto);
 
     let promos = [];
