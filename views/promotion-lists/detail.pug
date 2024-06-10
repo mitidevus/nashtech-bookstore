@@ -124,6 +124,10 @@ block content
         async function removeBook(event, bookId) {
             event.stopPropagation();
 
+            if (!confirm('Are you sure you want to remove this book from the promotion list?')) {
+                return;
+            }
+
             const promotionListId = document.getElementById('id').value;
 
             try {
