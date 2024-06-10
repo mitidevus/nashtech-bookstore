@@ -572,11 +572,16 @@ export class BookService {
 
       const result = await this.prismaService.$transaction(async (tx) => {
         let finalPrice;
-        if (dto.price && book.promotionListId) {
-          finalPrice = calculateDiscountedPrice(
-            price,
-            book.promotionList.discountPercentage,
-          );
+
+        if (dto.price) {
+          if (book.promotionListId) {
+            finalPrice = calculateDiscountedPrice(
+              price,
+              book.promotionList.discountPercentage,
+            );
+          } else {
+            finalPrice = price;
+          }
         } else {
           finalPrice = book.finalPrice;
         }
